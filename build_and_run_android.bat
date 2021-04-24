@@ -1,0 +1,2 @@
+call build_android
+call run_android

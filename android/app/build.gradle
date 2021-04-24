@@ -1,0 +1,30 @@
+apply plugin: 'com.android.application'
+
+android {
+	compileSdkVersion 26
+    defaultConfig {
+        applicationId "com.volian.unitedtiles"
+        minSdkVersion 26
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    externalNativeBuild {
+        ndkBuild {
+            path "src/main/jni/Android.mk"
+
+        }
+    }
+	ndkVersion "22.1.7171670"
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+}
