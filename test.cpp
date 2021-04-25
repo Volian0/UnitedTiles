@@ -76,12 +76,20 @@ void play_audio()
 	ma_device_init(0, &deviceConfig, &device);
 	ma_device_start(&device);
 	fluid_synth_program_change(synth, 0, 0);
+
+	fluid_synth_noteon(synth, 0, 40, 100);
+	std::this_thread::sleep_for(std::chrono::milliseconds(300));
+	fluid_synth_noteon(synth, 0, 43, 110);
 	std::this_thread::sleep_for(std::chrono::milliseconds(250));
-	play_some_notes(synth);
+	fluid_synth_noteon(synth, 0, 47, 120);
+	std::this_thread::sleep_for(std::chrono::milliseconds(900));
+	fluid_synth_all_notes_off(synth, 0);
+	fluid_synth_noteon(synth, 0, 35, 100);
+	std::this_thread::sleep_for(std::chrono::milliseconds(300));
+	fluid_synth_noteon(synth, 0, 37, 110);
 	std::this_thread::sleep_for(std::chrono::milliseconds(250));
-	fluid_synth_cc(synth, 0, 64, 127);
-	play_some_notes(synth);
-	std::this_thread::sleep_for(std::chrono::seconds(4));
+	fluid_synth_noteon(synth, 0, 40, 127);
+	std::this_thread::sleep_for(std::chrono::seconds(10));
 	ma_device_stop(&device);
 }
 
