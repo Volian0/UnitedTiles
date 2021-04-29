@@ -11,7 +11,28 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="test.cpp" />
+    <ClCompile Include="src\Font.cpp" />
+    <ClCompile Include="src\RendererReloadable.cpp" />
+    <ClCompile Include="src\Renderer.cpp" />
+    <ClCompile Include="src\FpsCounter.cpp" />
+    <ClCompile Include="src\GameState.cpp" />
+    <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\StateTest.cpp" />
+    <ClCompile Include="src\Texture.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Font.h" />
+    <ClInclude Include="src\RendererReloadable.h" />
+    <ClInclude Include="src\Renderer.h" />
+    <ClInclude Include="src\FpsCounter.h" />
+    <ClInclude Include="src\GameState.h" />
+    <ClInclude Include="src\Game.h" />
+    <ClInclude Include="src\Number.h" />
+    <ClInclude Include="src\Timepoint.h" />
+    <ClInclude Include="src\Unique.h" />
+    <ClInclude Include="src\StateTest.h" />
+    <ClInclude Include="src\Texture.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
