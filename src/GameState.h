@@ -1,6 +1,11 @@
 #pragma once
 
 #include "Unique.h"
+#include "Number.h"
+
+#include <vector>
+#include <unordered_map>
+#include <map>
 
 class Game;
 
@@ -12,8 +17,13 @@ public:
 
 	virtual ~GameState() = default;
 
-protected:
-	GameState(Game* game_);
+	std::map<uint16_t, Vec2> touch_held;
+	std::map<uint16_t, Vec2> touch_move;
+	std::map<uint16_t, Vec2> touch_up;
+	std::map<uint16_t, Vec2> touch_down;
 
 	Game* game;
+
+protected:
+	GameState(Game* game_);
 };

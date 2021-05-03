@@ -11,6 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\DevButton.cpp" />
+    <ClCompile Include="src\Path.cpp" />
     <ClCompile Include="src\Font.cpp" />
     <ClCompile Include="src\RendererReloadable.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
@@ -18,10 +20,15 @@
     <ClCompile Include="src\GameState.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\StateTest.cpp" />
+    <ClCompile Include="src\StateDevMenu.cpp" />
     <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\Soundfont.cpp" />
+    <ClCompile Include="src\StateSongSelection.cpp" />
+    <ClCompile Include="src\StateSettings.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\DevButton.h" />
+    <ClInclude Include="src\Path.h" />
     <ClInclude Include="src\Font.h" />
     <ClInclude Include="src\RendererReloadable.h" />
     <ClInclude Include="src\Renderer.h" />
@@ -31,8 +38,11 @@
     <ClInclude Include="src\Number.h" />
     <ClInclude Include="src\Timepoint.h" />
     <ClInclude Include="src\Unique.h" />
-    <ClInclude Include="src\StateTest.h" />
+    <ClInclude Include="src\StateDevMenu.h" />
     <ClInclude Include="src\Texture.h" />
+    <ClInclude Include="src\Soundfont.h" />
+    <ClInclude Include="src\StateSongSelection.h" />
+    <ClInclude Include="src\StateSettings.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

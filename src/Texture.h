@@ -32,7 +32,8 @@ public:
 	};
 	const std::variant<FileInfo, FontInfo> info;
 
-	void reload() override;
+	glm::u8vec4 tint = {255, 255, 255, 255};
+	uint8_t blend_mode;
 
 	glm::u32vec2 get_psize() const;
 	Vec2 get_rsize() const;
@@ -42,4 +43,6 @@ private:
 	glm::u32vec2 _psize;
 	Vec2 _rsize;
 	void update_size();
+	void unload() override;
+	void reload() override;
 };

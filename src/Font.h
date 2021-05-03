@@ -18,8 +18,9 @@ public:
 	const std::string filename;
 	const Number size;
 
-	void reload() override;
-
 private:
 	void* _ptr;
+
+	void unload() override;
+	void reload() override;
 };

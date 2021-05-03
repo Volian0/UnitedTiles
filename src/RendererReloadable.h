@@ -10,6 +10,7 @@ public:
 	RendererReloadable(Renderer* renderer);
 	virtual ~RendererReloadable();
 
+	virtual void unload() = 0;
 	virtual void reload() = 0;
 
 protected:

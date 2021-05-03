@@ -1,17 +1,16 @@
 #pragma once
 
 #include "GameState.h"
-
 #include "Font.h"
 #include "Texture.h"
-#include "FpsCounter.h"
+#include "DevButton.h"
 
 #include <memory>
 
-class StateTest : public GameState
+class StateSettings : public GameState
 {
 public:
-	StateTest(Game* game_);
+	StateSettings(Game* game_);
 
 private:
 	virtual void update();
@@ -19,6 +18,6 @@ private:
 
 	std::unique_ptr<Font> _font;
 	std::unique_ptr<Texture> _bg;
-	std::unique_ptr<Texture> _text;
-	FpsCounter _fps_counter;
+	std::unique_ptr<Texture> _dev_button_texture;
+	std::vector<DevButton> _dev_buttons;
 };

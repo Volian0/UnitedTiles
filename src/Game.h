@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GameState.h"
+#include "FpsCounter.h"
 
 #include <memory>
 

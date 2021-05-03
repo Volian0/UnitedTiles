@@ -1,6 +1,7 @@
 #include "Texture.h"
 #include "Font.h"
 #include "Renderer.h"
+#include "Path.h"
 
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_ttf.h>
@@ -10,8 +11,10 @@ Texture::Texture(Renderer* renderer, const std::string& filename)
 	type{ Type::FILE },
 	info{ FileInfo{ filename } }
 {
-	_ptr = IMG_LoadTexture(reinterpret_cast<SDL_Renderer*>(_renderer->_ptr), filename.c_str());
+	_ptr = IMG_LoadTexture(reinterpret_cast<SDL_Renderer*>(_renderer->_ptr), Path::res(filename, "textures").c_str());
+	SDL_SetTextureScaleMode(reinterpret_cast<SDL_Texture*>(_ptr), SDL_ScaleModeBest);
 	update_size();
+	blend_mode = SDL_BLENDMODE_NONE;
 }
 
 Texture::Texture(Renderer* renderer, Font* font, const std::string& text, glm::u8vec4 color)
@@ -23,20 +26,26 @@ Texture::Texture(Renderer* renderer, Font* font, const std::string& text, glm::u
 	_ptr = SDL_CreateTextureFromSurface(reinterpret_cast<SDL_Renderer*>(_renderer->_ptr), surface);
 	SDL_FreeSurface(surface);
 	update_size();
+	blend_mode = SDL_BLENDMODE_BLEND;
 }
 
 Texture::~Texture()
+{
+	unload();
+}
+
+void Texture::unload()
 {
 	SDL_DestroyTexture(reinterpret_cast<SDL_Texture*>(_ptr));
 }
 
 void Texture::reload()
 {
-	SDL_DestroyTexture(reinterpret_cast<SDL_Texture*>(_ptr));
 	if (type == Type::FILE)
 	{
 		const FileInfo& file_info = std::get<FileInfo>(info);
-		_ptr = IMG_LoadTexture(reinterpret_cast<SDL_Renderer*>(_renderer->_ptr), file_info.filename.c_str());
+		_ptr = IMG_LoadTexture(reinterpret_cast<SDL_Renderer*>(_renderer->_ptr), Path::res(file_info.filename, "textures").c_str());
+		SDL_SetTextureScaleMode(reinterpret_cast<SDL_Texture*>(_ptr), SDL_ScaleModeBest);
 	}
 	else if (type == Type::FONT)
 	{
