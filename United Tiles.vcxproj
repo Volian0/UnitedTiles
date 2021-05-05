@@ -11,6 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\RNG.cpp" />
+    <ClCompile Include="src\DustMotes.cpp" />
     <ClCompile Include="src\DevButton.cpp" />
     <ClCompile Include="src\Path.cpp" />
     <ClCompile Include="src\Font.cpp" />
@@ -27,6 +29,8 @@
     <ClCompile Include="src\StateSettings.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\RNG.h" />
+    <ClInclude Include="src\DustMotes.h" />
     <ClInclude Include="src\DevButton.h" />
     <ClInclude Include="src\Path.h" />
     <ClInclude Include="src\Font.h" />

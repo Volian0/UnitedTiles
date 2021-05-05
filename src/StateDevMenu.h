@@ -7,6 +7,7 @@
 #include "FpsCounter.h"
 #include "DevButton.h"
 #include "Timepoint.h"
+#include "DustMotes.h"
 
 #include <memory>
 #include <vector>
@@ -25,5 +26,7 @@ private:
 	std::unique_ptr<Texture> _logo;
 	std::unique_ptr<Texture> _dev_button_texture;
 	std::vector<DevButton> _dev_buttons;
+	DustMotes _dustmotes;
 	Number _logo_position;
+	Timepoint _old_tp;
 };

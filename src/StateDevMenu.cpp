@@ -9,7 +9,17 @@
 
 #include <algorithm>
 
-StateDevMenu::StateDevMenu(Game* game_) : GameState(game_)
+StateDevMenu::StateDevMenu(Game* game_) : GameState(game_),
+	_dustmotes{
+		{255, 255, 255, 127},
+		game_->renderer.get(),
+		"note.png",
+		0.125, 0.25,
+		8,
+		1, 4,
+		0
+	},
+	_old_tp{ Clock::now() }
 {
 	_font = std::make_unique<Font>(game->renderer.get(), "roboto.ttf", 8.0L);
 	_logo = std::make_unique<Texture>(game->renderer.get(), "logo.png");
@@ -52,11 +62,15 @@ void StateDevMenu::update()
 	{
 		return game->stop();
 	}
+	Timepoint new_tp = Clock::now();
+	_dustmotes.update(std::chrono::duration<Number>(new_tp - _old_tp).count());
+	_old_tp = new_tp;
 }
 
 void StateDevMenu::render() const
 {
 	game->renderer->render(_bg.get(), { 0,0 }, _bg->get_psize(), { 0,0 }, { 1,1 }, { 0,0 });
+	_dustmotes.render();
 	game->renderer->render(_logo.get(), { 0,0 }, _logo->get_psize(), { 0,_logo_position*2.0L-1 }, Vec2(0.5, 0.5 * game->renderer->get_aspect_ratio()), { 0,0 }, {0,0});
 	for (auto& button : _dev_buttons)
 	{
