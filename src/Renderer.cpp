@@ -4,6 +4,8 @@
 
 #include <SDL/SDL.h>
 
+#include <atomic>
+
 Renderer::Renderer(bool vsync_)
 	:vsync{ vsync_ }
 {
@@ -80,9 +82,13 @@ Number Renderer::get_aspect_ratio() const
 	return _widescreen ? 1.0L : _aspect_rato;
 }
 
+extern std::atomic_bool active_audio;
+
 bool Renderer::active() const
 {
-	return !(SDL_GetWindowFlags(reinterpret_cast<SDL_Window*>(_window)) & SDL_WINDOW_MINIMIZED);
+	bool active = !(SDL_GetWindowFlags(reinterpret_cast<SDL_Window*>(_window)) & SDL_WINDOW_MINIMIZED);
+	active_audio = active;
+	return active;
 }
 
 void Renderer::update_size()

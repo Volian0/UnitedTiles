@@ -2,6 +2,7 @@
 
 #include "GameState.h"
 #include "FpsCounter.h"
+#include "AudioDevice.h"
 
 #include <memory>
 
@@ -30,6 +31,7 @@ public:
 	}
 
 	std::unique_ptr<Renderer> renderer;
+	std::unique_ptr<AudioDevice> audio;
 
 private:
 	void init_libraries();

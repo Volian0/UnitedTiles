@@ -31,6 +31,7 @@ StateDevMenu::StateDevMenu(Game* game_) : GameState(game_),
 	_dev_buttons.emplace_back(Vec2{}, 1, _dev_buttons.size(), "Settings", _dev_button_texture.get(), _font.get(), this);
 	_dev_buttons.emplace_back(Vec2{}, 1, _dev_buttons.size(), "Discord", _dev_button_texture.get(), _font.get(), this);
 	_dev_buttons.emplace_back(Vec2{}, 1, _dev_buttons.size(), "Exit", _dev_button_texture.get(), _font.get(), this);
+	soundfont = game->audio->load_soundfont("test.sf2");
 }
 
 void StateDevMenu::update()
@@ -63,7 +64,18 @@ void StateDevMenu::update()
 		return game->stop();
 	}
 	Timepoint new_tp = Clock::now();
-	_dustmotes.update(std::chrono::duration<Number>(new_tp - _old_tp).count());
+	Number delta_time = std::chrono::duration<Number>(new_tp - _old_tp).count();
+	static Number accumulated_time = 0;
+	accumulated_time += delta_time;
+	if (accumulated_time > 0.5L)
+	{
+		accumulated_time -= 0.5L;
+		static bool note = false;
+		note = !note;
+		soundfont->note_off(note ? 43 : 40);
+		soundfont->note_on(note ? 40 : 43, 127);
+	}
+	_dustmotes.update(delta_time);
 	_old_tp = new_tp;
 }
 
