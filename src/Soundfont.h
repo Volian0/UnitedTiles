@@ -3,6 +3,7 @@
 #include "Unique.h"
 
 #include <string>
+#include <mutex>
 
 class Soundfont : Unique
 {
@@ -18,6 +19,6 @@ public:
 	void render(uint32_t frames, void* buffer);
 
 private:
+	std::mutex _mutex;
 	void* _ptr;
-	void* _ptr_settings;
 };

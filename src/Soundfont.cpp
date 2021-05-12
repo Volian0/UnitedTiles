@@ -1,46 +1,54 @@
 #include "Soundfont.h"
 
 #include "Path.h"
+#include "Number.h"
 
-#include <fluidsynth/fluidsynth.h>
+#define TSF_IMPLEMENTATION
+#include <TinySoundFont/tsf.h>
 
 Soundfont::Soundfont(const std::string& filename)
 {
-	_ptr_settings = new_fluid_settings();
-	fluid_settings_setnum(reinterpret_cast<fluid_settings_t*>(_ptr_settings), "synth.gain", 1.0L);
-	_ptr = new_fluid_synth(reinterpret_cast<fluid_settings_t*>(_ptr_settings));
+	std::scoped_lock lock(_mutex);
 	ExtractedRes soundfont_file(filename, "soundfonts");
-	fluid_synth_sfload(reinterpret_cast<fluid_synth_t*>(_ptr), soundfont_file.get_path().c_str(), true);
+	//reinterpret_cast<tsf*>(_ptr)
+	_ptr = tsf_load_filename(soundfont_file.get_path().c_str());
+	tsf_set_output(reinterpret_cast<tsf*>(_ptr), TSF_STEREO_INTERLEAVED, 44100); //sample rate
+	tsf_set_volume(reinterpret_cast<tsf*>(_ptr), 2.0L);
 }
 
 Soundfont::~Soundfont()
 {
-	delete_fluid_synth(reinterpret_cast<fluid_synth_t*>(_ptr));
-	delete_fluid_settings(reinterpret_cast<fluid_settings_t*>(_ptr_settings));
+	std::scoped_lock lock(_mutex);
+	tsf_close(reinterpret_cast<tsf*>(_ptr));
 }
 
 void Soundfont::cc(uint8_t control, uint8_t value)
 {
-	fluid_synth_cc(reinterpret_cast<fluid_synth_t*>(_ptr), 0, control, value);
+	std::scoped_lock lock(_mutex);
+	tsf_channel_midi_control(reinterpret_cast<tsf*>(_ptr), 0, control, value);
 }
 
 void Soundfont::note_on(uint8_t key, uint8_t velocity)
 {
-	fluid_synth_noteon(reinterpret_cast<fluid_synth_t*>(_ptr), 0, key, velocity);
+	std::scoped_lock lock(_mutex);
+	tsf_note_on(reinterpret_cast<tsf*>(_ptr), 0, key, Number(velocity) / 255.0L);
 }
 
 void Soundfont::note_off(uint8_t key)
 {
-	fluid_synth_noteoff(reinterpret_cast<fluid_synth_t*>(_ptr), 0, key);
+	std::scoped_lock lock(_mutex);
+	tsf_note_off(reinterpret_cast<tsf*>(_ptr), 0, key);
 }
 
 void Soundfont::reset()
 {
-	fluid_synth_program_reset(reinterpret_cast<fluid_synth_t*>(_ptr));
+	std::scoped_lock lock(_mutex);
+	tsf_reset(reinterpret_cast<tsf*>(_ptr));
 }
 
 void Soundfont::render(uint32_t frames, void* buffer)
 {
-	fluid_synth_write_s16(reinterpret_cast<fluid_synth_t*>(_ptr), frames, buffer, 0, 2, buffer, 1, 2);
+	std::scoped_lock lock(_mutex);
+	tsf_render_short(reinterpret_cast<tsf*>(_ptr), reinterpret_cast<short*>(buffer), frames, 0);
 }
 
