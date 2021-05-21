@@ -1,9 +1,12 @@
 #pragma once
 
 #include "Unique.h"
+#include "Timepoint.h"
+#include "SongInfo.h"
 
 #include <string>
 #include <mutex>
+#include <map>
 
 class Soundfont : Unique
 {
@@ -14,11 +17,19 @@ public:
 	void cc(uint8_t control, uint8_t value);
 	void note_on(uint8_t key, uint8_t velocity);
 	void note_off(uint8_t key);
+	void all_notes_off();
 	void reset();
 
 	void render(uint32_t frames, void* buffer);
 
+	void add_event(const Timepoint& timepoint, const NoteEvent& event);
+	void play_event(const NoteEvent& event);
+	void play_all_events();
+	void play_events(const Timepoint& bound = Clock::now());
+
 private:
-	std::mutex _mutex;
+	mutable std::mutex _mutex;
+	mutable std::mutex _mutex_events;
+	std::multimap<Timepoint, NoteEvent> _events;
 	void* _ptr;
 };
