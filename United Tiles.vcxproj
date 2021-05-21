@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\File.cpp" />
     <ClCompile Include="src\AudioDevice.cpp" />
     <ClCompile Include="src\RNG.cpp" />
     <ClCompile Include="src\DustMotes.cpp" />
@@ -28,8 +29,10 @@
     <ClCompile Include="src\Soundfont.cpp" />
     <ClCompile Include="src\StateSongSelection.cpp" />
     <ClCompile Include="src\StateSettings.cpp" />
+    <ClCompile Include="src\SongInfo.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\File.h" />
     <ClInclude Include="src\AudioDevice.h" />
     <ClInclude Include="src\RNG.h" />
     <ClInclude Include="src\DustMotes.h" />
@@ -49,6 +52,10 @@
     <ClInclude Include="src\Soundfont.h" />
     <ClInclude Include="src\StateSongSelection.h" />
     <ClInclude Include="src\StateSettings.h" />
+    <ClInclude Include="src\SongInfo.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="res\database\songs.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
