@@ -9,6 +9,9 @@
 Renderer::Renderer(bool vsync_)
 	:vsync{ vsync_ }
 {
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
 #ifdef __ANDROID__
 	_window = SDL_CreateWindow("United Tiles", 0, 0, 0, 0, SDL_WINDOW_FULLSCREEN_DESKTOP);
 #else
