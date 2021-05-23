@@ -37,7 +37,7 @@ struct TileInfo : Unique
 	void to_file(std::ofstream& file) const;
 };
 
-struct SongInfo : Unique
+struct SongInfo
 {
 	uint16_t version;
 	uint16_t note_ticks_per_single_tile;

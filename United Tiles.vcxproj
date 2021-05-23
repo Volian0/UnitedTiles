@@ -30,6 +30,8 @@
     <ClCompile Include="src\StateSongSelection.cpp" />
     <ClCompile Include="src\StateSettings.cpp" />
     <ClCompile Include="src\SongInfo.cpp" />
+    <ClCompile Include="src\StateLevel.cpp" />
+    <ClCompile Include="src\Tile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\File.h" />
@@ -53,6 +55,8 @@
     <ClInclude Include="src\StateSongSelection.h" />
     <ClInclude Include="src\StateSettings.h" />
     <ClInclude Include="src\SongInfo.h" />
+    <ClInclude Include="src\StateLevel.h" />
+    <ClInclude Include="src\Tile.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="res\database\songs.txt" />

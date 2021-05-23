@@ -23,7 +23,7 @@ void DustMote::simulate(Number delta_time, Number aspect_ratio)
 	position.y += cos(angular_direction) * velocity * 2.0L * delta_time * aspect_ratio;
 }
 
-DustMotes::DustMotes(glm::u8vec4 color, Renderer* renderer, const std::string& texture_name, Number min_size, Number max_size, Number particles_per_second, Number min_lifetime, Number max_lifetime, Number max_velocity)
+DustMotes::DustMotes(glm::u8vec4 color, Renderer* renderer, const std::string& texture_name, Number min_size, Number max_size, Number particles_per_second, Number min_lifetime, Number max_lifetime, Number max_velocity, uint8_t blend_mode)
 	:_color{color},
 	_renderer{renderer},
 	_texture{renderer, texture_name},
@@ -35,7 +35,7 @@ DustMotes::DustMotes(glm::u8vec4 color, Renderer* renderer, const std::string& t
 	_max_velocity{max_velocity},
 	_accumulated_time{0}
 {
-	_texture.blend_mode = 1;
+	_texture.blend_mode = blend_mode;
 }
 
 void DustMotes::update(Number delta_time)
@@ -73,7 +73,7 @@ void DustMotes::render() const
 {
 	for (const DustMote& dustmote : _dustmotes)
 	{
-		_texture.tint = {_color.r, _color.g, _color.b, uint16_t(_color.a) * uint16_t(dustmote.get_alpha()) / 255 };
+		_texture.tint = { _color.r, _color.g, _color.b, uint16_t(_color.a) * uint16_t(dustmote.get_alpha()) / 255 };
 		_renderer->render(&_texture, { 0,0 }, _texture.get_psize(), dustmote.position, { dustmote.size,dustmote.size * _renderer->get_aspect_ratio() }, dustmote.position, { 0,0 }, dustmote.angular_direction * -57.295779487L);
 	}
 }

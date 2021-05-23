@@ -26,7 +26,7 @@ struct DustMote
 class DustMotes : Unique
 {
 public:
-	DustMotes(glm::u8vec4 color, Renderer* renderer, const std::string& texture_name, Number min_size, Number max_size, Number particles_per_second, Number min_lifetime, Number max_lifetime, Number max_velocity);
+	DustMotes(glm::u8vec4 color, Renderer* renderer, const std::string& texture_name, Number min_size, Number max_size, Number particles_per_second, Number min_lifetime, Number max_lifetime, Number max_velocity, uint8_t blend_mode = 1);
 
 	void update(Number delta_time);
 	void render() const;

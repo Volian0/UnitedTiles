@@ -4,6 +4,7 @@
 #include "StateDevMenu.h"
 #include "File.h"
 #include "Path.h"
+#include "StateLevel.h"
 
 uint32_t StateSongSelection::song_index = 0;
 
@@ -44,7 +45,7 @@ void StateSongSelection::update()
 	}
 	if (confirm_button->update())
 	{
-
+		return game->change_state<StateLevel>(std::string(song_list.songs.at(song_index).filename));
 	}
 	if (return_button->update())
 	{
