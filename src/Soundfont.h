@@ -7,6 +7,7 @@
 #include <string>
 #include <mutex>
 #include <map>
+#include <unordered_set>
 
 class Soundfont : Unique
 {
@@ -32,4 +33,5 @@ private:
 	mutable std::mutex _mutex_events;
 	std::multimap<Timepoint, NoteEvent> _events;
 	void* _ptr;
+	std::unordered_set<uint8_t> _notes_on;
 };

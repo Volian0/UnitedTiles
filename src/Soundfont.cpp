@@ -6,13 +6,15 @@
 #define TSF_IMPLEMENTATION
 #include <TinySoundFont/tsf.h>
 
+#include <iostream>
+
 Soundfont::Soundfont(const std::string& filename)
 {
 	ExtractedRes soundfont_file(filename, "soundfonts");
 	//std::scoped_lock lock(_mutex);
 	_ptr = tsf_load_filename(soundfont_file.get_path().c_str());
 	tsf_set_output(reinterpret_cast<tsf*>(_ptr), TSF_STEREO_INTERLEAVED, 44100); //sample rate
-	tsf_set_volume(reinterpret_cast<tsf*>(_ptr), 1.0L);
+	tsf_set_volume(reinterpret_cast<tsf*>(_ptr), 1.20L);
 }
 
 Soundfont::~Soundfont()
@@ -31,24 +33,32 @@ void Soundfont::note_on(uint8_t key, uint8_t velocity)
 {
 	std::scoped_lock lock(_mutex);
 	tsf_note_on(reinterpret_cast<tsf*>(_ptr), 0, key, Number(velocity) / 127.0L);
+	if (_notes_on.count(key))
+	{
+		std::cout << "Duplicated note on: " << unsigned(key) << std::endl;
+	}
+	_notes_on.emplace(key);
 }
 
 void Soundfont::note_off(uint8_t key)
 {
 	std::scoped_lock lock(_mutex);
 	tsf_note_off(reinterpret_cast<tsf*>(_ptr), 0, key);
+	_notes_on.erase(key);
 }
 
 void Soundfont::all_notes_off()
 {
 	std::scoped_lock lock(_mutex);
 	tsf_note_off_all(reinterpret_cast<tsf*>(_ptr));
+	_notes_on.clear();
 }
 
 void Soundfont::reset()
 {
 	std::scoped_lock lock(_mutex);
 	tsf_reset(reinterpret_cast<tsf*>(_ptr));
+	_notes_on.clear();
 }
 
 void Soundfont::render(uint32_t frames, void* buffer)
@@ -61,7 +71,15 @@ void Soundfont::render(uint32_t frames, void* buffer)
 void Soundfont::add_event(const Timepoint& timepoint, const NoteEvent& event)
 {
 	std::scoped_lock lock(_mutex_events);
-	_events.emplace(timepoint, event);
+	if (!_events.empty() && timepoint < _events.rbegin()->first)
+	{
+		std::cout << "WARNING: Fixing soundfont event position!" << std::endl;
+		_events.emplace(_events.rbegin()->first, event);
+	}
+	else
+	{
+		_events.emplace(timepoint, event);
+	}
 }
 
 void Soundfont::play_event(const NoteEvent& event)

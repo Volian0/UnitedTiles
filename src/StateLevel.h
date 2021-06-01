@@ -16,10 +16,12 @@
 #include <vector>
 #include <cstdint>
 
+class StateLevel;
+
 class ScoreCounter : Unique
 {
 public:
-	ScoreCounter(Renderer* renderer_, uint32_t init_value = 0);
+	ScoreCounter(StateLevel* level_, uint32_t init_value = 0);
 	
 	void render() const;
 
@@ -27,7 +29,7 @@ public:
 	void add(uint32_t value);
 
 private:
-	Renderer* _renderer;
+	StateLevel* _level;
 	Font _font;
 	std::unique_ptr<Texture> _texture;
 	uint32_t _value;
@@ -45,21 +47,35 @@ public:
 	mutable Texture txt_game_over_tile;
 	mutable Texture txt_single_tile_cleared;
 
+	mutable Texture txt_long_tile;
+	mutable Texture txt_long_tile_ext;
+	mutable Texture txt_long_tile_clearing;
+	mutable Texture txt_long_tile_circle;
+	mutable Texture txt_long_tile_end;
+	mutable Texture tile_divider;
+
 	SongInfo _song_info;
 
 	std::shared_ptr<Tile> previous_tile;
+	Tile* game_over_tile = nullptr;
 
 	uint32_t cleared_tiles = 0;
 
-	void queue_notes(const std::multimap<uint32_t, NoteEvent>& notes, bool forceplay_old = true);
+	void queue_notes(const std::multimap<uint32_t, NoteEvent>& notes, bool forceplay_old = true, const std::optional<Timepoint> custom_tp = {});
 
 	Timepoint new_tp = Clock::now();
 
+	std::optional<Number> game_over_scroll_to;
+
 	ScoreCounter score;
+
+	Number tps = 1.0L;
 
 private:
 	virtual void update();
 	virtual void render() const;
+
+	void restart_level();
 
 	enum class State : uint8_t
 	{
@@ -68,7 +84,6 @@ private:
 
 	//Number position = 0.0L;
 	//uint32_t score = 0;
-	Number tps = 1.0L;
 	Timepoint last_tempo_change = Clock::now();
 	Number previous_position = 0;
 
@@ -81,10 +96,11 @@ private:
 	Timepoint _old_tp = Clock::now();
 
 	mutable Texture bg;
-	mutable Texture tile_divider;
 	mutable Texture bg_o;
 
 	Number _position = 0.0L;
+
+	std::optional<Timepoint> game_over_reset;
 
 	void change_tempo(Number new_tps, const Timepoint& tp_now, Number position);
 
