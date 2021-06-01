@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\DevTouch.cpp" />
     <ClCompile Include="src\File.cpp" />
     <ClCompile Include="src\AudioDevice.cpp" />
     <ClCompile Include="src\RNG.cpp" />
@@ -34,6 +35,7 @@
     <ClCompile Include="src\Tile.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\DevTouch.h" />
     <ClInclude Include="src\File.h" />
     <ClInclude Include="src\AudioDevice.h" />
     <ClInclude Include="src\RNG.h" />
