@@ -3,6 +3,7 @@
 #include "Renderer.h"
 #include "Font.h"
 #include "StateDevMenu.h"
+#include "DevTouch.h"
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
@@ -34,6 +35,7 @@ void Game::run()
 	_state_changed = false;
 
 	FpsCounter _fps_counter;
+	DevTouch _dev_touch(renderer.get());
 	Font fps_font(renderer.get(), "roboto.ttf", 4.0);
 
 	//while there is an active state...
@@ -72,6 +74,8 @@ void Game::run()
 			}
 		}
 
+		_dev_touch.update(_state.get());
+
 		//update the state
 		_state->update();
 
@@ -85,6 +89,7 @@ void Game::run()
 			auto fps = _fps_counter.update();
 			Texture fps_texture(renderer.get(), &fps_font, "FPS: " + std::to_string(fps), { fps < 60 ? 255 : 0, fps >= 30 ? 255 : 0, 0, 255 });
 			renderer->render(&fps_texture, { 0,0 }, fps_texture.get_psize(), { -1,-1 }, fps_texture.get_rsize(), {}, {-1, -1});
+			//_dev_touch.render(renderer.get());
 			renderer->display(); }
 
 		//check for SDL errors
