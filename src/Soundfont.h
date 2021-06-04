@@ -26,7 +26,7 @@ public:
 	void add_event(const Timepoint& timepoint, const NoteEvent& event);
 	void play_event(const NoteEvent& event);
 	void play_all_events();
-	void play_events(const Timepoint& bound = Clock::now());
+	void play_events(const Timepoint& bound = {});
 
 private:
 	mutable std::mutex _mutex;

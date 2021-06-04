@@ -51,7 +51,7 @@ StateLevel::StateLevel(Game* game_, const std::string& filename)
 	auto song_info_file = open_ifile(song_info_res.get_path()).value();
 	_song_info = song_info_file;
 	tps = _song_info.starting_tempo;
-	_old_tp = new_tp = last_tempo_change = Clock::now();
+	_old_tp = new_tp = last_tempo_change = {};
 }
 
 void StateLevel::queue_notes(const std::multimap<uint32_t, NoteEvent>& notes, bool forceplay_old, const std::optional<Timepoint> custom_tp)
@@ -73,14 +73,14 @@ void StateLevel::queue_notes(const std::multimap<uint32_t, NoteEvent>& notes, bo
 	}
 	for (const auto& [offset, note_event] : notes)
 	{
-		soundfont->add_event(std::chrono::time_point_cast<Clock::duration>(custom_tp.value_or(new_tp) + std::chrono::duration<Number>(
-			Number(offset) / Number(_song_info.note_ticks_per_single_tile) / tps)), note_event);
+		soundfont->add_event(custom_tp.value_or(new_tp) + 
+			Number(offset) / Number(_song_info.note_ticks_per_single_tile) / tps, note_event);
 	}
 }
 
 void StateLevel::update()
 {
-	new_tp = Clock::now();
+	new_tp = Timepoint();
 
 	if (game_over_scroll_to.has_value() && _state == State::GAME_OVER)
 	{
@@ -88,7 +88,7 @@ void StateLevel::update()
 		_position = previous_position - std::clamp(std::chrono::duration<Number>(new_tp - game_over_reset.value()).count() * 4.0L, 0.0L, 1.0L) * total_scroll_length;
 	}
 
-	if (game_over_reset.has_value() && new_tp - game_over_reset.value() > std::chrono::seconds(2))
+	if (game_over_reset.has_value() && new_tp - game_over_reset.value() > 2.0L)
 	{
 		//return restart_level();
 		return game->change_state<StateSongSelection>();
@@ -183,7 +183,7 @@ void StateLevel::render() const
 	//render tiles
 	for (const auto& [position, tile] : tiles)
 	{
-		if (!game_over_scroll_to.has_value() || game_over_tile != tile.get() || (new_tp.time_since_epoch() % std::chrono::milliseconds(250)) > std::chrono::milliseconds(125))
+		if (!game_over_scroll_to.has_value() || game_over_tile != tile.get() || (new_tp % 0.25) > 0.125)
 			tile->render(_position - position);
 	}
 	//render score counter
@@ -205,7 +205,7 @@ void StateLevel::restart_level()
 	soundfont->reset();
 	game_over_scroll_to.reset();
 	game_over_tile = nullptr;
-	_old_tp = new_tp = last_tempo_change = Clock::now();
+	_old_tp = new_tp = last_tempo_change = {};
 }
 
 void StateLevel::change_tempo(Number new_tps, const Timepoint& tp_now, Number position)
@@ -239,7 +239,7 @@ ScoreCounter::ScoreCounter(StateLevel* level_, uint32_t init_value)
 
 void ScoreCounter::render() const
 {
-	Number scale = std::clamp(1.0L - std::chrono::duration<Number>(Clock::now() - _tp_update).count(), 0.8L, 1.0L);
+	Number scale = std::clamp(1.0L - (Timepoint() - _tp_update), 0.8L, 1.0L);
 	_level->game->renderer->render(_texture.get(), { 0,0 }, _texture->get_psize(), { 0,-0.84 },
 		{ _texture->get_rsize().x * 0.8L,_texture->get_rsize().y*scale }, { 0,0 });
 }

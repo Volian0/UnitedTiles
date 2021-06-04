@@ -33,6 +33,7 @@
     <ClCompile Include="src\SongInfo.cpp" />
     <ClCompile Include="src\StateLevel.cpp" />
     <ClCompile Include="src\Tile.cpp" />
+    <ClCompile Include="src\Timepoint.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\DevTouch.h" />

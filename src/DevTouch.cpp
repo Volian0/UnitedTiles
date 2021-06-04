@@ -4,7 +4,7 @@
 
 bool DevTouchMarker::should_die(const Timepoint& tp) const
 {
-	return tp - timepoint > std::chrono::seconds(2);
+	return tp - timepoint > 2.0L;
 }
 
 void DevTouchMarker::render(const DevTouch* dt, Renderer* renderer) const
@@ -25,7 +25,7 @@ texture{renderer, "hit_marker.png"}
 
 void DevTouch::update(GameState* state)
 {
-	tp_now = Clock::now();
+	tp_now = Timepoint();
 
 	markers.erase(std::remove_if(markers.begin(), markers.end(), [&](const DevTouchMarker& marker) { return marker.should_die(tp_now); }), markers.end());
 

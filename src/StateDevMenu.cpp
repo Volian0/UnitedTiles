@@ -18,8 +18,7 @@ StateDevMenu::StateDevMenu(Game* game_) : GameState(game_),
 		8,
 		1, 4,
 		0
-	},
-	_old_tp{ Clock::now() }
+	}
 {
 	_font = std::make_unique<Font>(game->renderer.get(), "roboto.ttf", 8.0L);
 	_logo = std::make_unique<Texture>(game->renderer.get(), "logo.png");
@@ -32,10 +31,11 @@ StateDevMenu::StateDevMenu(Game* game_) : GameState(game_),
 	_dev_buttons.emplace_back(Vec2{}, 1, _dev_buttons.size(), "Discord", _dev_button_texture.get(), _font.get(), this);
 	_dev_buttons.emplace_back(Vec2{}, 1, _dev_buttons.size(), "Exit", _dev_button_texture.get(), _font.get(), this);
 	soundfont = game->audio->load_soundfont("test.sf2");
-	soundfont->add_event(std::chrono::time_point_cast<Clock::duration>(Clock::now() + std::chrono::duration<Number>(0.05L)), NoteEvent(NoteEvent::Type::ON, 50, 63));
-	soundfont->add_event(std::chrono::time_point_cast<Clock::duration>(Clock::now() + std::chrono::duration<Number>(0.15L)), NoteEvent(NoteEvent::Type::ON, 53, 80));
-	soundfont->add_event(std::chrono::time_point_cast<Clock::duration>(Clock::now() + std::chrono::duration<Number>(0.25L)), NoteEvent(NoteEvent::Type::ON, 57, 90));
-	soundfont->add_event(std::chrono::time_point_cast<Clock::duration>(Clock::now() + std::chrono::duration<Number>(1.25L)), NoteEvent(NoteEvent::Type::ALL_OFF));
+	Timepoint now;
+	soundfont->add_event(now + 0.05L, NoteEvent(NoteEvent::Type::ON, 50, 63));
+	soundfont->add_event(now + 0.15L, NoteEvent(NoteEvent::Type::ON, 53, 80));
+	soundfont->add_event(now + 0.25L, NoteEvent(NoteEvent::Type::ON, 57, 90));
+	soundfont->add_event(now + 1.25L, NoteEvent(NoteEvent::Type::ALL_OFF));
 }
 
 void StateDevMenu::update()
@@ -67,8 +67,8 @@ void StateDevMenu::update()
 	{
 		return game->stop();
 	}
-	Timepoint new_tp = Clock::now();
-	Number delta_time = std::chrono::duration<Number>(new_tp - _old_tp).count();
+	Timepoint new_tp;
+	Number delta_time = new_tp - _old_tp;
 	_dustmotes.update(delta_time);
 	_old_tp = new_tp;
 }

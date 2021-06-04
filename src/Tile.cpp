@@ -52,7 +52,7 @@ void SingleTile::render(Number y_offset) const
 	Texture* texture = _cleared ? &level->txt_single_tile_cleared : &level->txt_single_tile;
 	level->game->renderer->render(texture, {}, texture->get_psize(), pos,
 		{ 0.25, Number(info->length) / Number(level->_song_info.length_units_per_single_tile) / 4.0L }, {}, { 0,1 });
-	if (game_over_column.has_value() && (level->new_tp.time_since_epoch() % std::chrono::milliseconds(250)) > std::chrono::milliseconds(125))
+	if (game_over_column.has_value() && (level->new_tp % 0.25) > 0.125)
 	{
 		pos.x = get_x_pos(game_over_column.value());
 		texture = &level->txt_game_over_tile;
@@ -71,6 +71,7 @@ TileColumn SingleTile::next_column(const std::shared_ptr<Tile>& previous_tile)
 		case 1: return MID_LEFT; break;
 		case 2: return MID_RIGHT; break;
 		case 3: return FAR_RIGHT; break;
+		default: abort(); break;
 		}
 	}
 	else if (previous_tile->info->type == TileInfo::Type::SINGLE
@@ -206,7 +207,7 @@ void LongTile::render(Number y_offset) const
 				{ 0.125, 0.125L*level->game->renderer->get_aspect_ratio() }, {}, { 0,0 });
 		}
 	}
-	if (game_over_column.has_value() && (level->new_tp.time_since_epoch() % std::chrono::milliseconds(250)) > std::chrono::milliseconds(125))
+	if (game_over_column.has_value() && (level->new_tp % 0.25) > 0.125)
 	{
 		pos.x = SingleTile::get_x_pos(game_over_column.value());
 		texture = &level->txt_game_over_tile;
@@ -303,7 +304,7 @@ void DoubleTile::render(Number y_offset) const
 		{ 0.25, Number(info->length) / Number(level->_song_info.length_units_per_single_tile) / 4.0L }, {}, { 0,1 });
 	level->game->renderer->render(texture_right, {}, texture_right->get_psize(), pos_right,
 		{ 0.25, Number(info->length) / Number(level->_song_info.length_units_per_single_tile) / 4.0L }, {}, { 0,1 });
-	if (game_over_column.has_value() && (level->new_tp.time_since_epoch() % std::chrono::milliseconds(250)) > std::chrono::milliseconds(125))
+	if (game_over_column.has_value() && (level->new_tp % 0.25) > 0.125)
 	{
 		pos_left.x = SingleTile::get_x_pos(game_over_column.value());
 		texture_left = &level->txt_game_over_tile;
@@ -338,8 +339,11 @@ bool DoubleTile::touch_down(uint16_t finger_id, Vec2 pos)
 		else if (pos.x < 0.5)
 			clicked_column = MID_RIGHT;
 		else clicked_column = FAR_RIGHT;
-		if (active() && clicked_column & column)
+		if (clicked_column & column)
 		{
+			if (!active())
+				return true;
+
 			//handle already clicked tiles
 			if (clicked_column & 0b11110000)
 			{
@@ -369,7 +373,7 @@ bool DoubleTile::touch_down(uint16_t finger_id, Vec2 pos)
 				}
 				else
 				{
-					level->queue_notes(info->note_events_2nd_tile, false, std::chrono::time_point_cast<Clock::duration>(clicked.value() + std::chrono::duration<Number>(half_tile_duration)));
+					level->queue_notes(info->note_events_2nd_tile, false, clicked.value() + half_tile_duration);
 				}
 				level->score.add(1);
 				level->cleared_tiles++;
@@ -437,7 +441,7 @@ bool EmptyTile::is_cleared() const
 void EmptyTile::render(Number y_offset) const
 {
 	Vec2 pos = { 0, y_offset / 4.0L * 2.0L - 1.0L };
-	if (game_over_column.has_value() && (level->new_tp.time_since_epoch() % std::chrono::milliseconds(250)) > std::chrono::milliseconds(125))
+	if (game_over_column.has_value() && (level->new_tp % 0.25) > 0.125)
 	{
 		pos.x = SingleTile::get_x_pos(game_over_column.value());
 		Texture* texture = &level->txt_game_over_tile;

@@ -66,7 +66,7 @@ public:
 
 	void queue_notes(const std::multimap<uint32_t, NoteEvent>& notes, bool forceplay_old = true, const std::optional<Timepoint> custom_tp = {});
 
-	Timepoint new_tp = Clock::now();
+	Timepoint new_tp;
 
 	std::optional<Number> game_over_scroll_to;
 
@@ -87,7 +87,7 @@ private:
 
 	//Number position = 0.0L;
 	//uint32_t score = 0;
-	Timepoint last_tempo_change = Clock::now();
+	Timepoint last_tempo_change;
 	Number previous_position = 0;
 
 	std::multimap<Number, std::shared_ptr<Tile>> tiles;
@@ -96,7 +96,7 @@ private:
 	DustMotes _dustmotes;
 	DustMotes _dustmotes_stars;
 
-	Timepoint _old_tp = Clock::now();
+	Timepoint _old_tp;
 
 	mutable Texture bg;
 	mutable Texture bg_o;
