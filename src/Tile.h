@@ -115,3 +115,21 @@ private:
 
 	std::optional<Timepoint> clicked;
 };
+
+class EmptyTile : public Tile
+{
+public:
+	EmptyTile(uint32_t tile_id_, class StateLevel* level_);
+
+	std::shared_ptr<Tile> previous_tile;
+
+private:
+	bool is_cleared() const override;
+	void render(Number y_offset) const override;
+	bool should_be_cleared(Number y_offset) const override;
+	bool should_die(Number y_offset) const override;
+	bool touch_down(uint16_t finger_id, Vec2 pos) override;
+
+	std::optional<TileColumn> game_over_column;
+	mutable bool _cleared = false;
+};

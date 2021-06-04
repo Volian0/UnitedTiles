@@ -159,6 +159,9 @@ void StateLevel::update()
 				case TileInfo::Type::DOUBLE:
 					previous_tile = tiles.emplace(total_pos, std::make_shared<DoubleTile>(i, this))->second;
 					break;
+				case TileInfo::Type::EMPTY:
+					previous_tile = tiles.emplace(total_pos, std::make_shared<EmptyTile>(i, this))->second;
+					break;
 				default: abort(); break;
 				}
 				++spawned_tiles;
@@ -215,6 +218,7 @@ void StateLevel::change_tempo(Number new_tps, const Timepoint& tp_now, Number po
 
 void StateLevel::game_over(Tile* tile)
 {
+	score.silent_update();
 	game_over_tile = tile;
 	change_tempo(0, new_tp, _position);
 	_state = State::GAME_OVER;
@@ -250,4 +254,20 @@ void ScoreCounter::set(uint32_t value)
 void ScoreCounter::add(uint32_t value)
 {
 	set(_value + value);
+	was_silent_added = false;
+}
+
+void ScoreCounter::silent_add(uint32_t value)
+{
+	_value += value;
+	was_silent_added = true;
+}
+
+void ScoreCounter::silent_update()
+{
+	if (was_silent_added)
+	{
+		add(0);
+	}
+	was_silent_added = false;
 }

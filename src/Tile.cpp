@@ -95,6 +95,10 @@ TileColumn SingleTile::next_column(const std::shared_ptr<Tile>& previous_tile)
 		}
 		return RNG::integer(0, 1) ? MID_RIGHT : FAR_LEFT;
 	}
+	else if (previous_tile->info->type == TileInfo::Type::EMPTY)
+	{
+		return next_column(reinterpret_cast<EmptyTile*>(previous_tile.get())->previous_tile);
+	}
 	else abort();
 }
 
@@ -256,7 +260,7 @@ bool LongTile::touch_down(uint16_t finger_id, Vec2 pos)
 				_is_held = true;
 				level->cleared_tiles++;
 				level->queue_notes(info->note_events);
-				level->score.add(1);
+				level->score.silent_add(1);
 			}
 		}
 		else
@@ -273,6 +277,7 @@ bool LongTile::touch_up(uint16_t finger_id, Vec2 pos)
 	if (_is_held && finger_id == finger_id_clicked.value().first)
 	{
 		_is_held = false;
+		level->score.silent_update();
 	}
 	return true;
 }
@@ -394,5 +399,91 @@ TileColumn DoubleTile::next_column(const std::shared_ptr<Tile>& previous_tile)
 	{
 		return previous_tile->column == DT_LEFT ? DT_RIGHT : DT_LEFT;
 	}
+	else if (previous_tile->info->type == TileInfo::Type::EMPTY)
+	{
+		return next_column(reinterpret_cast<EmptyTile*>(previous_tile.get())->previous_tile);
+	}
 	else abort();
+}
+
+EmptyTile::EmptyTile(uint32_t tile_id_, StateLevel* level_)
+	:Tile(tile_id_, level_, FAR_LEFT)
+{
+	if (info->length >= level->_song_info.length_units_per_single_tile)
+	{
+		level->previous_tile.reset();
+	}
+	else if (level->previous_tile)
+	{
+		if (level->previous_tile->info->type == TileInfo::Type::EMPTY)
+		{
+			std::cout << "WARNING: 2 consecutive empty tiles!" << std::endl;
+
+			//prevent recursion
+			previous_tile = reinterpret_cast<EmptyTile*>(level->previous_tile.get())->previous_tile;
+		}
+		else
+		{
+			previous_tile = level->previous_tile;
+		}
+	}
+}
+
+bool EmptyTile::is_cleared() const
+{
+	return _cleared;
+}
+
+void EmptyTile::render(Number y_offset) const
+{
+	Vec2 pos = { 0, y_offset / 4.0L * 2.0L - 1.0L };
+	if (game_over_column.has_value() && (level->new_tp.time_since_epoch() % std::chrono::milliseconds(250)) > std::chrono::milliseconds(125))
+	{
+		pos.x = SingleTile::get_x_pos(game_over_column.value());
+		Texture* texture = &level->txt_game_over_tile;
+		level->game->renderer->render(texture, {}, texture->get_psize(), pos,
+			{ 0.25, Number(info->length) / Number(level->_song_info.length_units_per_single_tile) / 4.0L }, {}, { 0,1 });
+	}
+}
+
+bool EmptyTile::should_be_cleared(Number y_offset) const
+{
+	if (active())
+	{
+		_cleared = true;
+		level->cleared_tiles++;
+	}
+	return _cleared;
+}
+
+bool EmptyTile::should_die(Number y_offset) const
+{
+	return _cleared;
+}
+
+bool EmptyTile::touch_down(uint16_t finger_id, Vec2 pos)
+{
+	if (_cleared)
+	{
+		return true;
+	}
+	else if (active())
+	{
+		level->cleared_tiles++;
+		_cleared = true;
+	}
+	else if (pos.y >= 0 && pos.y < Number(info->length) / Number(level->_song_info.length_units_per_single_tile))
+	{
+		TileColumn clicked_column;
+		if (pos.x < -0.5)
+			clicked_column = FAR_LEFT;
+		else if (pos.x < 0)
+			clicked_column = MID_LEFT;
+		else if (pos.x < 0.5)
+			clicked_column = MID_RIGHT;
+		else clicked_column = FAR_RIGHT;
+			game_over_column = clicked_column;
+			return false;
+	}
+	return true;
 }

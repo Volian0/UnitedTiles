@@ -27,8 +27,11 @@ public:
 
 	void set(uint32_t value);
 	void add(uint32_t value);
+	void silent_add(uint32_t value);
+	void silent_update();
 
 private:
+	bool was_silent_added = false;
 	StateLevel* _level;
 	Font _font;
 	std::unique_ptr<Texture> _texture;
