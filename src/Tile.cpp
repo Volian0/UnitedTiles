@@ -5,6 +5,7 @@
 #include "AudioDevice.h"
 #include "Renderer.h"
 #include "RNG.h"
+#include "Color.h"
 
 #include <iostream>
 
@@ -130,7 +131,8 @@ bool SingleTile::touch_down(uint16_t finger_id, Vec2 pos)
 	{
 		return true;
 	}
-	if (pos.y >= 0 && pos.y < Number(info->length) / Number(level->_song_info.length_units_per_single_tile))
+	Number tile_length = Number(info->length) / Number(level->_song_info.length_units_per_single_tile);
+	if (pos.y >= 0 && pos.y < tile_length)
 	{
 		TileColumn clicked_column;
 		if (pos.x < -0.5)
@@ -148,6 +150,7 @@ bool SingleTile::touch_down(uint16_t finger_id, Vec2 pos)
 				level->cleared_tiles++;
 				level->queue_notes(info->note_events);
 				level->score.add(1);
+				level->_burst.add(Vec2(get_x_pos(column), (level->_position - level->get_tile_pos(this) - tile_length/2.0L) / 4.0L * 2.0L - 1.0L), Vec2(0.25L, tile_length / 4.0L), tile_length * 5.0L, 1.5L, Vec2(-1, -1), Vec2(1, 0), Color::BLACK);
 			}
 		}
 		else
@@ -227,6 +230,7 @@ bool LongTile::should_be_cleared(Number y_offset) const
 			_is_held = false;
 			fully_cleared = true;
 			level->score.add(1);
+			level->_burst.add(Vec2(SingleTile::get_x_pos(column), (level->_position - level->get_tile_pos(this) - tile_length / 2.0L) / 4.0L * 2.0L - 1.0L), Vec2(0.25L, tile_length / 4.0L), tile_length * 5.0L, 1.5L, Vec2(-1, -1), Vec2(1, 0), Color::CYAN);
 		}
 	}
 	return y_offset > 1.0L + 4.0L;
@@ -329,7 +333,8 @@ bool DoubleTile::touch_down(uint16_t finger_id, Vec2 pos)
 	{
 		return true;
 	}
-	if (pos.y >= 0 && pos.y < Number(info->length) / Number(level->_song_info.length_units_per_single_tile))
+	Number tile_length = Number(info->length) / Number(level->_song_info.length_units_per_single_tile);
+	if (pos.y >= 0 && pos.y < tile_length)
 	{
 		TileColumn clicked_column;
 		if (pos.x < -0.5)
@@ -363,6 +368,7 @@ bool DoubleTile::touch_down(uint16_t finger_id, Vec2 pos)
 				level->queue_notes(info->note_events);
 				level->score.add(1);
 				clicked = level->new_tp;
+				level->_burst.add(Vec2(SingleTile::get_x_pos(clicked_column), (level->_position - level->get_tile_pos(this) - tile_length / 2.0L) / 4.0L * 2.0L - 1.0L), Vec2(0.25L, tile_length / 4.0L), tile_length * 5.0L, 1.5L, Vec2(-1, -1), Vec2(1, 0), Color::BLACK);
 			}
 			else
 			{
@@ -377,6 +383,7 @@ bool DoubleTile::touch_down(uint16_t finger_id, Vec2 pos)
 				}
 				level->score.add(1);
 				level->cleared_tiles++;
+				level->_burst.add(Vec2(SingleTile::get_x_pos(clicked_column), (level->_position - level->get_tile_pos(this) - tile_length / 2.0L) / 4.0L * 2.0L - 1.0L), Vec2(0.25L, tile_length / 4.0L), tile_length * 5.0L, 1.5L, Vec2(-1, -1), Vec2(1, 0), Color::BLACK);
 			}
 		}
 		else

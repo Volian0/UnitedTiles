@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\BurstParticles.cpp" />
     <ClCompile Include="src\DevTouch.cpp" />
     <ClCompile Include="src\File.cpp" />
     <ClCompile Include="src\AudioDevice.cpp" />
@@ -36,6 +37,7 @@
     <ClCompile Include="src\Timepoint.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\BurstParticles.h" />
     <ClInclude Include="src\Color.h" />
     <ClInclude Include="src\DevTouch.h" />
     <ClInclude Include="src\File.h" />

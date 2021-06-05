@@ -10,6 +10,7 @@
 #include "DustMotes.h"
 #include "Soundfont.h"
 #include "Tile.h"
+#include "BurstParticles.h"
 
 #include <memory>
 #include <map>
@@ -74,6 +75,12 @@ public:
 
 	Number tps = 1.0L;
 
+	BurstParticles _burst;
+
+	Number get_tile_pos(const Tile* tile_);
+
+	Number _position = 0.0L;
+
 private:
 	virtual void update();
 	virtual void render() const;
@@ -102,8 +109,6 @@ private:
 
 	mutable Texture bg;
 	mutable Texture bg_o;
-
-	Number _position = 0.0L;
 
 	std::optional<Timepoint> game_over_reset;
 

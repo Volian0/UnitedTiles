@@ -37,7 +37,8 @@ StateLevel::StateLevel(Game* game_, const std::string& filename)
 	0.05, 0.1,
 	8,
 	1, 2,
-	1}
+	1},
+	_burst{game_->renderer.get(), "white.png"}
 {
 	tile_divider.blend_mode = 1;
 	txt_single_tile_cleared.blend_mode = 1;
@@ -85,6 +86,7 @@ void StateLevel::update()
 	Number delta_time = new_tp - _old_tp;
 	_dustmotes.update(delta_time);
 	_dustmotes_stars.update(delta_time);
+	_burst.update(delta_time);
 	_old_tp = new_tp;
 	//
 	if (_state != State::ACTIVE)
@@ -133,6 +135,7 @@ void StateLevel::update()
 void StateLevel::render() const
 {
 	game->renderer->render(&bg, {}, bg.get_psize(), {}, { 1,1 }, {});
+	_burst.render();
 	_dustmotes_stars.render();
 	_dustmotes.render();
 	game->renderer->render(&bg_o, {}, bg_o.get_psize(), {}, { 1,1 }, {});
@@ -147,6 +150,18 @@ void StateLevel::render() const
 	}
 	//render score counter
 	score.render();
+}
+
+Number StateLevel::get_tile_pos(const Tile* tile_)
+{
+	for (const auto& [position, tile] : tiles)
+	{
+		if (tile.get() == tile_)
+		{
+			return position;
+		}
+	}
+	return 0;
 }
 
 void StateLevel::restart_level()
