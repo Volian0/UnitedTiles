@@ -10,7 +10,7 @@ void BurstParticle::simulate(Number delta_time, Number aspect_ratio)
 	Vec2 new_pos = velocity * delta_time;
 	new_pos.y *= aspect_ratio;
 	position += new_pos;
-	angle += glm::length(velocity) * delta_time;
+	angle = glm::atan(velocity.x, velocity.y);
 }
 
 bool BurstParticleGroup::is_dead() const
