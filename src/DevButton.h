@@ -37,5 +37,4 @@ private:
 	Font* _font;
 	std::optional<uint16_t> _held_finger_id;
 	bool _pressed = false;
-
 };

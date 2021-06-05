@@ -13,7 +13,6 @@
 struct DevTouchMarker
 {
 	Vec2 position;
-	//uint16_t finger_id;
 	std::unique_ptr<Texture> finger_id;
 	Timepoint timepoint;
 	bool should_die(const Timepoint& tp) const;

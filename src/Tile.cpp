@@ -220,7 +220,7 @@ bool LongTile::should_be_cleared(Number y_offset) const
 {
 	if (_is_held)
 	{
-		held_tile_duration = std::chrono::duration<Number>(level->new_tp - finger_id_clicked.value().second).count() * level->tps;
+		held_tile_duration = (level->new_tp - finger_id_clicked.value().second) * level->tps;
 		Number tile_length = Number(info->length) / Number(level->_song_info.length_units_per_single_tile);
 		if (held_tile_duration + 1.0L >= tile_length)
 		{
@@ -367,7 +367,7 @@ bool DoubleTile::touch_down(uint16_t finger_id, Vec2 pos)
 			else
 			{
 				Number half_tile_duration = 0.5L / level->tps;
-				if (std::chrono::duration<Number>(level->new_tp - clicked.value()).count() >= half_tile_duration)
+				if (level->new_tp - clicked.value() >= half_tile_duration)
 				{
 					level->queue_notes(info->note_events_2nd_tile);
 				}

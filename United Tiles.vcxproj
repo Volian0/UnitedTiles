@@ -36,6 +36,7 @@
     <ClCompile Include="src\Timepoint.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Color.h" />
     <ClInclude Include="src\DevTouch.h" />
     <ClInclude Include="src\File.h" />
     <ClInclude Include="src\AudioDevice.h" />

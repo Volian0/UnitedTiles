@@ -80,6 +80,8 @@ private:
 
 	void restart_level();
 
+	void spawn_new_tiles();
+
 	enum class State : uint8_t
 	{
 		IDLE, ACTIVE, GAME_OVER

@@ -9,7 +9,7 @@ bool DevTouchMarker::should_die(const Timepoint& tp) const
 
 void DevTouchMarker::render(const DevTouch* dt, Renderer* renderer) const
 {
-	Number time = std::chrono::duration<Number>(dt->tp_now - timepoint).count();
+	Number time = dt->tp_now - timepoint;
 	uint8_t tint = std::clamp<uint8_t>(std::clamp((time/2) * 255.0L, 0.0L, 255.0L), 0, 255);
 	dt->texture.tint = { 255, tint, tint, 255 };
 	renderer->render(&dt->texture, {}, dt->texture.get_psize(), position, {0.25, renderer->get_aspect_ratio() * 0.25}, position, {}, 45);

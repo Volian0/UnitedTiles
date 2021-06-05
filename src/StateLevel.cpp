@@ -56,17 +56,6 @@ StateLevel::StateLevel(Game* game_, const std::string& filename)
 
 void StateLevel::queue_notes(const std::multimap<uint32_t, NoteEvent>& notes, bool forceplay_old, const std::optional<Timepoint> custom_tp)
 {
-	/*std::cout << "== = == Queue started == = ==" << std::endl;
-	for (const auto& [offset, note_event] : notes)
-	{
-		std::cout << offset << " | ";
-		std::cout << (note_event.type == NoteEvent::Type::ON ? "ON " : "OFF") << ", ";
-		std::cout << unsigned(note_event.key);
-		if (note_event.type == NoteEvent::Type::ON)
-			std::cout << ", " << unsigned(note_event.velocity);
-		std::cout << std::endl;
-	}
-	std::cout << std::endl;*/
 	if (forceplay_old)
 	{
 		soundfont->play_all_events();
@@ -85,16 +74,15 @@ void StateLevel::update()
 	if (game_over_scroll_to.has_value() && _state == State::GAME_OVER)
 	{
 		Number total_scroll_length = previous_position - game_over_scroll_to.value() - 4.0L;
-		_position = previous_position - std::clamp(std::chrono::duration<Number>(new_tp - game_over_reset.value()).count() * 4.0L, 0.0L, 1.0L) * total_scroll_length;
+		_position = previous_position - std::clamp((new_tp - game_over_reset.value()) * 4.0L, 0.0L, 1.0L) * total_scroll_length;
 	}
 
 	if (game_over_reset.has_value() && new_tp - game_over_reset.value() > 2.0L)
 	{
-		//return restart_level();
 		return game->change_state<StateSongSelection>();
 	}
 
-	Number delta_time = std::chrono::duration<Number>(new_tp - _old_tp).count();
+	Number delta_time = new_tp - _old_tp;
 	_dustmotes.update(delta_time);
 	_dustmotes_stars.update(delta_time);
 	_old_tp = new_tp;
@@ -104,7 +92,7 @@ void StateLevel::update()
 		return;
 	}
 	//
-	_position = previous_position + std::chrono::duration<Number>(new_tp - last_tempo_change).count() * tps;
+	_position = previous_position + (new_tp - last_tempo_change) * tps;
 	//delete old tiles
 	for (auto it = tiles.cbegin(); it != tiles.cend();)
 	{
@@ -139,36 +127,7 @@ void StateLevel::update()
 		}
 	}
 	//spawn new tiles
-	uint64_t total_length = 0;
-	for (uint32_t i = 0; i < _song_info.tiles.size(); ++i)
-	{
-		Number total_pos = Number(total_length) / Number(_song_info.length_units_per_single_tile);
-		total_length += _song_info.tiles[i].length;
-		if (i >= spawned_tiles)
-		{
-			if (_position > total_pos)
-			{
-				switch (_song_info.tiles[i].type)
-				{
-				case TileInfo::Type::SINGLE:
-					previous_tile = tiles.emplace(total_pos, std::make_shared<SingleTile>(i, this))->second;
-					break;
-				case TileInfo::Type::LONG:
-					previous_tile = tiles.emplace(total_pos, std::make_shared<LongTile>(i, this))->second;
-					break;
-				case TileInfo::Type::DOUBLE:
-					previous_tile = tiles.emplace(total_pos, std::make_shared<DoubleTile>(i, this))->second;
-					break;
-				case TileInfo::Type::EMPTY:
-					previous_tile = tiles.emplace(total_pos, std::make_shared<EmptyTile>(i, this))->second;
-					break;
-				default: abort(); break;
-				}
-				++spawned_tiles;
-			}
-			else break;
-		}
-	}
+	spawn_new_tiles();
 }
 
 void StateLevel::render() const
@@ -208,12 +167,45 @@ void StateLevel::restart_level()
 	_old_tp = new_tp = last_tempo_change = {};
 }
 
+void StateLevel::spawn_new_tiles()
+{
+	uint64_t total_length = 0;
+	for (uint32_t i = 0; i < _song_info.tiles.size(); ++i)
+	{
+		Number total_pos = Number(total_length) / Number(_song_info.length_units_per_single_tile);
+		total_length += _song_info.tiles[i].length;
+		if (i >= spawned_tiles)
+		{
+			if (_position > total_pos)
+			{
+				switch (_song_info.tiles[i].type)
+				{
+				case TileInfo::Type::SINGLE:
+					previous_tile = tiles.emplace(total_pos, std::make_shared<SingleTile>(i, this))->second;
+					break;
+				case TileInfo::Type::LONG:
+					previous_tile = tiles.emplace(total_pos, std::make_shared<LongTile>(i, this))->second;
+					break;
+				case TileInfo::Type::DOUBLE:
+					previous_tile = tiles.emplace(total_pos, std::make_shared<DoubleTile>(i, this))->second;
+					break;
+				case TileInfo::Type::EMPTY:
+					previous_tile = tiles.emplace(total_pos, std::make_shared<EmptyTile>(i, this))->second;
+					break;
+				default: abort(); break;
+				}
+				++spawned_tiles;
+			}
+			else break;
+		}
+	}
+}
+
 void StateLevel::change_tempo(Number new_tps, const Timepoint& tp_now, Number position)
 {
 	previous_position = position;
 	tps = new_tps;
 	last_tempo_change = tp_now;
-	//std::chrono::duration<Number>(tp_now - last_tempo_change).count() * tps;
 }
 
 void StateLevel::game_over(Tile* tile)

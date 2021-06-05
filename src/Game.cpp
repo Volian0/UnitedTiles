@@ -4,6 +4,7 @@
 #include "Font.h"
 #include "StateDevMenu.h"
 #include "DevTouch.h"
+#include "Color.h"
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
@@ -87,7 +88,12 @@ void Game::run()
 			renderer->clear();
 			_state->render();
 			auto fps = _fps_counter.update();
-			Texture fps_texture(renderer.get(), &fps_font, "FPS: " + std::to_string(fps), { fps < 60 ? 255 : 0, fps >= 30 ? 255 : 0, 0, 255 });
+			auto fps_font_color = Color::GREEN;
+			if (fps < 30)
+				fps_font_color = Color::RED;
+			else if (fps < 60)
+				fps_font_color = Color::YELLOW;
+			Texture fps_texture(renderer.get(), &fps_font, "FPS: " + std::to_string(fps), fps_font_color);
 			renderer->render(&fps_texture, { 0,0 }, fps_texture.get_psize(), { -1,-1 }, fps_texture.get_rsize(), {}, {-1, -1});
 			//_dev_touch.render(renderer.get());
 			renderer->display(); }

@@ -158,6 +158,9 @@
     <ClInclude Include="src\DevTouch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Color.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="res\database\songs.txt" />
