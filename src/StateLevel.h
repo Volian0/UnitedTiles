@@ -63,7 +63,7 @@ public:
 	std::shared_ptr<Tile> previous_tile;
 	Tile* game_over_tile = nullptr;
 
-	uint32_t cleared_tiles = 0;
+	uint64_t cleared_tiles = 0;
 
 	void queue_notes(const std::multimap<uint32_t, NoteEvent>& notes, bool forceplay_old = true, const std::optional<Timepoint> custom_tp = {});
 
@@ -80,6 +80,8 @@ public:
 	Number get_tile_pos(const Tile* tile_);
 
 	Number _position = 0.0L;
+
+	uint64_t total_length = 0;
 
 private:
 	virtual void update();

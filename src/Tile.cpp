@@ -19,7 +19,7 @@ Tile::Tile(uint32_t tile_id_, StateLevel* level_, TileColumn column_)
 
 bool Tile::active() const
 {
-	return tile_id == level->cleared_tiles;
+	return tile_id == (level->cleared_tiles % level->_song_info.tiles.size());
 }
 
 bool Tile::touch_down(uint16_t finger_id, Vec2 pos)
