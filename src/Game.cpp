@@ -4,7 +4,7 @@
 #include "Font.h"
 #include "StateDevMenu.h"
 #include "DevTouch.h"
-#include "Color.h"
+#include "Colors.h"
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
@@ -12,6 +12,8 @@
 #include <curl/curl.h>
 
 #include <algorithm>
+#include <unordered_map>
+#include <functional>
 
 Game::Game()
 {
@@ -55,23 +57,14 @@ void Game::run()
 			else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
 				renderer->reload();
 			}
-			else if (event.type == SDL_FINGERDOWN) {
+			else if (event.type == SDL_FINGERDOWN || event.type == SDL_FINGERUP || event.type == SDL_FINGERMOTION) {
 				Vec2 position{ std::clamp(Number(event.tfinger.x) * 2.0L - 1.0L, -1.0L, 1.0L),
 					std::clamp(Number(event.tfinger.y) * 2.0L - 1.0L, -1.0L, 1.0L) };
-				_state->touch_down.emplace(event.tfinger.fingerId, position);
-				_state->touch_held.emplace(event.tfinger.fingerId, position);
-			}
-			else if (event.type == SDL_FINGERUP) {
-				Vec2 position{ std::clamp(Number(event.tfinger.x) * 2.0L - 1.0L, -1.0L, 1.0L),
-					std::clamp(Number(event.tfinger.y) * 2.0L - 1.0L, -1.0L, 1.0L) };
-				_state->touch_up.emplace(event.tfinger.fingerId, position);
-				_state->touch_held.erase(event.tfinger.fingerId);
-			}
-			else if (event.type == SDL_FINGERMOTION) {
-				Vec2 position{ std::clamp(Number(event.tfinger.x) * 2.0L - 1.0L, -1.0L, 1.0L),
-					std::clamp(Number(event.tfinger.y) * 2.0L - 1.0L, -1.0L, 1.0L) };
-				_state->touch_move.emplace(event.tfinger.fingerId, position);
-				_state->touch_held[event.tfinger.fingerId] = position;
+				std::unordered_map<uint32_t, std::reference_wrapper<std::map<uint16_t, Vec2>>>
+				{   { SDL_FINGERDOWN,   _state->touch_down },
+					{ SDL_FINGERUP,     _state->touch_up   },
+					{ SDL_FINGERMOTION, _state->touch_move }
+				}.at(event.type).get().emplace(event.tfinger.fingerId, position);
 			}
 		}
 
@@ -88,11 +81,11 @@ void Game::run()
 			renderer->clear();
 			_state->render();
 			auto fps = _fps_counter.update();
-			auto fps_font_color = Color::GREEN;
+			auto fps_font_color = Colors::GREEN;
 			if (fps < 30)
-				fps_font_color = Color::RED;
+				fps_font_color = Colors::RED;
 			else if (fps < 60)
-				fps_font_color = Color::YELLOW;
+				fps_font_color = Colors::YELLOW;
 			Texture fps_texture(renderer.get(), &fps_font, "FPS: " + std::to_string(fps), fps_font_color);
 			renderer->render(&fps_texture, { 0,0 }, fps_texture.get_psize(), { -1,-1 }, fps_texture.get_rsize(), {}, {-1, -1});
 			//_dev_touch.render(renderer.get());

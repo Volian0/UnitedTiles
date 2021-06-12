@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Number.h"
+#include "Types.h"
 
 #include <fstream>
 #include <string>

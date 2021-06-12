@@ -57,6 +57,8 @@ public:
 	mutable Texture txt_long_tile_circle;
 	mutable Texture txt_long_tile_end;
 	mutable Texture tile_divider;
+	mutable Texture slider_tile;
+	mutable Texture slider_tile_clearing;
 
 	SongInfo _song_info;
 

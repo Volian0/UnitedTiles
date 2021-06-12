@@ -1,7 +1,7 @@
 #include "Soundfont.h"
 
 #include "Path.h"
-#include "Number.h"
+#include "Types.h"
 
 #define TSF_IMPLEMENTATION
 #include <TinySoundFont/tsf.h>

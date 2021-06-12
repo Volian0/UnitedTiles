@@ -23,7 +23,7 @@ void DustMote::simulate(Number delta_time, Number aspect_ratio)
 	position.y += cos(angular_direction) * velocity * 2.0L * delta_time * aspect_ratio;
 }
 
-DustMotes::DustMotes(glm::u8vec4 color, Renderer* renderer, const std::string& texture_name, Number min_size, Number max_size, Number particles_per_second, Number min_lifetime, Number max_lifetime, Number max_velocity, uint8_t blend_mode)
+DustMotes::DustMotes(Color color, Renderer* renderer, const std::string& texture_name, Number min_size, Number max_size, Number particles_per_second, Number min_lifetime, Number max_lifetime, Number max_velocity, uint8_t blend_mode)
 	:_color{color},
 	_renderer{renderer},
 	_texture{renderer, texture_name},

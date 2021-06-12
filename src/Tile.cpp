@@ -5,9 +5,10 @@
 #include "AudioDevice.h"
 #include "Renderer.h"
 #include "RNG.h"
-#include "Color.h"
+#include "Colors.h"
 
 #include <iostream>
+#include <algorithm>
 
 Tile::Tile(uint32_t tile_id_, StateLevel* level_, TileColumn column_)
 	:tile_id{tile_id_},
@@ -150,7 +151,7 @@ bool SingleTile::touch_down(uint16_t finger_id, Vec2 pos)
 				level->cleared_tiles++;
 				level->queue_notes(info->note_events);
 				level->score.add(1);
-				level->_burst.add(Vec2(get_x_pos(column), (level->_position - level->get_tile_pos(this) - tile_length/2.0L) / 4.0L * 2.0L - 1.0L), Vec2(0.25L, tile_length / 4.0L), tile_length * 5.0L, 1.5L, Vec2(-1, -1), Vec2(1, 0), Color::BLACK);
+				level->_burst.add(Vec2(get_x_pos(column), (level->_position - level->get_tile_pos(this) - tile_length/2.0L) / 4.0L * 2.0L - 1.0L), Vec2(0.25L, tile_length / 4.0L), tile_length * 4.0L / level->game->renderer->get_aspect_ratio(), 1.5L, Vec2(-1, -1), Vec2(1, 0), Colors::BLACK);
 			}
 		}
 		else
@@ -230,7 +231,7 @@ bool LongTile::should_be_cleared(Number y_offset) const
 			_is_held = false;
 			fully_cleared = true;
 			level->score.add(1);
-			level->_burst.add(Vec2(SingleTile::get_x_pos(column), (level->_position - level->get_tile_pos(this) - tile_length / 2.0L) / 4.0L * 2.0L - 1.0L), Vec2(0.25L, tile_length / 4.0L), tile_length * 5.0L, 1.5L, Vec2(-1, -1), Vec2(1, 0), Color::CYAN);
+			level->_burst.add(Vec2(SingleTile::get_x_pos(column), (level->_position - level->get_tile_pos(this) - tile_length / 2.0L) / 4.0L * 2.0L - 1.0L), Vec2(0.25L, tile_length / 4.0L), tile_length * 4.0L / level->game->renderer->get_aspect_ratio(), 1.5L, Vec2(-1, -1), Vec2(1, 0), Colors::CYAN);
 		}
 	}
 	return y_offset > 1.0L + 4.0L;
@@ -368,7 +369,7 @@ bool DoubleTile::touch_down(uint16_t finger_id, Vec2 pos)
 				level->queue_notes(info->note_events);
 				level->score.add(1);
 				clicked = level->new_tp;
-				level->_burst.add(Vec2(SingleTile::get_x_pos(clicked_column), (level->_position - level->get_tile_pos(this) - tile_length / 2.0L) / 4.0L * 2.0L - 1.0L), Vec2(0.25L, tile_length / 4.0L), tile_length * 5.0L, 1.5L, Vec2(-1, -1), Vec2(1, 0), Color::BLACK);
+				level->_burst.add(Vec2(SingleTile::get_x_pos(clicked_column), (level->_position - level->get_tile_pos(this) - tile_length / 2.0L) / 4.0L * 2.0L - 1.0L), Vec2(0.25L, tile_length / 4.0L), tile_length * 4.0L / level->game->renderer->get_aspect_ratio(), 1.5L, Vec2(-1, -1), Vec2(1, 0), Colors::BLACK);
 			}
 			else
 			{
@@ -383,7 +384,7 @@ bool DoubleTile::touch_down(uint16_t finger_id, Vec2 pos)
 				}
 				level->score.add(1);
 				level->cleared_tiles++;
-				level->_burst.add(Vec2(SingleTile::get_x_pos(clicked_column), (level->_position - level->get_tile_pos(this) - tile_length / 2.0L) / 4.0L * 2.0L - 1.0L), Vec2(0.25L, tile_length / 4.0L), tile_length * 5.0L, 1.5L, Vec2(-1, -1), Vec2(1, 0), Color::BLACK);
+				level->_burst.add(Vec2(SingleTile::get_x_pos(clicked_column), (level->_position - level->get_tile_pos(this) - tile_length / 2.0L) / 4.0L * 2.0L - 1.0L), Vec2(0.25L, tile_length / 4.0L), tile_length * 4.0L / level->game->renderer->get_aspect_ratio(), 1.5L, Vec2(-1, -1), Vec2(1, 0), Colors::BLACK);
 			}
 		}
 		else
@@ -497,4 +498,137 @@ bool EmptyTile::touch_down(uint16_t finger_id, Vec2 pos)
 			return false;
 	}
 	return true;
+}
+
+SliderTile::SliderTile(uint32_t tile_id_, StateLevel* level_)
+	:Tile(tile_id_, level_, SingleTile::next_column(level_->previous_tile))
+{
+	/*const uint32_t lines_n = (info->length - 1U) / uint32_t(level->_song_info.length_units_per_single_tile) / 3U + 1U;
+	for (uint32_t i = 0; i < lines_n; ++i)
+	{
+		uint32_t length = uint32_t(level->_song_info.length_units_per_single_tile) * 3U;
+		TileColumn line_column;
+		SliderTileLine::Direction direction;
+		//uint32_t starting_note_tick;
+		if (i == 0)
+		{
+			line_column = column;
+			if (column == FAR_LEFT || column == FAR_RIGHT)
+			{
+				direction = FAR_LEFT ? SliderTileLine::Direction::RIGHT : SliderTileLine::Direction::LEFT;
+			}
+			else
+			{
+				direction = RNG::integer(0, 1) ? SliderTileLine::Direction::RIGHT : SliderTileLine::Direction::LEFT;
+				//if (direction == SliderTileLine::Direction::RIGHT && column )
+			}
+		}
+		else
+		{
+			line_column = lines.back().direction == SliderTileLine::Direction::LEFT ? FAR_LEFT : FAR_RIGHT;
+			direction = line_column == FAR_LEFT ? SliderTileLine::Direction::RIGHT : SliderTileLine::Direction::LEFT;
+		}
+		if (i == lines_n - 1)
+		{
+			length = info->length % (uint32_t(level->_song_info.length_units_per_single_tile) * 3U);
+			if (!length)
+				length = uint32_t(level->_song_info.length_units_per_single_tile) * 3U;
+		}
+		lines.emplace_back(SliderTileLine{
+			length,
+			line_column,
+			direction//,
+			//starting_note_tick
+			});
+	}*/
+}
+
+bool SliderTile::is_cleared() const
+{
+	return get_cleared_lines() == lines.size();
+}
+
+void SliderTile::render(Number y_offset) const
+{
+	Number acc_length = 0;
+	for (const auto& line : lines)
+	{
+		line.render(y_offset+acc_length, this);
+		acc_length += Number(line.length) / Number(level->_song_info.length_units_per_single_tile);
+	}
+}
+
+bool SliderTile::should_be_cleared(Number y_offset) const
+{
+	return y_offset > Number(info->length) / Number(level->_song_info.length_units_per_single_tile) + 4.0L;
+}
+
+bool SliderTile::should_die(Number y_offset) const
+{
+	return should_be_cleared(y_offset) && is_cleared();
+}
+
+bool SliderTile::touch_down(uint16_t finger_id, Vec2 pos)
+{
+	if (!finger.has_value() && !is_held)
+	{
+		is_held = true;
+		finger.emplace(finger_id, pos);
+		lines[0].cleared = level->new_tp;
+	}
+	return true;
+}
+
+bool SliderTile::touch_up(uint16_t finger_id, Vec2 pos)
+{
+	if (finger.has_value() && finger.value().first == finger_id)
+	{
+		if (!is_cleared())
+		{
+			is_held = false;
+			return false;
+		}
+	}
+	return true;
+}
+
+bool SliderTile::touch_move(uint16_t finger_id, Vec2 pos)
+{
+	if (finger.has_value() && finger.value().first == finger_id)
+	{
+		const auto cleared_lines = get_cleared_lines();
+		Number acc_length = 0;
+		for (uint32_t i = 0; i < cleared_lines - 1; ++i)
+		{
+			acc_length += Number(lines[i].length) / Number(level->_song_info.length_units_per_single_tile);
+		}
+		lines[cleared_lines - 1].update_pos({ pos.x,pos.y + acc_length }, this);
+		acc_length += Number(lines[cleared_lines - 1].length) / Number(level->_song_info.length_units_per_single_tile);
+	}
+	return true;
+}
+
+uint32_t SliderTile::get_cleared_lines() const
+{
+	uint32_t cleared_lines = 0;
+	for (const auto& line : lines)
+	{
+		if (line.is_cleared())
+			++cleared_lines;
+	}
+	return cleared_lines;
+}
+
+void SliderTileLine::render(Number y_offset, const SliderTile* tile) const
+{
+}
+
+bool SliderTileLine::is_cleared() const
+{
+	return cleared.has_value();
+}
+
+void SliderTileLine::update_pos(Vec2 pos, SliderTile* tile)
+{
+	progress = std::max({(tile->level->new_tp - cleared.value()) * tile->level->tps, pos.y, progress });
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Number.h"
+#include "Types.h"
 #include "Timepoint.h"
 #include "Font.h"
 #include "Renderer.h"

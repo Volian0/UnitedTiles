@@ -22,6 +22,8 @@ StateLevel::StateLevel(Game* game_, const std::string& filename)
 	txt_long_tile_clearing{game->renderer.get(), "long_tile_clearing.png"},
 	txt_long_tile_circle{game->renderer.get(), "long_tile_circle.png"},
 	txt_long_tile_end{game->renderer.get(), "long_tile_end.png"},
+	slider_tile{game->renderer.get(), "slider.png"},
+	slider_tile_clearing{game->renderer.get(), "slider_clearing.png"},
 	_dustmotes{
 	{255, 255, 255, 127},
 	game_->renderer.get(),
@@ -43,6 +45,8 @@ StateLevel::StateLevel(Game* game_, const std::string& filename)
 	tile_divider.blend_mode = 1;
 	txt_single_tile_cleared.blend_mode = 1;
 	bg_o.blend_mode = 1;
+	slider_tile.blend_mode = 1;
+	slider_tile_clearing.blend_mode = 1;
 	txt_long_tile_end.blend_mode = 1;
 	txt_long_tile_circle.blend_mode = 1;
 	tile_divider.tint = { 200, 255, 255, 63 };
@@ -267,7 +271,7 @@ void ScoreCounter::render() const
 void ScoreCounter::set(uint32_t value)
 {
 	_value = value;
-	_texture = std::make_unique<Texture>(_level->game->renderer.get(), &_font, std::to_string(_value), glm::u8vec4{ 255, 63, 63, 255 });
+	_texture = std::make_unique<Texture>(_level->game->renderer.get(), &_font, std::to_string(_value), Color{ 255, 63, 63, 255 });
 	_tp_update = _level->new_tp;
 }
 

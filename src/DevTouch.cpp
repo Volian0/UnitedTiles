@@ -31,7 +31,7 @@ void DevTouch::update(GameState* state)
 
 	for (const auto& td : state->touch_down)
 	{
-		markers.emplace_back(DevTouchMarker{ td.second, std::make_unique<Texture>(state->game->renderer.get(), &font, std::to_string(td.first), glm::u8vec4{ 255,255,255,255 }), tp_now });
+		markers.emplace_back(DevTouchMarker{ td.second, std::make_unique<Texture>(state->game->renderer.get(), &font, std::to_string(td.first), Color{ 255,255,255,255 }), tp_now });
 	}
 }
 

@@ -98,7 +98,7 @@
     <ClInclude Include="src\GameState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Number.h">
+    <ClInclude Include="src\Types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\StateDevMenu.h">
@@ -161,7 +161,7 @@
     <ClInclude Include="src\DevTouch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Color.h">
+    <ClInclude Include="src\Colors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\BurstParticles.h">

@@ -17,4 +17,10 @@ namespace RNG
 		std::uniform_int_distribution<uint32_t> distribution(min, max);
 		return distribution(generator);
 	}
+
+	bool boolean()
+	{
+		static std::uniform_int_distribution<uint16_t> distribution(0, 1);
+		return distribution(generator);
+	}
 }

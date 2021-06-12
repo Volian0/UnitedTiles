@@ -17,7 +17,7 @@ Texture::Texture(Renderer* renderer, const std::string& filename)
 	blend_mode = SDL_BLENDMODE_NONE;
 }
 
-Texture::Texture(Renderer* renderer, Font* font, const std::string& text, glm::u8vec4 color)
+Texture::Texture(Renderer* renderer, Font* font, const std::string& text, Color color)
 	:RendererReloadable(renderer),
 	type{ Type::FONT },
 	info{ FontInfo{ font->filename, font->size, text, color } }

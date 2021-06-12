@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Unique.h"
-#include "Number.h"
+#include "Types.h"
 
 #include <cstdint>
 #include <vector>

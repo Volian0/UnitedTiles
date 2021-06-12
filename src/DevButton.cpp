@@ -4,7 +4,7 @@
 #include "Renderer.h"
 #include "Texture.h"
 #include "Game.h"
-#include "Color.h"
+#include "Colors.h"
 
 DevButton::DevButton(Vec2 position_, Number width_, uint32_t id_, const std::string& text, Texture* texture, Font* font, GameState* state)
 	:position{position_},
@@ -50,8 +50,8 @@ void DevButton::render() const
 {
 	if (is_held())
 	{
-		_text_texture->tint = Color::BLACK;
-		_texture->tint = Color::GRAY;
+		_text_texture->tint = Colors::BLACK;
+		_texture->tint = Colors::GRAY;
 	}
 
 	Renderer* renderer = _state->game->renderer.get();
@@ -67,13 +67,13 @@ void DevButton::render() const
 
 	_state->game->renderer->render(_text_texture.get(), { 0,0 }, _text_texture->get_psize(), position, _text_texture->get_rsize(), { 0,0 });
 
-	_text_texture->tint = Color::WHITE;
-	_texture->tint = Color::WHITE;
+	_text_texture->tint = Colors::WHITE;
+	_texture->tint = Colors::WHITE;
 }
 
 void DevButton::set_text(const std::string& text)
 {
-	_text_texture = std::make_unique<Texture>(_state->game->renderer.get(), _font, text, Color::WHITE);
+	_text_texture = std::make_unique<Texture>(_state->game->renderer.get(), _font, text, Colors::WHITE);
 }
 
 bool DevButton::is_pressed() const

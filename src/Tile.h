@@ -1,7 +1,7 @@
 #pragma once
 
 #include "SongInfo.h"
-#include "Number.h"
+#include "Types.h"
 #include "Timepoint.h"
 
 #include <cstdint>
@@ -15,17 +15,8 @@ enum TileColumn : uint8_t
 	MID_RIGHT = 0b00001100,
 	FAR_RIGHT = 0b00000011,
 	DT_LEFT   = 0b11001100,
-	DT_RIGHT  = 0b00110011
+	DT_RIGHT  = 0b00110011,
 };
-
-/*struct Tile
-{
-	uint32_t tile_id;
-	TileColumn column;
-	bool cleared = false;
-	std::optional<Timepoint> tp;
-	std::optional<uint16_t> finger_id;
-};*/
 
 class Tile : Unique
 {
@@ -54,7 +45,7 @@ public:
 	class StateLevel* level;
 };
 
-class SingleTile : public Tile
+class SingleTile final : public Tile
 {
 public:
 	SingleTile(uint32_t tile_id_, class StateLevel* level_);
@@ -73,7 +64,7 @@ private:
 	bool _cleared = false;
 };
 
-class LongTile : public Tile
+class LongTile final : public Tile
 {
 public:
 	LongTile(uint32_t tile_id_, class StateLevel* level_);
@@ -95,7 +86,7 @@ private:
 	mutable bool fully_cleared = false;
 };
 
-class DoubleTile : public Tile
+class DoubleTile final : public Tile
 {
 public:
 	DoubleTile(uint32_t tile_id_, class StateLevel* level_);
@@ -116,7 +107,7 @@ private:
 	std::optional<Timepoint> clicked;
 };
 
-class EmptyTile : public Tile
+class EmptyTile final : public Tile
 {
 public:
 	EmptyTile(uint32_t tile_id_, class StateLevel* level_);
@@ -132,4 +123,39 @@ private:
 
 	std::optional<TileColumn> game_over_column;
 	mutable bool _cleared = false;
+};
+
+struct SliderTileLine
+{
+	uint32_t length;
+	TileColumn column;
+	bool is_facing_left;
+	//uint32_t starting_note_tick;
+	Number progress = 0;
+	std::optional<Timepoint> cleared;
+
+	void render(Number y_offset, const class SliderTile* tile) const;
+	bool is_cleared() const;
+	void update_pos(Vec2 pos, class SliderTile* tile);
+};
+
+class SliderTile final : public Tile
+{
+public:
+	SliderTile(uint32_t tile_id_, class StateLevel* level_);
+
+private:
+	bool is_cleared() const override;
+	void render(Number y_offset) const override;
+	bool should_be_cleared(Number y_offset) const override;
+	bool should_die(Number y_offset) const override;
+	bool touch_down(uint16_t finger_id, Vec2 pos) override;
+	bool touch_up(uint16_t finger_id, Vec2 pos) override;
+	bool touch_move(uint16_t finger_id, Vec2 pos) override;
+
+	uint32_t get_cleared_lines() const;
+
+	std::optional<std::pair<uint16_t,Vec2>> finger;
+	bool is_held = false;
+	std::vector<SliderTileLine> lines;
 };

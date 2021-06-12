@@ -39,7 +39,7 @@ BurstParticles::BurstParticles(Renderer* renderer, const std::string& texture_na
 	_texture.blend_mode = 1;
 }
 
-void BurstParticles::add(Vec2 pos, Vec2 size, uint16_t number_of_particles, Number max_lifetime, Vec2 min_velocity, Vec2 max_velocity, glm::u8vec4 color)
+void BurstParticles::add(Vec2 pos, Vec2 size, uint16_t number_of_particles, Number max_lifetime, Vec2 min_velocity, Vec2 max_velocity, Color color)
 {
 	auto& group = _particle_groups.emplace_back(BurstParticleGroup{ color, max_lifetime });
 	for (uint16_t i = 0; i < number_of_particles; ++i)

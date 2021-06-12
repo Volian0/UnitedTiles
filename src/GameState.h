@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Unique.h"
-#include "Number.h"
+#include "Types.h"
 
 #include <vector>
 #include <unordered_map>
@@ -17,7 +17,7 @@ public:
 
 	virtual ~GameState() = default;
 
-	std::map<uint16_t, Vec2> touch_held;
+	//std::map<uint16_t, Vec2> touch_held;
 	std::map<uint16_t, Vec2> touch_move;
 	std::map<uint16_t, Vec2> touch_up;
 	std::map<uint16_t, Vec2> touch_down;

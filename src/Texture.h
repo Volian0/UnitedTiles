@@ -1,7 +1,8 @@
 #pragma once
 
 #include "RendererReloadable.h"
-#include "Number.h"
+#include "Types.h"
+#include "Colors.h"
 
 #include <string>
 #include <variant>
@@ -15,7 +16,7 @@ class Texture : RendererReloadable
 
 public:
 	Texture(Renderer* renderer, const std::string& filename);
-	Texture(Renderer* renderer, Font* font, const std::string& text, glm::u8vec4 color);
+	Texture(Renderer* renderer, Font* font, const std::string& text, Color color);
 	~Texture();
 
 	enum class Type : uint8_t {
@@ -28,11 +29,11 @@ public:
 		const std::string filename;
 		const Number size;
 		const std::string text;
-		const glm::u8vec4 color;
+		const Color color;
 	};
 	const std::variant<FileInfo, FontInfo> info;
 
-	glm::u8vec4 tint = {255, 255, 255, 255};
+	Color tint = Colors::WHITE;
 	uint8_t blend_mode;
 
 	glm::u32vec2 get_psize() const;

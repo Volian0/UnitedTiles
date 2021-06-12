@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Unique.h"
-#include "Number.h"
+#include "Types.h"
 #include "Renderer.h"
 #include "Texture.h"
 #include "Timepoint.h"
@@ -26,14 +26,14 @@ struct DustMote
 class DustMotes : Unique
 {
 public:
-	DustMotes(glm::u8vec4 color, Renderer* renderer, const std::string& texture_name, Number min_size, Number max_size, Number particles_per_second, Number min_lifetime, Number max_lifetime, Number max_velocity, uint8_t blend_mode = 1);
+	DustMotes(Color color, Renderer* renderer, const std::string& texture_name, Number min_size, Number max_size, Number particles_per_second, Number min_lifetime, Number max_lifetime, Number max_velocity, uint8_t blend_mode = 1);
 
 	void update(Number delta_time);
 	void render() const;
 
 private:
 
-	glm::u8vec4 _color;
+	Color _color;
 	Renderer* _renderer;
 	mutable Texture _texture;
 	Number _min_size;
