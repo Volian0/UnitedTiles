@@ -1,0 +1,202 @@
+#include "Tile.h"
+
+#include "../StateLevel.h"
+#include "../Game.h"
+#include "../AudioDevice.h"
+#include "../Renderer.h"
+#include "../RNG.h"
+#include "../Colors.h"
+#include "EmptyTile.h"
+
+#include <iostream>
+#include <algorithm>
+
+Tile::Tile(StateLevel* level, TileColumn column_)
+	:_level{level},
+	id{ level->spawned_tiles % level->_song_info.tiles.size() },
+	column{column_}
+{
+}
+
+Number get_column_x_pos(TileColumn column)
+{
+	if (column == FAR_LEFT)
+		return -0.75;
+	if (column == MID_LEFT)
+		return -0.25;
+	if (column == MID_RIGHT)
+		return 0.25;
+	return 0.75;
+}
+
+TileColumn get_column(Number x_pos)
+{
+	if (x_pos < -0.5)
+		return FAR_LEFT;
+	if (x_pos < 0)
+		return MID_LEFT;
+	if (x_pos < 0.5)
+		return MID_RIGHT;
+	return FAR_RIGHT;
+}
+
+TileColumn next_column(const std::shared_ptr<Tile>& previous_tile)
+{
+	if (!previous_tile)
+	{
+		switch (RNG::integer(0, 3))
+		{
+		case 0: return FAR_LEFT; break;
+		case 1: return MID_LEFT; break;
+		case 2: return MID_RIGHT; break;
+		case 3: return FAR_RIGHT; break;
+		}
+	}
+	else if (previous_tile->get_info().type == TileInfo::Type::SINGLE
+		|| previous_tile->get_info().type == TileInfo::Type::LONG)
+	{
+		uint8_t random_column = RNG::integer(0, 2);
+		TileColumn new_column;
+		if (random_column == 0)
+			new_column = FAR_LEFT;
+		else if (random_column == 1)
+			new_column = MID_LEFT;
+		else new_column = MID_RIGHT;
+		if (new_column == previous_tile->column)
+			new_column = FAR_RIGHT;
+		return new_column;
+	}
+	else if (previous_tile->get_info().type == TileInfo::Type::DOUBLE)
+	{
+		if (previous_tile->column == DT_LEFT)
+		{
+			return RNG::integer(0, 1) ? MID_LEFT : FAR_RIGHT;
+		}
+		return RNG::integer(0, 1) ? MID_RIGHT : FAR_LEFT;
+	}
+	else if (previous_tile->get_info().type == TileInfo::Type::EMPTY)
+	{
+		return next_column(reinterpret_cast<EmptyTile*>(previous_tile.get())->previous_tile);
+	}
+	abort();
+}
+
+bool Tile::is_active() const
+{
+	return id == (_level->cleared_tiles % _level->_song_info.tiles.size());
+}
+
+Number Tile::get_tile_length() const
+{
+	return Number(get_info().length) / Number(_level->_song_info.length_units_per_single_tile);
+}
+
+Number Tile::get_height() const
+{
+	return get_tile_length() / 4.0L;
+}
+
+const TileInfo& Tile::get_info() const
+{
+	return _level->_song_info.tiles[id];
+}
+
+void Tile::render_bg(Number y_offset) const
+{
+}
+
+void Tile::render_fg(Number y_offset) const
+{
+}
+
+void Tile::update(Number y_offset, bool force_first_interaction)
+{
+	my_update(y_offset, force_first_interaction);
+	for (const auto& [finger_id, touch_pos] : _level->touch_down)
+	{
+		touch_down(finger_id, { touch_pos.x, y_offset - (touch_pos.y + 1.0L) / 2.0L * 4.0L }, force_first_interaction);
+	}
+	for (const auto& [finger_id, touch_pos] : _level->touch_move)
+	{
+		touch_move(finger_id, { touch_pos.x, y_offset - (touch_pos.y + 1.0L) / 2.0L * 4.0L }, force_first_interaction);
+	}
+	for (const auto& [finger_id, touch_pos] : _level->touch_up)
+	{
+		touch_up(finger_id, { touch_pos.x, y_offset - (touch_pos.y + 1.0L) / 2.0L * 4.0L }, force_first_interaction);
+	}
+}
+
+void Tile::touch_down(uint16_t finger_id, Vec2 pos, bool force_first_interaction)
+{
+}
+
+void Tile::touch_move(uint16_t finger_id, Vec2 pos, bool force_first_interaction)
+{
+}
+
+void Tile::touch_up(uint16_t finger_id, Vec2 pos, bool force_first_interaction)
+{
+}
+
+void Tile::my_update(Number y_offset, bool force_first_interaction)
+{
+}
+
+void Tile::handle_first_interaction()
+{
+	auto tile_index = static_cast<uint32_t>(_level->cleared_tiles % _level->_song_info.tiles.size());
+	if (tile_index == 0)
+	{
+		_level->change_tempo(_level->_song_info.starting_tempo, _level->new_tp, _level->_position);
+	}
+	else if (_level->_song_info.tempo_changes.count(tile_index))
+	{
+		_level->change_tempo(_level->_song_info.tempo_changes.at(tile_index), _level->new_tp, _level->_position);
+	}
+}
+
+void Tile::handle_clear()
+{
+	_level->cleared_tiles++;
+}
+
+void Tile::handle_game_over()
+{
+	_level->game_over(this);
+}
+
+void Tile::handle_state_change(const TileStateInfo* state)
+{
+	if (state->score_info.has_value())
+	{
+		auto points = state->score_info->points;
+		state->score_info->silent ? _level->score.silent_add(points) : _level->score.add(points);
+	}
+}
+
+
+
+/*bool EmptyTile::should_game_over(Number y_offset) const
+{
+	return false;
+}
+bool EmptyTile::should_die(Number y_offset) const
+{
+	return y_offset > get_tile_length() + 4.0L;
+}
+void EmptyTile::touch_down(uint16_t finger_id, Vec2 pos, bool force_first_interaction)
+{
+
+}
+void EmptyTile::my_update(Number y_offset, bool force_first_interaction)
+{
+
+}
+void EmptyTile::on_changed_state()
+{
+
+}
+void EmptyTile::render_fg(Number y_offset) const
+{
+
+}*/

@@ -75,7 +75,7 @@
     <ClCompile Include="src\StateLevel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Tile.cpp">
+    <ClCompile Include="src\tiles\Tile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\DevTouch.cpp">
@@ -85,6 +85,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\BurstParticles.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tiles\SingleTile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tiles\DoubleTile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tiles\LongTile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tiles\EmptyTile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -155,7 +167,7 @@
     <ClInclude Include="src\StateLevel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Tile.h">
+    <ClInclude Include="src\tiles\Tile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\DevTouch.h">
@@ -165,6 +177,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\BurstParticles.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tiles\SingleTile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tiles\DoubleTile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tiles\LongTile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tiles\EmptyTile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

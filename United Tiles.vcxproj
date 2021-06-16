@@ -11,6 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\tiles\DoubleTile.cpp" />
+    <ClCompile Include="src\tiles\EmptyTile.cpp" />
+    <ClCompile Include="src\tiles\LongTile.cpp" />
+    <ClCompile Include="src\tiles\SingleTile.cpp" />
     <ClCompile Include="src\BurstParticles.cpp" />
     <ClCompile Include="src\DevTouch.cpp" />
     <ClCompile Include="src\File.cpp" />
@@ -33,10 +37,14 @@
     <ClCompile Include="src\StateSettings.cpp" />
     <ClCompile Include="src\SongInfo.cpp" />
     <ClCompile Include="src\StateLevel.cpp" />
-    <ClCompile Include="src\Tile.cpp" />
+    <ClCompile Include="src\tiles\Tile.cpp" />
     <ClCompile Include="src\Timepoint.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\tiles\DoubleTile.h" />
+    <ClInclude Include="src\tiles\EmptyTile.h" />
+    <ClInclude Include="src\tiles\LongTile.h" />
+    <ClInclude Include="src\tiles\SingleTile.h" />
     <ClInclude Include="src\BurstParticles.h" />
     <ClInclude Include="src\Colors.h" />
     <ClInclude Include="src\DevTouch.h" />
@@ -62,7 +70,7 @@
     <ClInclude Include="src\StateSettings.h" />
     <ClInclude Include="src\SongInfo.h" />
     <ClInclude Include="src\StateLevel.h" />
-    <ClInclude Include="src\Tile.h" />
+    <ClInclude Include="src\tiles\Tile.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="res\database\songs.txt" />

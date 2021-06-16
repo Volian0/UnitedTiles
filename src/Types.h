@@ -10,4 +10,3 @@ using Vec4 = glm::vec<4, Number>;
 
 using Color    = glm::u8vec4;
 using FingerID = uint16_t;
-using Size     = uint32_t;

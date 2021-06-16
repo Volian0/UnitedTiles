@@ -5,6 +5,11 @@
 #include "Game.h"
 #include "StateSongSelection.h"
 
+#include "tiles/DoubleTile.h"
+#include "tiles/EmptyTile.h"
+#include "tiles/LongTile.h"
+#include "tiles/SingleTile.h"
+
 #include <algorithm>
 #include <iostream>
 
@@ -77,15 +82,6 @@ void StateLevel::update()
 {
 	new_tp = Timepoint();
 
-	if (cleared_tiles % _song_info.tiles.size() == 1)
-	{
-		change_tempo(_song_info.starting_tempo, new_tp, _position);
-	}
-	else if (cleared_tiles > 0 && _song_info.tempo_changes.count((cleared_tiles - 1) % _song_info.tiles.size()))
-	{
-		change_tempo(_song_info.tempo_changes.at((cleared_tiles - 1) % _song_info.tiles.size()), new_tp, _position);
-	}
-
 	if (game_over_scroll_to.has_value() && _state == State::GAME_OVER)
 	{
 		Number total_scroll_length = previous_position - game_over_scroll_to.value() - 4.0L;
@@ -112,34 +108,25 @@ void StateLevel::update()
 	//delete old tiles
 	for (auto it = tiles.cbegin(); it != tiles.cend();)
 	{
-		if (it->second->should_be_cleared(_position - it->first) && !it->second->is_cleared())
+		auto action = it->second->get_action(_position - it->first);
+		if (action == TileAction::GAME_OVER)
 		{
 			game_over_scroll_to = it->first;
 			return game_over(it->second.get());
 		}
-		if (it->second->should_die(_position - it->first))
+		if (action == TileAction::DELETE)
 		{
 			it = tiles.erase(it);
 		}
 		else ++it;
 	}
-	//test collision
+	//update tiles
 	for (const auto& [tile_pos, tile] : tiles)
 	{
-		for (const auto& [finger_id, touch_pos] : touch_down)
+		tile->update(_position - tile_pos, tps == 0);
+		if (_state != State::ACTIVE)
 		{
-			if (!tile->touch_down(finger_id, { touch_pos.x, (_position - tile_pos) - (touch_pos.y + 1.0L) / 2.0L * 4.0L }))
-				return game_over(tile.get());
-		}
-		for (const auto& [finger_id, touch_pos] : touch_move)
-		{
-			if (!tile->touch_move(finger_id, { touch_pos.x, (_position - tile_pos) - (touch_pos.y + 1.0L) / 2.0L * 4.0L }))
-				return game_over(tile.get());
-		}
-		for (const auto& [finger_id, touch_pos] : touch_up)
-		{
-			if (!tile->touch_up(finger_id,   { touch_pos.x, (_position - tile_pos) - (touch_pos.y + 1.0L) / 2.0L * 4.0L }))
-				return game_over(tile.get());
+			break;
 		}
 	}
 	//spawn new tiles
@@ -158,8 +145,10 @@ void StateLevel::render() const
 	//render tiles
 	for (const auto& [position, tile] : tiles)
 	{
+		auto y_offset = _position - position;
+		tile->render_bg(y_offset);
 		if (!game_over_scroll_to.has_value() || game_over_tile != tile.get() || (new_tp % 0.25) > 0.125)
-			tile->render(_position - position);
+			tile->render_fg(_position - position);
 	}
 	//render score counter
 	_burst.render();
@@ -211,16 +200,16 @@ void StateLevel::spawn_new_tiles()
 			switch (_song_info.tiles[i].type)
 			{
 			case TileInfo::Type::SINGLE:
-				previous_tile = tiles.emplace(total_pos, std::make_shared<SingleTile>(i, this))->second;
+				previous_tile = tiles.emplace(total_pos, std::make_shared<SingleTile>(this))->second;
 				break;
 			case TileInfo::Type::LONG:
-				previous_tile = tiles.emplace(total_pos, std::make_shared<LongTile>(i, this))->second;
+				previous_tile = tiles.emplace(total_pos, std::make_shared<LongTile>(this))->second;
 				break;
 			case TileInfo::Type::DOUBLE:
-				previous_tile = tiles.emplace(total_pos, std::make_shared<DoubleTile>(i, this))->second;
+				previous_tile = tiles.emplace(total_pos, std::make_shared<DoubleTile>(this))->second;
 				break;
 			case TileInfo::Type::EMPTY:
-				previous_tile = tiles.emplace(total_pos, std::make_shared<EmptyTile>(i, this))->second;
+				previous_tile = tiles.emplace(total_pos, std::make_shared<EmptyTile>(this))->second;
 				break;
 			default: abort(); break;
 			}

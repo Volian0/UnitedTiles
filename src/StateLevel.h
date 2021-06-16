@@ -9,7 +9,7 @@
 #include "Timepoint.h"
 #include "DustMotes.h"
 #include "Soundfont.h"
-#include "Tile.h"
+#include "tiles/Tile.h"
 #include "BurstParticles.h"
 
 #include <memory>
