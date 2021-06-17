@@ -5,6 +5,7 @@
 
 #include "../RNG.h"
 #include "EmptyTile.h"
+#include "SliderTile.h"
 
 DoubleTile::DoubleTile(StateLevel* level_)
 	:StatableTile(level_, this->next_column(level_->previous_tile))
@@ -128,6 +129,15 @@ TileColumn DoubleTile::next_column(const std::shared_ptr<Tile>& previous_tile)
 	else if (previous_tile->get_info().type == TileInfo::Type::EMPTY)
 	{
 		return this->next_column(reinterpret_cast<EmptyTile*>(previous_tile.get())->previous_tile);
+	}
+	else if (previous_tile->get_info().type == TileInfo::Type::SLIDER)
+	{
+		auto end_columns = reinterpret_cast<SliderTile*>(previous_tile.get())->get_end_column();
+		if (end_columns.first & 0b11001100)
+		{
+			return DT_RIGHT;
+		}
+		return DT_LEFT;
 	}
 	else abort();
 }

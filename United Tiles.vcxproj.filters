@@ -99,6 +99,9 @@
     <ClCompile Include="src\tiles\EmptyTile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\tiles\SliderTile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Unique.h">
@@ -189,6 +192,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\tiles\EmptyTile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tiles\SliderTile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

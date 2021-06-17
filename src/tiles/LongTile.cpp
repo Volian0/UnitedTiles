@@ -20,7 +20,7 @@ bool LongTile::should_die(Number y_offset) const
 
 void LongTile::my_update(Number y_offset, bool force_first_interaction)
 {
-	if (is_state(&LongTileClearning))
+	if (is_state(&LongTileClearing))
 	{
 		held_tile_duration = (_level->new_tp - tp_tapped) * _level->tps;
 		if (held_tile_duration + 1.0L >= get_tile_length())
@@ -42,7 +42,7 @@ void LongTile::touch_down(uint16_t finger_id, Vec2 pos, bool force_first_interac
 				if (pos.y < 1.0L)
 				{
 					finger = finger_id;
-					change_state(&LongTileClearning, force_first_interaction);
+					change_state(&LongTileClearing, force_first_interaction);
 				}
 			}
 			else
@@ -56,7 +56,7 @@ void LongTile::touch_down(uint16_t finger_id, Vec2 pos, bool force_first_interac
 
 void LongTile::touch_up(uint16_t finger_id, Vec2 pos, bool force_first_interaction)
 {
-	if (is_state(&LongTileClearning) && finger_id == finger)
+	if (is_state(&LongTileClearing) && finger_id == finger)
 	{
 		change_state(&LongTileNotFullyCleared, force_first_interaction);
 	}
@@ -64,7 +64,7 @@ void LongTile::touch_up(uint16_t finger_id, Vec2 pos, bool force_first_interacti
 
 void LongTile::on_changed_state()
 {
-	if (is_state(&LongTileClearning))
+	if (is_state(&LongTileClearing))
 	{
 		_level->queue_notes(get_info().note_events);
 		tp_tapped = _level->new_tp;
@@ -97,7 +97,7 @@ void LongTile::render_fg(Number y_offset) const
 		Number div_offset = -0.25L - 0.25L * _level->game->renderer->get_aspect_ratio() * 0.33203125L;
 		_level->game->renderer->render(texture, {}, texture->get_psize(), pos + Vec2{ 0, div_offset },
 			{ 0.01L, get_height() + div_offset / 2.0L - 0.0625L }, {}, { 0,1 });
-		if (is_state(&LongTileClearning) || is_state(&LongTileNotFullyCleared))
+		if (is_state(&LongTileClearing) || is_state(&LongTileNotFullyCleared))
 		{
 			texture = &_level->txt_long_tile_clearing;
 			_level->game->renderer->render(texture, {}, texture->get_psize(), pos,

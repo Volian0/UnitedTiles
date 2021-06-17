@@ -9,6 +9,7 @@
 #include "tiles/EmptyTile.h"
 #include "tiles/LongTile.h"
 #include "tiles/SingleTile.h"
+#include "tiles/SliderTile.h"
 
 #include <algorithm>
 #include <iostream>
@@ -29,6 +30,7 @@ StateLevel::StateLevel(Game* game_, const std::string& filename)
 	txt_long_tile_end{game->renderer.get(), "long_tile_end.png"},
 	slider_tile{game->renderer.get(), "slider.png"},
 	slider_tile_clearing{game->renderer.get(), "slider_clearing.png"},
+	_debug_font{game->renderer.get(), "roboto.ttf", 4},
 	_dustmotes{
 	{255, 255, 255, 127},
 	game_->renderer.get(),
@@ -63,6 +65,17 @@ StateLevel::StateLevel(Game* game_, const std::string& filename)
 	tps = 0;
 	_old_tp = new_tp = last_tempo_change = {};
 	previous_position = 3.0L;
+}
+
+void StateLevel::render_debug() const
+{
+	Texture dbg_tps{ game->renderer.get(), &_debug_font, "TPS: " + std::to_string(tps), Colors::WHITE };
+	Texture dbg_tiles_n{ game->renderer.get(), &_debug_font, "Active tiles: " + std::to_string(tiles.size()), Colors::WHITE };
+	Texture dbg_cleared_n{ game->renderer.get(), &_debug_font, "Cleared tiles: " + std::to_string(cleared_tiles), Colors::WHITE };
+
+	game->renderer->render(&dbg_cleared_n, {}, dbg_cleared_n.get_psize(), Vec2(-1, 1), dbg_cleared_n.get_rsize(), {}, { -1,1 });
+	game->renderer->render(&dbg_tiles_n, {}, dbg_tiles_n.get_psize(), Vec2(-1, 1 - (dbg_cleared_n.get_rsize().y) * 2.0L), dbg_tiles_n.get_rsize(), {}, { -1,1 });
+	game->renderer->render(&dbg_tps, {}, dbg_tps.get_psize(), Vec2(-1, 1 - (dbg_cleared_n.get_rsize().y + dbg_tps.get_rsize().y) * 2.0L), dbg_tps.get_rsize(), {}, { -1,1 });
 }
 
 void StateLevel::queue_notes(const std::multimap<uint32_t, NoteEvent>& notes, bool forceplay_old, const std::optional<Timepoint> custom_tp)
@@ -153,6 +166,8 @@ void StateLevel::render() const
 	//render score counter
 	_burst.render();
 	score.render();
+
+	render_debug();
 }
 
 Number StateLevel::get_tile_pos(const Tile* tile_)
@@ -210,6 +225,9 @@ void StateLevel::spawn_new_tiles()
 				break;
 			case TileInfo::Type::EMPTY:
 				previous_tile = tiles.emplace(total_pos, std::make_shared<EmptyTile>(this))->second;
+				break;
+			case TileInfo::Type::SLIDER:
+				previous_tile = tiles.emplace(total_pos, std::make_shared<SliderTile>(this))->second;
 				break;
 			default: abort(); break;
 			}

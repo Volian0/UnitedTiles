@@ -7,9 +7,11 @@
 #include "../RNG.h"
 #include "../Colors.h"
 #include "EmptyTile.h"
+#include "SliderTile.h"
 
 #include <iostream>
 #include <algorithm>
+#include <unordered_set>
 
 Tile::Tile(StateLevel* level, TileColumn column_)
 	:_level{level},
@@ -20,11 +22,11 @@ Tile::Tile(StateLevel* level, TileColumn column_)
 
 Number get_column_x_pos(TileColumn column)
 {
-	if (column == FAR_LEFT)
+	if (column & FAR_LEFT)
 		return -0.75;
-	if (column == MID_LEFT)
+	if (column & MID_LEFT)
 		return -0.25;
-	if (column == MID_RIGHT)
+	if (column & MID_RIGHT)
 		return 0.25;
 	return 0.75;
 }
@@ -78,6 +80,22 @@ TileColumn next_column(const std::shared_ptr<Tile>& previous_tile)
 	{
 		return next_column(reinterpret_cast<EmptyTile*>(previous_tile.get())->previous_tile);
 	}
+	else if (previous_tile->get_info().type == TileInfo::Type::SLIDER)
+	{
+		std::set<TileColumn> possible_columns = { FAR_LEFT, MID_LEFT, MID_RIGHT, FAR_RIGHT };
+		auto end_columns = reinterpret_cast<SliderTile*>(previous_tile.get())->get_end_column();
+		uint8_t mask = end_columns.first;
+		if (end_columns.second.has_value())
+			mask |= end_columns.second.value();
+		for (uint8_t i = 0; i < possible_columns.size(); ++i)
+		{
+			if (mask & *std::next(possible_columns.begin(), i))
+			{
+				possible_columns.erase(std::next(possible_columns.begin(), i));
+			}
+		}
+		return *std::next(possible_columns.begin(), RNG::integer(0, possible_columns.size() - 1));
+	}
 	abort();
 }
 
@@ -112,7 +130,15 @@ void Tile::render_fg(Number y_offset) const
 void Tile::update(Number y_offset, bool force_first_interaction)
 {
 	my_update(y_offset, force_first_interaction);
+	std::vector<std::pair<uint16_t,Vec2>> touch_down_sorted_positions;
 	for (const auto& [finger_id, touch_pos] : _level->touch_down)
+	{
+		touch_down_sorted_positions.emplace_back(finger_id, touch_pos);
+	}
+	std::sort(touch_down_sorted_positions.begin(), touch_down_sorted_positions.end(),
+		[](const std::pair<uint16_t, Vec2>& pos_a, const std::pair<uint16_t, Vec2>& pos_b) { return pos_a.second.y < pos_b.second.y; });
+
+	for (const auto& [finger_id, touch_pos] : touch_down_sorted_positions)
 	{
 		touch_down(finger_id, { touch_pos.x, y_offset - (touch_pos.y + 1.0L) / 2.0L * 4.0L }, force_first_interaction);
 	}

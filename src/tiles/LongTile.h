@@ -4,11 +4,11 @@
 
 inline constexpr auto LongTileDefault         = TileStateInfo{ TileAction::GAME_OVER };
 inline constexpr auto LongTileMissed          = TileStateInfo{ TileAction::NOTHING };
-inline constexpr auto LongTileClearning       = TileStateInfo{ TileAction::NOTHING, ScoreInfo{1,true} };
+inline constexpr auto LongTileClearing       = TileStateInfo{ TileAction::NOTHING, ScoreInfo{1,true} };
 inline constexpr auto LongTileNotFullyCleared = TileStateInfo{ TileAction::DELETE, ScoreInfo{0} };
 inline constexpr auto LongTileFullyCleared    = TileStateInfo{ TileAction::DELETE, ScoreInfo{1} };
 
-class LongTile : public StatableTile<&LongTileDefault, &LongTileMissed, &LongTileClearning, &LongTileClearning>
+class LongTile : public StatableTile<&LongTileDefault, &LongTileMissed, &LongTileClearing, &LongTileClearing>
 {
 public:
 	LongTile(class StateLevel* level_);

@@ -65,6 +65,10 @@ public:
 	std::shared_ptr<Tile> previous_tile;
 	Tile* game_over_tile = nullptr;
 
+	mutable Font _debug_font;
+
+	void render_debug() const;
+
 	uint64_t cleared_tiles = 0;
 
 	void queue_notes(const std::multimap<uint32_t, NoteEvent>& notes, bool forceplay_old = true, const std::optional<Timepoint> custom_tp = {});

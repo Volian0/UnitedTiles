@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\tiles\SliderTile.cpp" />
     <ClCompile Include="src\tiles\DoubleTile.cpp" />
     <ClCompile Include="src\tiles\EmptyTile.cpp" />
     <ClCompile Include="src\tiles\LongTile.cpp" />
@@ -41,6 +42,7 @@
     <ClCompile Include="src\Timepoint.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\tiles\SliderTile.h" />
     <ClInclude Include="src\tiles\DoubleTile.h" />
     <ClInclude Include="src\tiles\EmptyTile.h" />
     <ClInclude Include="src\tiles\LongTile.h" />
