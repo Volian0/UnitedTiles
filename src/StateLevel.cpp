@@ -91,6 +91,11 @@ void StateLevel::queue_notes(const std::multimap<uint32_t, NoteEvent>& notes, bo
 	}
 }
 
+bool StateLevel::force_first_interaction() const
+{
+	return tps == 0;
+}
+
 void StateLevel::update()
 {
 	new_tp = Timepoint();
@@ -111,17 +116,24 @@ void StateLevel::update()
 	_dustmotes_stars.update(delta_time);
 	_burst.update(delta_time);
 	_old_tp = new_tp;
-	//
+
+	//update Y offset
+	for (auto& [position, tile] : tiles)
+	{
+		tile->y_offset = _position - position;
+	}
+
 	if (_state != State::ACTIVE)
 	{
 		return;
 	}
-	//
+
 	_position = previous_position + (new_tp - last_tempo_change) * tps;
+
 	//delete old tiles
 	for (auto it = tiles.cbegin(); it != tiles.cend();)
 	{
-		auto action = it->second->get_action(_position - it->first);
+		auto action = it->second->get_action();
 		if (action == TileAction::GAME_OVER)
 		{
 			game_over_scroll_to = it->first;
@@ -136,7 +148,7 @@ void StateLevel::update()
 	//update tiles
 	for (const auto& [tile_pos, tile] : tiles)
 	{
-		tile->update(_position - tile_pos, tps == 0);
+		tile->update();
 		if (_state != State::ACTIVE)
 		{
 			break;
@@ -158,10 +170,9 @@ void StateLevel::render() const
 	//render tiles
 	for (const auto& [position, tile] : tiles)
 	{
-		auto y_offset = _position - position;
-		tile->render_bg(y_offset);
+		tile->render_bg();
 		if (!game_over_scroll_to.has_value() || game_over_tile != tile.get() || (new_tp % 0.25) > 0.125)
-			tile->render_fg(_position - position);
+			tile->render_fg();
 	}
 	//render score counter
 	_burst.render();

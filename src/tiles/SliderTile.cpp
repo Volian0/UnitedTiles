@@ -14,17 +14,17 @@ SliderTile::SliderTile(StateLevel* level_)
 {
 }
 
-bool SliderTile::should_game_over(Number y_offset) const
+bool SliderTile::should_game_over() const
 {
 	return y_offset > 1.0L + 4.0L;
 }
 
-bool SliderTile::should_die(Number y_offset) const
+bool SliderTile::should_die() const
 {
 	return y_offset > get_tile_length() + 4.0L;
 }
 
-void SliderTile::my_update(Number y_offset, bool force_first_interaction)
+void SliderTile::my_update()
 {
 	//very hacky, but it works
 	finger_pos.y += y_offset - previous_offset.value_or(y_offset);
@@ -37,17 +37,17 @@ void SliderTile::my_update(Number y_offset, bool force_first_interaction)
 			held_tile_duration = std::max(finger_pos.y, held_tile_duration);
 			if (held_tile_duration + 1.0L >= get_tile_length())
 			{
-				change_state(&SliderTileCleared, force_first_interaction);
+				change_state(&SliderTileCleared);
 			}
 		}
 		else
 		{
-			change_state(&SliderTileMissed, force_first_interaction);
+			change_state(&SliderTileMissed);
 		}
 	}
 }
 
-void SliderTile::touch_down(uint16_t finger_id, Vec2 pos, bool force_first_interaction)
+void SliderTile::touch_down(uint16_t finger_id, Vec2 pos)
 {
 	if (is_state(&SliderTileDefault))
 	{
@@ -55,12 +55,12 @@ void SliderTile::touch_down(uint16_t finger_id, Vec2 pos, bool force_first_inter
 		{
 			finger = finger_id;
 			finger_pos = pos;
-			change_state(&SliderTileClearing, force_first_interaction);
+			change_state(&SliderTileClearing);
 		}
 	}
 }
 
-void SliderTile::touch_move(uint16_t finger_id, Vec2 pos, bool force_first_interaction)
+void SliderTile::touch_move(uint16_t finger_id, Vec2 pos)
 {
 	if (is_state(&SliderTileClearing) && finger_id == finger)
 	{
@@ -68,11 +68,11 @@ void SliderTile::touch_move(uint16_t finger_id, Vec2 pos, bool force_first_inter
 	}
 }
 
-void SliderTile::touch_up(uint16_t finger_id, Vec2 pos, bool force_first_interaction)
+void SliderTile::touch_up(uint16_t finger_id, Vec2 pos)
 {
 	if (is_state(&SliderTileClearing) && finger_id == finger)
 	{
-		change_state(&SliderTileMissed, force_first_interaction);
+		change_state(&SliderTileMissed);
 	}
 }
 
@@ -84,7 +84,7 @@ void SliderTile::on_changed_state()
 	}
 }
 
-void SliderTile::render_fg(Number y_offset) const
+void SliderTile::render_fg() const
 {
 	if (is_state(&SliderTileMissed) && (_level->new_tp % 0.25) > 0.125)
 	{
@@ -128,13 +128,6 @@ void SliderTile::render_fg(Number y_offset) const
 
 		total_held_left -= y_length;
 	}
-
-	//debug_draw_hitbox(y_offset);
-}
-
-Number SliderTile::get_x_pos(Number y_offset) const
-{
-	return std::abs(std::fmod(y_offset + Number(_column_index) * 0.5L, 3.0L) - 1.5L) - 0.75L;
 }
 
 TileColumn SliderTile::next_column(const std::shared_ptr<Tile>& previous_tile) const
@@ -151,7 +144,7 @@ TileColumn SliderTile::next_column(const std::shared_ptr<Tile>& previous_tile) c
 
 bool SliderTile::in_range(Vec2 pos) const
 {
-	return std::abs(get_x_pos(pos.y) - pos.x) <= 0.75L;
+	return std::abs((std::abs(std::fmod(pos.y + Number(_column_index) * 0.5L, 3.0L) - 1.5L) - 0.75L) - pos.x) < 0.75L;
 }
 
 uint8_t SliderTile::get_column_index() const
@@ -163,24 +156,6 @@ uint8_t SliderTile::get_column_index() const
 			return index;
 		}
 	}
-}
-
-void SliderTile::debug_draw_hitbox(Number y_offset) const
-{
-	if (is_active() == false)
-	{
-		return;
-	}
-	auto texture = &_level->txt_long_tile_circle;
-	auto size = 0.05L;
-	for (Number y = -1.0L; y <= 1.0L; y += size)
-		for (Number x = -1.0L; x <= 1.0L; x += size)
-		{
-			if (in_range({ x, y_offset - (y + 1.0L) * 2.0L }))
-			{
-				_level->game->renderer->render(texture, {}, texture->get_psize(), { x,y }, Vec2(size / 2.0L), {});
-			}
-		}
 }
 
 void SliderTile::render_fragment(Texture* texture, Number length, Vec2 pos, bool facing_right) const

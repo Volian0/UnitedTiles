@@ -13,13 +13,13 @@ public:
 	DoubleTile(class StateLevel* level_);
 
 private:
-	bool should_game_over(Number y_offset) const final;
-	bool should_die(Number y_offset) const final;
-	void touch_down(uint16_t finger_id, Vec2 pos, bool force_first_interaction = false) final;
+	bool should_game_over() const final;
+	bool should_die() const final;
+	void touch_down(uint16_t finger_id, Vec2 pos) final;
 	void on_changed_state() final;
 
-	void render_bg(Number y_offset) const final;
-	void render_fg(Number y_offset) const final;
+	void render_bg() const final;
+	void render_fg() const final;
 
 	TileColumn next_column(const std::shared_ptr<Tile>& previous_tile);
 

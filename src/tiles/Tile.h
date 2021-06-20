@@ -72,25 +72,28 @@ public:
 
 	const TileInfo& get_info() const;
 
-	virtual void render_bg(Number y_offset) const;
-	virtual void render_fg(Number y_offset) const;
+	virtual void render_bg() const;
+	virtual void render_fg() const;
 
-	virtual TileAction get_action(Number y_offset) = 0;
+	virtual TileAction get_action() = 0;
 
-	void update(Number y_offset, bool force_first_interaction = false);
+	void update();
 
-	virtual void my_update(Number y_offset, bool force_first_interaction = false);
+	virtual void my_update();
 
-	virtual void touch_down(uint16_t finger_id, Vec2 pos, bool force_first_interaction = false);
-	virtual void touch_move(uint16_t finger_id, Vec2 pos, bool force_first_interaction = false);
-	virtual void touch_up(uint16_t finger_id, Vec2 pos, bool force_first_interaction = false);
+	virtual void touch_down(uint16_t finger_id, Vec2 pos);
+	virtual void touch_move(uint16_t finger_id, Vec2 pos);
+	virtual void touch_up(uint16_t finger_id, Vec2 pos);
 
-	virtual bool should_game_over(Number y_offset) const = 0;
-	virtual bool should_die(Number y_offset) const = 0;
+	virtual bool should_game_over() const = 0;
+	virtual bool should_die() const = 0;
 
 	TileColumn missed_column;
 
+	Number y_offset;
+
 protected:
+	bool force_first_interaction() const;
 	void handle_first_interaction();
 	void handle_clear();
 	void handle_game_over();
@@ -113,7 +116,7 @@ public:
 	{
 	}
 
-	inline bool change_state(const TileStateInfo* state, bool force_first_interaction = false)
+	inline bool change_state(const TileStateInfo* state)
 	{
 		if (_state == game_over_state)
 		{
@@ -127,7 +130,7 @@ public:
 			}
 			handle_first_interaction();
 		}
-		else if (force_first_interaction)
+		else if (force_first_interaction())
 		{
 			return false;
 		}
@@ -145,7 +148,7 @@ public:
 		return true;
 	}
 
-	inline TileAction get_action(Number y_offset) final
+	inline TileAction get_action() final
 	{
 		if (_state == game_over_state || _state->action == TileAction::NOTHING)
 		{
@@ -153,9 +156,9 @@ public:
 		}
 		if (_state->action == TileAction::GAME_OVER)
 		{
-			return should_game_over(y_offset) ? TileAction::GAME_OVER : TileAction::NOTHING;
+			return should_game_over() ? TileAction::GAME_OVER : TileAction::NOTHING;
 		}
-		return should_die(y_offset) ? TileAction::DELETE : TileAction::NOTHING;
+		return should_die() ? TileAction::DELETE : TileAction::NOTHING;
 	}
 
 	inline bool is_state(const TileStateInfo* state) const

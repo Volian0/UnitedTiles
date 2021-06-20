@@ -119,17 +119,17 @@ const TileInfo& Tile::get_info() const
 	return _level->_song_info.tiles[id];
 }
 
-void Tile::render_bg(Number y_offset) const
+void Tile::render_bg() const
 {
 }
 
-void Tile::render_fg(Number y_offset) const
+void Tile::render_fg() const
 {
 }
 
-void Tile::update(Number y_offset, bool force_first_interaction)
+void Tile::update()
 {
-	my_update(y_offset, force_first_interaction);
+	my_update();
 	std::vector<std::pair<uint16_t,Vec2>> touch_down_sorted_positions;
 	for (const auto& [finger_id, touch_pos] : _level->touch_down)
 	{
@@ -140,32 +140,37 @@ void Tile::update(Number y_offset, bool force_first_interaction)
 
 	for (const auto& [finger_id, touch_pos] : touch_down_sorted_positions)
 	{
-		touch_down(finger_id, { touch_pos.x, y_offset - (touch_pos.y + 1.0L) / 2.0L * 4.0L }, force_first_interaction);
+		touch_down(finger_id, { touch_pos.x, y_offset - (touch_pos.y + 1.0L) / 2.0L * 4.0L });
 	}
 	for (const auto& [finger_id, touch_pos] : _level->touch_move)
 	{
-		touch_move(finger_id, { touch_pos.x, y_offset - (touch_pos.y + 1.0L) / 2.0L * 4.0L }, force_first_interaction);
+		touch_move(finger_id, { touch_pos.x, y_offset - (touch_pos.y + 1.0L) / 2.0L * 4.0L });
 	}
 	for (const auto& [finger_id, touch_pos] : _level->touch_up)
 	{
-		touch_up(finger_id, { touch_pos.x, y_offset - (touch_pos.y + 1.0L) / 2.0L * 4.0L }, force_first_interaction);
+		touch_up(finger_id, { touch_pos.x, y_offset - (touch_pos.y + 1.0L) / 2.0L * 4.0L });
 	}
 }
 
-void Tile::touch_down(uint16_t finger_id, Vec2 pos, bool force_first_interaction)
+void Tile::touch_down(uint16_t finger_id, Vec2 pos)
 {
 }
 
-void Tile::touch_move(uint16_t finger_id, Vec2 pos, bool force_first_interaction)
+void Tile::touch_move(uint16_t finger_id, Vec2 pos)
 {
 }
 
-void Tile::touch_up(uint16_t finger_id, Vec2 pos, bool force_first_interaction)
+void Tile::touch_up(uint16_t finger_id, Vec2 pos)
 {
 }
 
-void Tile::my_update(Number y_offset, bool force_first_interaction)
+void Tile::my_update()
 {
+}
+
+bool Tile::force_first_interaction() const
+{
+	return _level->force_first_interaction();
 }
 
 void Tile::handle_first_interaction()
@@ -199,30 +204,3 @@ void Tile::handle_state_change(const TileStateInfo* state)
 		state->score_info->silent ? _level->score.silent_add(points) : _level->score.add(points);
 	}
 }
-
-
-
-/*bool EmptyTile::should_game_over(Number y_offset) const
-{
-	return false;
-}
-bool EmptyTile::should_die(Number y_offset) const
-{
-	return y_offset > get_tile_length() + 4.0L;
-}
-void EmptyTile::touch_down(uint16_t finger_id, Vec2 pos, bool force_first_interaction)
-{
-
-}
-void EmptyTile::my_update(Number y_offset, bool force_first_interaction)
-{
-
-}
-void EmptyTile::on_changed_state()
-{
-
-}
-void EmptyTile::render_fg(Number y_offset) const
-{
-
-}*/
