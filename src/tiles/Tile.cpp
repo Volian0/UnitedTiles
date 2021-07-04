@@ -175,10 +175,11 @@ void Tile::handle_first_interaction()
 	{
 		_level->change_tempo(_level->_song_info.starting_tempo, _level->new_tp, _level->_position);
 	}
-	else if (_level->_song_info.tempo_changes.count(tile_index))
+	//TODO: Implement acceleration methods
+	/*else if (_level->_song_info.acceleration_method == SongInfo::AccelerationMethod::LINEAR && _level->_song_info.acceleration_info.tempo_changes.count(tile_index))
 	{
-		_level->change_tempo(_level->_song_info.tempo_changes.at(tile_index), _level->new_tp, _level->_position);
-	}
+		_level->change_tempo(_level->_song_info.acceleration_info.tempo_changes.at(tile_index), _level->new_tp, _level->_position);
+	}*/
 }
 
 void Tile::handle_clear()

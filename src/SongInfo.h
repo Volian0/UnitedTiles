@@ -7,6 +7,7 @@
 #include <vector>
 #include <map>
 #include <fstream>
+#include <array>
 
 struct NoteEvent
 {
@@ -37,19 +38,31 @@ struct TileInfo : Unique
 	void to_file(std::ofstream& file) const;
 };
 
+struct AccelerationInfo
+{
+	std::array<std::pair<uint32_t, Number>, 2> classic_tempo_changes;
+	std::map<uint32_t, Number> tempo_changes;
+	Number parameter; //acceleration value or multiplier
+};
+
 struct SongInfo
 {
 	uint16_t version;
 	uint16_t note_ticks_per_single_tile;
 	uint16_t length_units_per_single_tile;
 	Number starting_tempo;
+	enum class AccelerationMethod : uint8_t {
+		CONSTANT = 0, CLASSIC, LINEAR, ACCELERATION
+	} acceleration_method;
+	AccelerationInfo acceleration_info;
 	std::vector<TileInfo> tiles;
-	std::map<uint32_t, Number> tempo_changes;
 
 	SongInfo() = default;
 	SongInfo(std::ifstream& file);
 	void to_file(std::ofstream& file) const;
 };
+
+SongInfo legacy_song_load(uint16_t version, std::ifstream& file);
 
 struct SongBasicInfo
 {
