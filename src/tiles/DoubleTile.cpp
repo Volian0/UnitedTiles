@@ -12,17 +12,17 @@ DoubleTile::DoubleTile(StateLevel* level_)
 {
 }
 
-bool DoubleTile::should_game_over(Number y_offset) const
+bool DoubleTile::should_game_over() const
 {
 	return y_offset > get_tile_length() + 4.0L;
 }
 
-bool DoubleTile::should_die(Number y_offset) const
+bool DoubleTile::should_die() const
 {
-	return should_game_over(y_offset);
+	return should_game_over();
 }
 
-void DoubleTile::touch_down(uint16_t finger_id, Vec2 pos, bool force_first_interaction)
+void DoubleTile::touch_down(uint16_t finger_id, Vec2 pos)
 {
 	if (pos.y >= 0 && pos.y < get_tile_length()
 		&& (is_state(&DoubleTileDefault) || is_state(&DoubleTilePartiallyCleared)))
@@ -33,16 +33,16 @@ void DoubleTile::touch_down(uint16_t finger_id, Vec2 pos, bool force_first_inter
 		missed_column = clicked_column;
 		if (missed)
 		{
-			change_state(&DoubleTileMissed, force_first_interaction);
+			change_state(&DoubleTileMissed);
 		}
 		else if (is_state(&DoubleTileDefault))
 		{
 			left_tile_cleared = clicked_left;
-			change_state(&DoubleTilePartiallyCleared, force_first_interaction);
+			change_state(&DoubleTilePartiallyCleared);
 		}
 		else if (clicked_left ^ left_tile_cleared)
 		{
-			change_state(&DoubleTileFullyCleared, force_first_interaction);
+			change_state(&DoubleTileFullyCleared);
 		}
 	}
 }
@@ -72,7 +72,7 @@ void DoubleTile::on_changed_state()
 	}
 }
 
-void DoubleTile::render_bg(Number y_offset) const
+void DoubleTile::render_bg() const
 {
 	const Vec2 pos_left = { get_column_x_pos(column == DT_LEFT ? FAR_LEFT : MID_LEFT), y_offset / 4.0L * 2.0L - 1.0L };
 	if (is_state(&DoubleTilePartiallyCleared) || is_state(&DoubleTileFullyCleared) || (is_state(&DoubleTileMissed) && tp_tapped.has_value()))
@@ -88,7 +88,7 @@ void DoubleTile::render_bg(Number y_offset) const
 	}
 }
 
-void DoubleTile::render_fg(Number y_offset) const
+void DoubleTile::render_fg() const
 {
 	if (!is_state(&DoubleTileFullyCleared))
 	{

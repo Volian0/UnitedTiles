@@ -14,10 +14,10 @@ public:
 	std::shared_ptr<Tile> previous_tile;
 
 private:
-	bool should_game_over(Number y_offset) const final;
-	bool should_die(Number y_offset) const final;
-	void touch_down(uint16_t finger_id, Vec2 pos, bool force_first_interaction = false) final;
-	void my_update(Number y_offset, bool force_first_interaction = false) final;
+	bool should_game_over() const final;
+	bool should_die() const final;
+	void touch_down(uint16_t finger_id, Vec2 pos) final;
+	void my_update() final;
 
-	void render_fg(Number y_offset) const final;
+	void render_fg() const final;
 };

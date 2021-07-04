@@ -8,16 +8,16 @@ SingleTile::SingleTile(StateLevel* level_)
 {
 }
 
-bool SingleTile::should_game_over(Number y_offset) const
+bool SingleTile::should_game_over() const
 {
 	return y_offset > get_tile_length() + 4.0L;
 }
-bool SingleTile::should_die(Number y_offset) const
+bool SingleTile::should_die() const
 {
-	return should_game_over(y_offset);
+	return should_game_over();
 }
 
-void SingleTile::touch_down(uint16_t finger_id, Vec2 pos, bool force_first_interaction)
+void SingleTile::touch_down(uint16_t finger_id, Vec2 pos)
 {
 	if (is_state(&SingleTileDefault))
 	{
@@ -26,12 +26,12 @@ void SingleTile::touch_down(uint16_t finger_id, Vec2 pos, bool force_first_inter
 			TileColumn clicked_column = get_column(pos.x);
 			if (clicked_column == column)
 			{
-				change_state(&SingleTileCleared, force_first_interaction);
+				change_state(&SingleTileCleared);
 			}
 			else
 			{
 				missed_column = clicked_column;
-				change_state(&SingleTileMissed, force_first_interaction);
+				change_state(&SingleTileMissed);
 			}
 		}
 	}
@@ -46,7 +46,7 @@ void SingleTile::on_changed_state()
 	}
 }
 
-void SingleTile::render_fg(Number y_offset) const
+void SingleTile::render_fg() const
 {
 	Vec2 pos = { get_column_x_pos(column), y_offset / 4.0L * 2.0L - 1.0L };
 	Texture* texture = is_state(&SingleTileCleared) ? &_level->txt_single_tile_cleared : &_level->txt_single_tile;

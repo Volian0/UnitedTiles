@@ -27,37 +27,37 @@ EmptyTile::EmptyTile(StateLevel* level_)
 	}
 }
 
-bool EmptyTile::should_game_over(Number y_offset) const
+bool EmptyTile::should_game_over() const
 {
 	return false;
 }
 
-bool EmptyTile::should_die(Number y_offset) const
+bool EmptyTile::should_die() const
 {
 	return true;
 }
 
-void EmptyTile::touch_down(uint16_t finger_id, Vec2 pos, bool force_first_interaction)
+void EmptyTile::touch_down(uint16_t finger_id, Vec2 pos)
 {
 	if (is_state(&EmptyTileDefault))
 	{
 		if (pos.y >= 0 && pos.y < get_tile_length())
 		{
 			missed_column = get_column(pos.x);
-			change_state(&EmptyTileMissed, force_first_interaction);
+			change_state(&EmptyTileMissed);
 		}
 	}
 }
 
-void EmptyTile::my_update(Number y_offset, bool force_first_interaction)
+void EmptyTile::my_update()
 {
 	if (is_state(&EmptyTileDefault))
 	{
-		change_state(&EmptyTileCleared, force_first_interaction);
+		change_state(&EmptyTileCleared);
 	}
 }
 
-void EmptyTile::render_fg(Number y_offset) const
+void EmptyTile::render_fg() const
 {
 	if (is_state(&EmptyTileMissed) && (_level->new_tp % 0.25) > 0.125)
 	{

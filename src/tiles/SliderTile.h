@@ -15,18 +15,16 @@ public:
 	std::pair<TileColumn, std::optional<TileColumn>> get_end_column() const;
 
 private:
-	bool should_game_over(Number y_offset) const final;
-	bool should_die(Number y_offset) const final;
-	void my_update(Number y_offset, bool force_first_interaction = false) final;
-	void touch_down(uint16_t finger_id, Vec2 pos, bool force_first_interaction = false) final;
-	void touch_move(uint16_t finger_id, Vec2 pos, bool force_first_interaction = false) final;
-	void touch_up(uint16_t finger_id, Vec2 pos, bool force_first_interaction = false) final;
+	bool should_game_over() const final;
+	bool should_die() const final;
+	void my_update() final;
+	void touch_down(uint16_t finger_id, Vec2 pos) final;
+	void touch_move(uint16_t finger_id, Vec2 pos) final;
+	void touch_up(uint16_t finger_id, Vec2 pos) final;
 	void on_changed_state() final;
 
-	void render_fg(Number y_offset) const final;
+	void render_fg() const final;
 
-	Number get_x_pos(Number y_offset) const;
-	//bool is_facing_left(Number y_offset) const;
 	TileColumn next_column(const std::shared_ptr<Tile>& previous_tile) const;
 	bool in_range(Vec2 pos) const;
 
@@ -34,8 +32,6 @@ private:
 
 	uint8_t get_column_index() const;
 	const uint8_t _column_index;
-
-	void debug_draw_hitbox(Number y_offset) const;
 
 	void render_fragment(class Texture* texture, Number length, Vec2 pos, bool facing_right) const;
 

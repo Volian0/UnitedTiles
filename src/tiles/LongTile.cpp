@@ -8,29 +8,29 @@ LongTile::LongTile(StateLevel* level_)
 {
 }
 
-bool LongTile::should_game_over(Number y_offset) const
+bool LongTile::should_game_over() const
 {
 	return y_offset > 1.0L + 4.0L;
 }
 
-bool LongTile::should_die(Number y_offset) const
+bool LongTile::should_die() const
 {
 	return y_offset > get_tile_length() + 4.0L;;
 }
 
-void LongTile::my_update(Number y_offset, bool force_first_interaction)
+void LongTile::my_update()
 {
 	if (is_state(&LongTileClearing))
 	{
 		held_tile_duration = (_level->new_tp - tp_tapped) * _level->tps;
 		if (held_tile_duration + 1.0L >= get_tile_length())
 		{
-			change_state(&LongTileFullyCleared, force_first_interaction);
+			change_state(&LongTileFullyCleared);
 		}
 	}
 }
 
-void LongTile::touch_down(uint16_t finger_id, Vec2 pos, bool force_first_interaction)
+void LongTile::touch_down(uint16_t finger_id, Vec2 pos)
 {
 	if (is_state(&LongTileDefault))
 	{
@@ -42,23 +42,23 @@ void LongTile::touch_down(uint16_t finger_id, Vec2 pos, bool force_first_interac
 				if (pos.y < 1.0L)
 				{
 					finger = finger_id;
-					change_state(&LongTileClearing, force_first_interaction);
+					change_state(&LongTileClearing);
 				}
 			}
 			else
 			{
 				missed_column = clicked_column;
-				change_state(&LongTileMissed, force_first_interaction);
+				change_state(&LongTileMissed);
 			}
 		}
 	}
 }
 
-void LongTile::touch_up(uint16_t finger_id, Vec2 pos, bool force_first_interaction)
+void LongTile::touch_up(uint16_t finger_id, Vec2 pos)
 {
 	if (is_state(&LongTileClearing) && finger_id == finger)
 	{
-		change_state(&LongTileNotFullyCleared, force_first_interaction);
+		change_state(&LongTileNotFullyCleared);
 	}
 }
 
@@ -75,7 +75,7 @@ void LongTile::on_changed_state()
 	}
 }
 
-void LongTile::render_fg(Number y_offset) const
+void LongTile::render_fg() const
 {
 	Vec2 pos = { get_column_x_pos(column), y_offset / 4.0L * 2.0L - 1.0L };
 	Texture* texture;

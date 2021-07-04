@@ -73,6 +73,8 @@ public:
 
 	void queue_notes(const std::multimap<uint32_t, NoteEvent>& notes, bool forceplay_old = true, const std::optional<Timepoint> custom_tp = {});
 
+	bool force_first_interaction() const;
+
 	Timepoint new_tp;
 
 	std::optional<Number> game_over_scroll_to;
@@ -102,8 +104,6 @@ private:
 		IDLE, ACTIVE, GAME_OVER
 	} _state = State::ACTIVE;
 
-	//Number position = 0.0L;
-	//uint32_t score = 0;
 	Timepoint last_tempo_change;
 	Number previous_position = 0;
 
