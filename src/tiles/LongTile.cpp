@@ -23,6 +23,7 @@ void LongTile::my_update()
 	if (is_state(&LongTileClearing))
 	{
 		held_tile_duration = (_level->new_tp - tp_tapped) * _level->tps;
+
 		if (held_tile_duration + 1.0L >= get_tile_length())
 		{
 			change_state(&LongTileFullyCleared);

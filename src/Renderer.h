@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Unique.h"
+#include "NonCopyable.h"
 #include "Types.h"
 
 #include <memory>
@@ -9,7 +9,7 @@
 class RendererReloadable;
 class Texture;
 
-class Renderer : Unique
+class Renderer : NonCopyable
 {
 	friend RendererReloadable;
 	friend Texture;
@@ -27,12 +27,18 @@ public:
 		Vec2 rot_origin,
 		Vec2 src_origin = { 0.0L, 0.0L }, Number angle = 0.0L, uint8_t flip = 0);
 
-	glm::u16vec2 get_size() const;
-	Number get_aspect_ratio() const;
-	bool active() const;
+	[[nodiscard]] glm::u16vec2 get_size() const;
+	[[nodiscard]] Number get_aspect_ratio() const;
+	[[nodiscard]] bool active() const;
 	bool vsync;
 
+	void set_clip_rect(Vec2 pos, Vec2 size, Vec2 origin);
+	void unset_clip();
 private:
+	Vec2 _clip_size{};
+	Vec2 _clip_position{};
+	Vec2 _clip_origin{};
+
 	void* _ptr;
 	void* _window;
 	std::unordered_set<RendererReloadable*> _reloadables;

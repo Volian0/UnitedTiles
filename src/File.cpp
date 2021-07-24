@@ -81,18 +81,18 @@ std::optional<std::string> read_string(std::ifstream& file)
 	{
 		return {};
 	}
-	std::optional<std::vector<char>> buffer = read_buffer(file, size.value());
+	auto buffer = read_buffer(file, size.value());
 	if (!buffer.has_value())
 	{
 		return {};
 	}
-	return std::string(buffer.value().data(), size.value());
+	return std::string(reinterpret_cast<char*>(buffer.value().data()), size.value());
 }
 
-std::optional<std::vector<char>> read_buffer(std::ifstream& file, uint32_t size)
+std::optional<std::vector<std::byte>> read_buffer(std::ifstream& file, uint32_t size)
 {
-	std::vector<char> buffer(size, 0);
-	if (file.read(buffer.data(), size))
+	std::vector<std::byte> buffer(size);
+	if (file.read(reinterpret_cast<char*>(buffer.data()), size))
 	{
 		return buffer;
 	}
@@ -144,14 +144,14 @@ bool write_string(std::ofstream& file, const std::string& string)
 {
 	if (write_u32(file, string.size()))
 	{
-		return write_buffer(file, string.c_str(), string.size());
+		return write_buffer(file, reinterpret_cast<const std::byte*>(string.c_str()), string.size());
 	}
 	return false;
 }
 
-bool write_buffer(std::ofstream& file, const char* buffer, uint32_t size)
+bool write_buffer(std::ofstream& file, const std::byte* buffer, uint32_t size)
 {
-	return bool(file.write(buffer, size));
+	return bool(file.write(reinterpret_cast<const char*>(buffer), size));
 }
 
 std::optional<std::ifstream> open_ifile(const std::string& filename)

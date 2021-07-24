@@ -53,6 +53,7 @@ void BurstParticles::add(Vec2 pos, Vec2 size, uint16_t number_of_particles, Numb
 
 void BurstParticles::update(Number delta_time)
 {
+	if (!enabled) { return; }
 	//remove old particle groups
 	_particle_groups.erase(std::remove_if(_particle_groups.begin(), _particle_groups.end(), [&](const BurstParticleGroup& particle_group) { return particle_group.is_dead(); }), _particle_groups.end());
 
@@ -64,6 +65,7 @@ void BurstParticles::update(Number delta_time)
 
 void BurstParticles::render() const
 {
+	if (!enabled) { return; }
 	for (const auto& particle_group : _particle_groups)
 	{
 		_texture.tint = particle_group.color;
@@ -75,3 +77,5 @@ void BurstParticles::render() const
 		}
 	}
 }
+
+bool BurstParticles::enabled = true;

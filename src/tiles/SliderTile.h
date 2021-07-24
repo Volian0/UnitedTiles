@@ -15,8 +15,8 @@ public:
 	std::pair<TileColumn, std::optional<TileColumn>> get_end_column() const;
 
 private:
-	bool should_game_over() const final;
-	bool should_die() const final;
+	[[nodiscard]] bool should_game_over() const final;
+	[[nodiscard]] bool should_die() const final;
 	void my_update() final;
 	void touch_down(uint16_t finger_id, Vec2 pos) final;
 	void touch_move(uint16_t finger_id, Vec2 pos) final;
@@ -25,12 +25,12 @@ private:
 
 	void render_fg() const final;
 
-	TileColumn next_column(const std::shared_ptr<Tile>& previous_tile) const;
-	bool in_range(Vec2 pos) const;
+	[[nodiscard]] TileColumn next_column(const std::shared_ptr<Tile>& previous_tile) const;
+	[[nodiscard]] bool in_range(Vec2 pos) const;
 
 	Number held_tile_duration = 0;
 
-	uint8_t get_column_index() const;
+	[[nodiscard]] uint8_t get_column_index() const;
 	const uint8_t _column_index;
 
 	void render_fragment(class Texture* texture, Number length, Vec2 pos, bool facing_right) const;

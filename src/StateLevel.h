@@ -19,7 +19,7 @@
 
 class StateLevel;
 
-class ScoreCounter : Unique
+class ScoreCounter : NonCopyable
 {
 public:
 	ScoreCounter(StateLevel* level_, uint32_t init_value = 0);
@@ -73,7 +73,7 @@ public:
 
 	void queue_notes(const std::multimap<uint32_t, NoteEvent>& notes, bool forceplay_old = true, const std::optional<Timepoint> custom_tp = {});
 
-	bool force_first_interaction() const;
+	[[nodiscard]] bool force_first_interaction() const;
 
 	Timepoint new_tp;
 
@@ -85,7 +85,7 @@ public:
 
 	BurstParticles _burst;
 
-	Number get_tile_pos(const Tile* tile_);
+	[[nodiscard]] Number get_tile_pos(const Tile* tile_);
 
 	Number _position = 0.0L;
 

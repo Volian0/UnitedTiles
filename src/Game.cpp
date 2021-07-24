@@ -5,6 +5,7 @@
 #include "StateDevMenu.h"
 #include "DevTouch.h"
 #include "Colors.h"
+#include "BurstParticles.h"
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
@@ -19,8 +20,14 @@ Game::Game()
 {
 	init_libraries();
 
-	renderer = std::make_unique<Renderer>();
-	audio = std::make_unique<AudioDevice>();
+	cfg = std::make_unique<Configuration>();
+	cfg->load_from_file();
+
+	renderer = std::make_unique<Renderer>(cfg->enable_vsync);
+	audio = std::make_unique<AudioDevice>(cfg->audio_sample_rate, cfg->audio_stereo);
+
+	DustMotes::enabled = cfg->enable_particles_dustmotes;
+	BurstParticles::enabled = cfg->enable_particles_burst;
 
 	change_state<StateDevMenu>();
 }
@@ -29,6 +36,10 @@ Game::~Game()
 {
 	//make sure to destruct the old state
 	stop();
+
+	audio.reset();
+	renderer.reset();
+	cfg->save_to_file();
 
 	deinit_libraries();
 }
@@ -68,7 +79,7 @@ void Game::run()
 			}
 		}
 
-		_dev_touch.update(_state.get());
+		if (cfg->enable_hit_markers) { _dev_touch.update(_state.get()); }
 
 		//update the state
 		_state->update();
@@ -80,15 +91,18 @@ void Game::run()
 		else if (renderer->active()) {
 			renderer->clear();
 			_state->render();
-			auto fps = _fps_counter.update();
-			auto fps_font_color = Colors::GREEN;
-			if (fps < 30)
-				fps_font_color = Colors::RED;
-			else if (fps < 60)
-				fps_font_color = Colors::YELLOW;
-			Texture fps_texture(renderer.get(), &fps_font, "FPS: " + std::to_string(fps), fps_font_color);
-			renderer->render(&fps_texture, { 0,0 }, fps_texture.get_psize(), { -1,-1 }, fps_texture.get_rsize(), {}, {-1, -1});
-			//_dev_touch.render(renderer.get());
+			if (cfg->show_fps)
+			{
+				auto fps = _fps_counter.update();
+				auto fps_font_color = Colors::GREEN;
+				if (fps < 30)
+					fps_font_color = Colors::RED;
+				else if (fps < 60)
+					fps_font_color = Colors::YELLOW;
+				Texture fps_texture(renderer.get(), &fps_font, "FPS: " + std::to_string(fps), fps_font_color);
+				renderer->render(&fps_texture, { 0,0 }, fps_texture.get_psize(), { -1,-1 }, fps_texture.get_rsize(), {}, { -1, -1 });
+			}
+			if (cfg->enable_hit_markers) { _dev_touch.render(renderer.get()); }
 			renderer->display(); }
 
 		//check for SDL errors
@@ -103,6 +117,16 @@ void Game::stop()
 {
 	_state_changed = true;
 	_state.reset();
+}
+
+void Game::append_cfg()
+{
+	renderer->vsync = cfg->enable_vsync;
+	renderer->reload();
+	audio = std::make_unique<AudioDevice>(cfg->audio_sample_rate, cfg->audio_stereo);
+	DustMotes::enabled = cfg->enable_particles_dustmotes;
+	BurstParticles::enabled = cfg->enable_particles_burst;
+	cfg->save_to_file();
 }
 
 void Game::init_libraries()

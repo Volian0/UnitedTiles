@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Unique.h"
+#include "NonCopyable.h"
 #include "Types.h"
 #include "Texture.h"
 
@@ -26,9 +26,9 @@ public:
 
 	void set_text(const std::string& text);
 
-	bool is_pressed() const;
-	bool is_held() const;
-	bool in_range(Vec2 pos) const;
+	[[nodiscard]] bool is_pressed() const;
+	[[nodiscard]] bool is_held() const;
+	[[nodiscard]] bool in_range(Vec2 pos) const;
 
 private:
 	GameState* _state;

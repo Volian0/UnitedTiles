@@ -50,6 +50,11 @@ void Renderer::reload()
 	{
 		reloadable->reload();
 	}
+
+	if (_clip_size != Vec2{})
+	{
+		set_clip_rect(_clip_position, _clip_size, _clip_origin);
+	}
 }
 
 void Renderer::render(Texture* texture, glm::u32vec2 src_pos, glm::u32vec2 src_size, Vec2 dest_pos, Vec2 dest_size, Vec2 rot_origin, Vec2 src_origin, Number angle, uint8_t flip)
@@ -92,6 +97,26 @@ bool Renderer::active() const
 	bool active = !(SDL_GetWindowFlags(reinterpret_cast<SDL_Window*>(_window)) & SDL_WINDOW_MINIMIZED);
 	active_audio = active;
 	return active;
+}
+
+void Renderer::set_clip_rect(Vec2 pos, Vec2 size, Vec2 origin)
+{
+	_clip_origin = origin;
+	_clip_position = pos;
+	_clip_size = size;
+
+	size *= Vec2(_size);
+	pos = (pos + Number(1.0L)) * Vec2(_size) / Number(2.0L) - (origin + Number(1.0L)) * Vec2(size) / Number(2.0L);
+	SDL_Rect dest_rect{ std::round(pos.x), std::round(pos.y), std::round(size.x), std::round(size.y) };
+
+	SDL_RenderSetClipRect(reinterpret_cast<SDL_Renderer*>(_ptr), &dest_rect);
+}
+
+void Renderer::unset_clip()
+{
+	_clip_size = {};
+
+	SDL_RenderSetClipRect(reinterpret_cast<SDL_Renderer*>(_ptr), nullptr);
 }
 
 void Renderer::update_size()

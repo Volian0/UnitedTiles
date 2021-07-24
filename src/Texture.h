@@ -36,8 +36,8 @@ public:
 	Color tint = Colors::WHITE;
 	uint8_t blend_mode;
 
-	glm::u32vec2 get_psize() const;
-	Vec2 get_rsize() const;
+	[[nodiscard]] glm::u32vec2 get_psize() const;
+	[[nodiscard]] Vec2 get_rsize() const;
 
 private:
 	void* _ptr;

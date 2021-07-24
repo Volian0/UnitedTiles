@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Unique.h"
+#include "NonCopyable.h"
 #include "Timepoint.h"
 #include "SongInfo.h"
 
@@ -9,10 +9,10 @@
 #include <map>
 #include <unordered_set>
 
-class Soundfont : Unique
+class Soundfont : NonCopyable
 {
 public:
-	Soundfont(const std::string& filename);
+	Soundfont(const std::string& filename, uint16_t sample_rate, bool stereo);
 	~Soundfont();
 
 	void cc(uint8_t control, uint8_t value);

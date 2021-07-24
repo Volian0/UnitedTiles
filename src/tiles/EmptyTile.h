@@ -14,8 +14,8 @@ public:
 	std::shared_ptr<Tile> previous_tile;
 
 private:
-	bool should_game_over() const final;
-	bool should_die() const final;
+	[[nodiscard]] bool should_game_over() const final;
+	[[nodiscard]] bool should_die() const final;
 	void touch_down(uint16_t finger_id, Vec2 pos) final;
 	void my_update() final;
 

@@ -2,21 +2,21 @@
 
 #include <string>
 
-#include "Unique.h"
+#include "NonCopyable.h"
 
 namespace Path
 {
-	std::string user(const std::string& filename, const std::string& folder = {});
-	std::string res(const std::string& filename, const std::string& folder = {});
+	[[nodiscard]] std::string user(const std::string& filename, const std::string& folder = {});
+	[[nodiscard]] std::string res(const std::string& filename, const std::string& folder = {});
 };
 
-class ExtractedRes : Unique
+class ExtractedRes : NonCopyable
 {
 public:
 	ExtractedRes(const std::string& filename, const std::string& folder = {});
 	~ExtractedRes();
 
-	const std::string& get_path() const;
+	[[nodiscard]] const std::string& get_path() const;
 
 private:
 	std::string _path;

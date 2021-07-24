@@ -8,66 +8,76 @@
 #include <algorithm>
 
 StateSettings::StateSettings(Game* game_)
-	:GameState(game_)
+	:GameState(game_),
+	_font{ game_->renderer.get(), "roboto.ttf", 8.0L },
+	_bg{ game->renderer.get(), "dev_background.png" },
+	_dev_button_texture{ game->renderer.get(), "dev_button.png" },
+	_b_discard{ {-0.5, 0}, 0.4L, 0, "Discard", &_dev_button_texture, &_font, this},
+	_b_apply{ {0.5, 0}, 0.4L, 0, "Apply", &_dev_button_texture, &_font, this },
+	cb_u{ game->renderer.get(), "ui/checkbox0.png"},
+	cb_c{ game->renderer.get(), "ui/checkbox1.png"}
 {
-	_font = std::make_unique<Font>(game->renderer.get(), "roboto.ttf", 8.0L);
-	_bg = std::make_unique<Texture>(game->renderer.get(), "dev_background.png");
-	_dev_button_texture = std::make_unique<Texture>(game->renderer.get(), "dev_button.png");
-	_dev_button_texture->blend_mode = 1;
-	std::unique_ptr<Font> small_font = std::make_unique<Font>(game->renderer.get(), "roboto.ttf", 4.0L);
-	_dev_buttons.emplace_back(Vec2{}, 1, _dev_buttons.size(), "Return to menu", _dev_button_texture.get(), _font.get(), this);
-	_dev_buttons.emplace_back(Vec2{}, 1, _dev_buttons.size(), game->renderer->vsync ? "V-sync: ON" : "V-sync: OFF", _dev_button_texture.get(), _font.get(), this);
-	_dev_buttons.emplace_back(Vec2{}, 1, _dev_buttons.size(), "Sample rate: 44100", _dev_button_texture.get(), _font.get(), this);
-	_dev_buttons.emplace_back(Vec2{}, 1, _dev_buttons.size(), "Channels: STEREO", _dev_button_texture.get(), _font.get(), this);
-	_dev_buttons.emplace_back(Vec2{}, 1, _dev_buttons.size(), "Reset to default", _dev_button_texture.get(), _font.get(), this);
-	_dev_buttons.emplace_back(Vec2{}, 1, _dev_buttons.size(), "Clear user data", _dev_button_texture.get(), _font.get(), this);
+	_dev_button_texture.blend_mode = 1;
+	cb_u.blend_mode = 1;
+	cb_c.blend_mode = 1;
+	scrollable_panel.origin = Vec2{ 0, -1 };
+	//append check boxes
+	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Stereo audio", game->renderer.get()), std::forward_as_tuple(game->cfg->audio_stereo));
+	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Burst particles", game->renderer.get()), std::forward_as_tuple(game->cfg->enable_particles_burst));
+	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "DustMotes particles", game->renderer.get()), std::forward_as_tuple(game->cfg->enable_particles_dustmotes));
+	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Show debug hit markers", game->renderer.get()), std::forward_as_tuple(game->cfg->enable_hit_markers));
+	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Show FPS", game->renderer.get()), std::forward_as_tuple(game->cfg->show_fps));
+	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Show debug gameplay information", game->renderer.get()), std::forward_as_tuple(game->cfg->show_gameplay_debug_info));
+	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Enable V-Sync", game->renderer.get()), std::forward_as_tuple(game->cfg->enable_vsync));
+	//set correct checkbox values
+	for (auto& checkbox : check_boxes)
+	{
+		checkbox.first._checked = checkbox.second;
+	}
+	scrollable_panel._state = this;
+	scrollable_panel.max_offset = 0.0L;
 }
 
 void StateSettings::update()
 {
-	Number aspect_ratio = game->renderer->get_aspect_ratio();
-	Number button_height = 0.125L * aspect_ratio;
-	Number margin = (1.0L - Number(_dev_buttons.size()) * button_height) / (1.0L + Number(_dev_buttons.size()));
-	for (uint8_t i = 0; i < _dev_buttons.size(); ++i)
+	if (_b_apply.update())
 	{
-		_dev_buttons[i].position = { 0, (margin + (button_height + margin) * Number(i) + button_height / 2.0L) * 2.0L - 1.0L };
-		_dev_buttons[i].width = std::clamp(1.0L - 2.0L * margin / aspect_ratio, 0.8L, 1.0L);
+		for (auto& checkbox : check_boxes)
+		{
+			checkbox.second.get() = checkbox.first._checked;
+		}
+		game->append_cfg();
+		return game->change_state<StateDevMenu>();
 	}
-	if (_dev_buttons[0].update())
+	if (_b_discard.update())
 	{
 		return game->change_state<StateDevMenu>();
 	}
-	if (_dev_buttons[1].update())
+	//set button positions
+	Number button_y_pos = -1.0L + ((1.0L / 8.0L) + 0.1L) * game->renderer->get_aspect_ratio();
+	Number button_height = ((1.0L / 8.0L) + 0.1L) * game->renderer->get_aspect_ratio() * 2.0L;
+	scrollable_panel.position = { 0, -1.0L + button_height };
+	scrollable_panel.size = { 2.0L, 2.0L };
+	scrollable_panel.min_offset = -1.0L;
+	scrollable_panel.update();
+	_b_apply.position.y = button_y_pos;
+	_b_discard.position.y = button_y_pos;
+	for (uint8_t i = 0; i < check_boxes.size(); ++i)
 	{
-		game->renderer->vsync = !game->renderer->vsync;
-		game->renderer->reload();
-		return game->change_state<StateSettings>();
-	}
-	if (_dev_buttons[2].update())
-	{
-
-	}
-	if (_dev_buttons[3].update())
-	{
-
-	}
-	if (_dev_buttons[4].update())
-	{
-		game->renderer->vsync = false;
-		game->renderer->reload();
-		return game->change_state<StateSettings>();
-	}
-	if (_dev_buttons[5].update())
-	{
-
+		check_boxes[i].first.label.position.y = -1.0L + button_height + 0.1L * game->renderer->get_aspect_ratio() + 0.2L * game->renderer->get_aspect_ratio() * Number(i) + scrollable_panel.get_offset();
+		check_boxes[i].first.update(this);
 	}
 }
 
 void StateSettings::render() const
 {
-	game->renderer->render(_bg.get(), { 0,0 }, _bg->get_psize(), { 0,0 }, { 1,1 }, { 0,0 });
-	for (auto& button : _dev_buttons)
+	game->renderer->render(&_bg, { 0,0 }, _bg.get_psize(), { 0,0 }, { 1,1 }, { 0,0 });
+	_b_apply.render();
+	_b_discard.render();
+	scrollable_panel.start_rendering();
+	for (auto& checkbox : check_boxes)
 	{
-		button.render();
+		checkbox.first.render(game->renderer.get());
 	}
+	scrollable_panel.stop_rendering();
 }

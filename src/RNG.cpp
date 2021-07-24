@@ -8,14 +8,12 @@ namespace RNG
 
 	Number number(Number min, Number max)
 	{
-		std::uniform_real_distribution<Number> distribution(min, max);
-		return distribution(generator);
+		return std::uniform_real_distribution<Number>(min, max)(generator);
 	}
 
 	uint32_t integer(uint32_t min, uint32_t max)
 	{
-		std::uniform_int_distribution<uint32_t> distribution(min, max);
-		return distribution(generator);
+		return std::uniform_int_distribution<uint32_t>(min, max)(generator);
 	}
 
 	bool boolean()

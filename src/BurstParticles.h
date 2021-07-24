@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Unique.h"
+#include "NonCopyable.h"
 #include "Types.h"
 #include "Renderer.h"
 #include "Texture.h"
@@ -22,12 +22,12 @@ struct BurstParticleGroup
 	Number lifetime;
 	Number total_time = 0;
 	std::vector<BurstParticle> _particles;
-	bool is_dead() const;
-	uint8_t get_alpha() const;
+	[[nodiscard]] bool is_dead() const;
+	[[nodiscard]] uint8_t get_alpha() const;
 	void simulate(Number delta_time, Number aspect_ratio);;
 };
 
-class BurstParticles : Unique
+class BurstParticles : NonCopyable
 {
 public:
 	BurstParticles(Renderer* renderer, const std::string& texture_name);
@@ -36,6 +36,8 @@ public:
 
 	void update(Number delta_time);
 	void render() const;
+
+	static bool enabled;
 
 private:
 	Renderer* _renderer;

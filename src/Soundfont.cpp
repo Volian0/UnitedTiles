@@ -8,12 +8,12 @@
 
 #include <iostream>
 
-Soundfont::Soundfont(const std::string& filename)
+Soundfont::Soundfont(const std::string& filename, uint16_t sample_rate, bool stereo)
 {
 	ExtractedRes soundfont_file(filename, "soundfonts");
 	//std::scoped_lock lock(_mutex);
 	_ptr = tsf_load_filename(soundfont_file.get_path().c_str());
-	tsf_set_output(reinterpret_cast<tsf*>(_ptr), TSF_STEREO_INTERLEAVED, 44100); //sample rate
+	tsf_set_output(reinterpret_cast<tsf*>(_ptr), stereo ? TSF_STEREO_INTERLEAVED : TSF_MONO, sample_rate); //sample rate
 	tsf_set_volume(reinterpret_cast<tsf*>(_ptr), 1.20L);
 }
 

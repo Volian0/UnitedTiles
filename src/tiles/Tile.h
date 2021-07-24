@@ -33,9 +33,9 @@ inline constexpr std::array<TileColumn, 6> columns = {
 	ST_FAR_LEFT, ST_MID_LEFT_FACING_RIGHT, ST_MID_RIGHT_FACING_RIGHT
 };
 
-extern Number get_column_x_pos(TileColumn column);
-extern TileColumn get_column(Number x_pos);
-extern TileColumn next_column(const std::shared_ptr<class Tile>& previous_tile);
+[[nodiscard]] extern  Number get_column_x_pos(TileColumn column);
+[[nodiscard]] extern TileColumn get_column(Number x_pos);
+[[nodiscard]] extern TileColumn next_column(const std::shared_ptr<class Tile>& previous_tile);
 
 struct ScoreInfo
 {
@@ -56,7 +56,7 @@ struct TileStateInfo
 	std::optional<ScoreInfo> score_info = {};
 };
 
-class Tile : Unique
+class Tile : NonCopyable
 {
 public:
 	Tile(class StateLevel* level, TileColumn column_);
@@ -65,17 +65,17 @@ public:
 	const uint32_t id;
 	const TileColumn column;
 
-	bool is_active() const;
+	[[nodiscard]] bool is_active() const;
 
-	Number get_tile_length() const;
-	Number get_height() const;
+	[[nodiscard]] Number get_tile_length() const;
+	[[nodiscard]] Number get_height() const;
 
-	const TileInfo& get_info() const;
+	[[nodiscard]] const TileInfo& get_info() const;
 
 	virtual void render_bg() const;
 	virtual void render_fg() const;
 
-	virtual TileAction get_action() = 0;
+	[[nodiscard]] virtual TileAction get_action() = 0;
 
 	void update();
 
@@ -85,15 +85,15 @@ public:
 	virtual void touch_move(uint16_t finger_id, Vec2 pos);
 	virtual void touch_up(uint16_t finger_id, Vec2 pos);
 
-	virtual bool should_game_over() const = 0;
-	virtual bool should_die() const = 0;
+	[[nodiscard]] virtual bool should_game_over() const = 0;
+	[[nodiscard]] virtual bool should_die() const = 0;
 
 	TileColumn missed_column;
 
 	Number y_offset;
 
 protected:
-	bool force_first_interaction() const;
+	[[nodiscard]] bool force_first_interaction() const;
 	void handle_first_interaction();
 	void handle_clear();
 	void handle_game_over();
@@ -148,7 +148,7 @@ public:
 		return true;
 	}
 
-	inline TileAction get_action() final
+	[[nodiscard]] inline TileAction get_action() final
 	{
 		if (_state == game_over_state || _state->action == TileAction::NOTHING)
 		{
@@ -161,7 +161,7 @@ public:
 		return should_die() ? TileAction::DELETE : TileAction::NOTHING;
 	}
 
-	inline bool is_state(const TileStateInfo* state) const
+	[[nodiscard]] inline bool is_state(const TileStateInfo* state) const
 	{
 		return state == _state;
 	}

@@ -5,6 +5,9 @@
 #include "Texture.h"
 #include "DevButton.h"
 
+#include "ui/CheckBox.h"
+#include "ui/ScrollablePanel.h"
+
 #include <memory>
 
 class StateSettings : public GameState
@@ -16,8 +19,15 @@ private:
 	virtual void update();
 	virtual void render() const;
 
-	std::unique_ptr<Font> _font;
-	std::unique_ptr<Texture> _bg;
-	std::unique_ptr<Texture> _dev_button_texture;
-	std::vector<DevButton> _dev_buttons;
+	Font _font;
+	mutable Texture _bg;
+	Texture _dev_button_texture;
+	DevButton _b_discard;
+	DevButton _b_apply;
+
+	Texture cb_u, cb_c;
+
+	ScrollablePanel scrollable_panel;
+
+	std::vector<std::pair<CheckBox, std::reference_wrapper<bool>>> check_boxes;
 };

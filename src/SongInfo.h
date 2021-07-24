@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Unique.h"
+#include "NonCopyable.h"
 #include "Types.h"
 
 #include <cstdint>
@@ -22,7 +22,7 @@ struct NoteEvent
 	void to_file(std::ofstream& file) const;
 };
 
-struct TileInfo : Unique
+struct TileInfo : NonCopyable
 {
 	uint32_t length;
 	enum class Type : uint8_t {

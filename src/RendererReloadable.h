@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Unique.h"
+#include "NonCopyable.h"
 
 class Renderer;
 
-class RendererReloadable : Unique
+class RendererReloadable : NonCopyable
 {
 public:
 	RendererReloadable(Renderer* renderer);

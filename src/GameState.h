@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Unique.h"
+#include "NonCopyable.h"
 #include "Types.h"
 
 #include <vector>
@@ -9,7 +9,7 @@
 
 class Game;
 
-class GameState : Unique
+class GameState : NonCopyable
 {
 public:
 	virtual void update() = 0;

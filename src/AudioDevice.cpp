@@ -20,14 +20,15 @@ void AudioDevice::data_callback(ma_device* device, void* output, const void* inp
 	}
 }
 
-AudioDevice::AudioDevice()
+AudioDevice::AudioDevice(uint16_t sample_rate_, bool stereo_)
+: sample_rate{sample_rate_}, stereo{stereo_}
 {
 	_ptr = new ma_device;
 	
 	ma_device_config device_cfg = ma_device_config_init(ma_device_type_playback);
 	device_cfg.playback.format = ma_format_s16;
-	device_cfg.playback.channels = 2;
-	device_cfg.sampleRate = 44100;
+	device_cfg.playback.channels = stereo ? 2 : 1;
+	device_cfg.sampleRate = sample_rate;
 	device_cfg.dataCallback = data_callback;
 	device_cfg.pUserData = this;
 
@@ -53,7 +54,7 @@ std::shared_ptr<Soundfont> AudioDevice::load_soundfont(const std::string& filena
 {
 	std::scoped_lock lock(_soundfont_mutex);
 	_soundfont.reset();
-	_soundfont = std::make_shared<Soundfont>(filename);
+	_soundfont = std::make_shared<Soundfont>(filename, sample_rate, stereo);
 	return _soundfont;
 }
 

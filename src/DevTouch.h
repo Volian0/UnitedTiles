@@ -15,11 +15,11 @@ struct DevTouchMarker
 	Vec2 position;
 	std::unique_ptr<Texture> finger_id;
 	Timepoint timepoint;
-	bool should_die(const Timepoint& tp) const;
+	[[nodiscard]] bool should_die(const Timepoint& tp) const;
 	void render(const class DevTouch* dt, Renderer* renderer) const;
 };
 
-class DevTouch : Unique
+class DevTouch : NonCopyable
 {
 	friend DevTouchMarker;
 

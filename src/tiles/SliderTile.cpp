@@ -156,6 +156,7 @@ uint8_t SliderTile::get_column_index() const
 			return index;
 		}
 	}
+	abort();
 }
 
 void SliderTile::render_fragment(Texture* texture, Number length, Vec2 pos, bool facing_right) const

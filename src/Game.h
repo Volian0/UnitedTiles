@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Configuration.h"
 #include "GameState.h"
 #include "FpsCounter.h"
 #include "AudioDevice.h"
@@ -8,7 +9,7 @@
 
 class Renderer;
 
-class Game : Unique
+class Game : NonCopyable
 {
 public:
 	Game();
@@ -16,6 +17,8 @@ public:
 
 	void run();
 	void stop();
+
+	void append_cfg();
 
 	template<typename T, typename... Args>
 	void change_state(Args&&... args)
@@ -29,6 +32,8 @@ public:
 		//create the new state
 		_state = std::make_unique<T>(this, std::forward<Args>(args)...);
 	}
+
+	std::unique_ptr<Configuration> cfg;
 
 	std::unique_ptr<Renderer> renderer;
 	std::unique_ptr<AudioDevice> audio;

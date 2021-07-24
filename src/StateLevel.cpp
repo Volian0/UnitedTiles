@@ -178,7 +178,7 @@ void StateLevel::render() const
 	_burst.render();
 	score.render();
 
-	render_debug();
+	if (game->cfg->show_gameplay_debug_info) render_debug();
 }
 
 Number StateLevel::get_tile_pos(const Tile* tile_)

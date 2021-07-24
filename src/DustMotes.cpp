@@ -40,6 +40,7 @@ DustMotes::DustMotes(Color color, Renderer* renderer, const std::string& texture
 
 void DustMotes::update(Number delta_time)
 {
+	if (!enabled) { return; }
 	_accumulated_time += delta_time;
 
 	//remove old particles
@@ -71,9 +72,12 @@ void DustMotes::update(Number delta_time)
 
 void DustMotes::render() const
 {
+	if (!enabled) { return; }
 	for (const DustMote& dustmote : _dustmotes)
 	{
 		_texture.tint = { _color.r, _color.g, _color.b, uint16_t(_color.a) * uint16_t(dustmote.get_alpha()) / 255 };
 		_renderer->render(&_texture, { 0,0 }, _texture.get_psize(), dustmote.position, { dustmote.size,dustmote.size * _renderer->get_aspect_ratio() }, dustmote.position, { 0,0 }, dustmote.angular_direction * -57.295779487L);
 	}
 }
+
+bool DustMotes::enabled = true;

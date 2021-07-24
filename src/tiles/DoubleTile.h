@@ -13,15 +13,15 @@ public:
 	DoubleTile(class StateLevel* level_);
 
 private:
-	bool should_game_over() const final;
-	bool should_die() const final;
+	[[nodiscard]] bool should_game_over() const final;
+	[[nodiscard]] bool should_die() const final;
 	void touch_down(uint16_t finger_id, Vec2 pos) final;
 	void on_changed_state() final;
 
 	void render_bg() const final;
 	void render_fg() const final;
 
-	TileColumn next_column(const std::shared_ptr<Tile>& previous_tile);
+	[[nodiscard]] TileColumn next_column(const std::shared_ptr<Tile>& previous_tile);
 
 	std::optional<Timepoint> tp_tapped;
 	bool left_tile_cleared;

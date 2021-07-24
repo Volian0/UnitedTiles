@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Unique.h"
+#include "NonCopyable.h"
 #include "Types.h"
 #include "Renderer.h"
 #include "Texture.h"
@@ -18,18 +18,20 @@ struct DustMote
 	Number lifetime;
 	Number velocity;
 	Number acceleration;
-	bool is_dead() const;
-	uint8_t get_alpha() const;
+	[[nodiscard]] bool is_dead() const;
+	[[nodiscard]] uint8_t get_alpha() const;
 	void simulate(Number delta_time, Number aspect_ratio);
 };
 
-class DustMotes : Unique
+class DustMotes : NonCopyable
 {
 public:
 	DustMotes(Color color, Renderer* renderer, const std::string& texture_name, Number min_size, Number max_size, Number particles_per_second, Number min_lifetime, Number max_lifetime, Number max_velocity, uint8_t blend_mode = 1);
 
 	void update(Number delta_time);
 	void render() const;
+
+	static bool enabled;
 
 private:
 
