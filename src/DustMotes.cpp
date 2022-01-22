@@ -11,7 +11,7 @@ bool DustMote::is_dead() const
 
 uint8_t DustMote::get_alpha() const
 {
-	return std::clamp((1.0L - abs(total_time / lifetime - 0.5L) * 2.0L) * 255.0L, 0.0L, 255.0L);
+	return std::clamp((1.0L - std::abs(total_time / lifetime - 0.5L) * 2.0L) * 255.0L, 0.0L, 255.0L);
 }
 
 void DustMote::simulate(Number delta_time, Number aspect_ratio)
