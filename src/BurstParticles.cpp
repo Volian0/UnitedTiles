@@ -3,6 +3,7 @@
 #include "RNG.h"
 
 #include <algorithm>
+#include <iostream>
 
 void BurstParticle::simulate(Number delta_time, Number aspect_ratio)
 {
@@ -20,7 +21,7 @@ bool BurstParticleGroup::is_dead() const
 
 uint8_t BurstParticleGroup::get_alpha() const
 {
-	return std::clamp((1.0L - abs(total_time / lifetime)) * 255.0L, 0.0L, 255.0L);
+	return std::clamp((1.0L - total_time / lifetime) * 255.0L, 0.0L, 255.0L);
 }
 
 void BurstParticleGroup::simulate(Number delta_time, Number aspect_ratio)

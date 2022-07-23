@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <unordered_map>
 #include <functional>
+#include <thread>
 
 Game::Game()
 {

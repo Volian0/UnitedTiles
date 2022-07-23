@@ -20,6 +20,15 @@ DevButton::DevButton(Vec2 position_, Number width_, uint32_t id_, const std::str
 bool DevButton::update()
 {
 	_pressed = false;
+	if (!is_held())
+	for (auto& [key, value] : _state->touch_down)
+	{
+		if (in_range(value))
+		{
+			_held_finger_id.emplace(key);
+			break;
+		}
+	}
 	if (is_held())
 	{
 		uint16_t finger_id = _held_finger_id.value();
@@ -29,17 +38,6 @@ bool DevButton::update()
 			if (in_range(_state->touch_up[finger_id]))
 			{
 				_pressed = true;
-			}
-		}
-	}
-	else
-	{
-		for (auto& [key, value] : _state->touch_down)
-		{
-			if (in_range(value))
-			{
-				_held_finger_id.emplace(key);
-				break;
 			}
 		}
 	}

@@ -29,6 +29,7 @@ StateSettings::StateSettings(Game* game_)
 	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Show FPS", game->renderer.get()), std::forward_as_tuple(game->cfg->show_fps));
 	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Show debug gameplay information", game->renderer.get()), std::forward_as_tuple(game->cfg->show_gameplay_debug_info));
 	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Enable V-Sync", game->renderer.get()), std::forward_as_tuple(game->cfg->enable_vsync));
+	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "God mode", game->renderer.get()), std::forward_as_tuple(game->cfg->god_mode));
 	//set correct checkbox values
 	for (auto& checkbox : check_boxes)
 	{

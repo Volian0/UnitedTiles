@@ -35,17 +35,17 @@ StateLevel::StateLevel(Game* game_, const std::string& filename)
 	{255, 255, 255, 127},
 	game_->renderer.get(),
 	"glow.png",
-	0.5, 1,
-	2,
+	0.25, 0.5,
+	3,
 	8, 8,
 	0, 2},
 	_dustmotes_stars{
 	{200, 255, 255, 127},
 	game_->renderer.get(),
 	"star.png",
-	0.05, 0.1,
+	0.025, 0.05,
 	8,
-	1, 2,
+	2, 3,
 	1},
 	_burst{game_->renderer.get(), "white.png"}
 {
@@ -56,8 +56,8 @@ StateLevel::StateLevel(Game* game_, const std::string& filename)
 	slider_tile_clearing.blend_mode = 1;
 	txt_long_tile_end.blend_mode = 1;
 	txt_long_tile_circle.blend_mode = 1;
-	tile_divider.tint = { 200, 255, 255, 63 };
-	bg_o.tint = { 63, 63, 63, 31 };
+	tile_divider.tint = { 200, 255, 255, 80 };
+	bg_o.tint = { 63, 63, 63, 15 };
 	soundfont = game->audio->load_soundfont("test.sf2");
 	ExtractedRes song_info_res(filename, "songs");
 	auto song_info_file = open_ifile(song_info_res.get_path()).value();
@@ -100,22 +100,64 @@ void StateLevel::update()
 {
 	new_tp = Timepoint();
 
-	if (game_over_scroll_to.has_value() && _state == State::GAME_OVER)
-	{
-		Number total_scroll_length = previous_position - game_over_scroll_to.value() - 4.0L;
-		_position = previous_position - std::clamp((new_tp - game_over_reset.value()) * 4.0L, 0.0L, 1.0L) * total_scroll_length;
-	}
+	Number delta_time = new_tp - _old_tp;
+	_dustmotes.update(delta_time);
+	_dustmotes_stars.update(delta_time);
+	_burst.update(delta_time);
+	_old_tp = new_tp;
+
 
 	if (game_over_reset.has_value() && new_tp - game_over_reset.value() > 2.0L)
 	{
 		return game->change_state<StateSongSelection>();
 	}
 
-	Number delta_time = new_tp - _old_tp;
-	_dustmotes.update(delta_time);
-	_dustmotes_stars.update(delta_time);
-	_burst.update(delta_time);
-	_old_tp = new_tp;
+	if (game_over_scroll_to.has_value() && _state == State::GAME_OVER)
+	{
+		Number total_scroll_length = previous_position - game_over_scroll_to.value() - 4.0L;
+		_position = previous_position - std::clamp((new_tp - game_over_reset.value()) * 4.0L, 0.0L, 1.0L) * total_scroll_length;
+		for (auto& [position, tile] : tiles)
+		{
+			tile->y_offset = _position - position;
+		}
+		return;
+	}
+
+
+	_position = previous_position + (new_tp - last_tempo_change) * tps;
+
+	//sort touch down
+	touch_down_sorted_positions.clear();
+	for (const auto& [finger_id, touch_pos] : touch_down)
+	{
+		touch_down_sorted_positions.emplace_back(finger_id, touch_pos);
+	}
+	std::sort(touch_down_sorted_positions.begin(), touch_down_sorted_positions.end(),
+		[](const std::pair<uint16_t, Vec2>& pos_a, const std::pair<uint16_t, Vec2>& pos_b) { return pos_a.second.y < pos_b.second.y; });
+
+	//update tiles
+	for (const auto& [tile_pos, tile] : tiles)
+	{
+		if (game->cfg->god_mode)
+		{
+			if (tile->is_active() && tile->y_offset > 3.0L)
+			{
+				if (tile->get_info().type != TileInfo::Type::SLIDER)
+				{
+					if (tile->get_info().type == TileInfo::Type::DOUBLE)
+					{
+						tile->touch_down(0, {get_column_x_pos(tile->column) + 1.0L, 0.0L});
+					}
+					tile->touch_down(0, {get_column_x_pos(tile->column), 0.0L});
+				}
+			}
+		}
+		tile->update();
+		if (_state != State::ACTIVE)
+		{
+			break;
+		}
+	}
 
 	//update Y offset
 	for (auto& [position, tile] : tiles)
@@ -127,8 +169,6 @@ void StateLevel::update()
 	{
 		return;
 	}
-
-	_position = previous_position + (new_tp - last_tempo_change) * tps;
 
 	//delete old tiles
 	for (auto it = tiles.cbegin(); it != tiles.cend();)
@@ -145,15 +185,7 @@ void StateLevel::update()
 		}
 		else ++it;
 	}
-	//update tiles
-	for (const auto& [tile_pos, tile] : tiles)
-	{
-		tile->update();
-		if (_state != State::ACTIVE)
-		{
-			break;
-		}
-	}
+
 	//spawn new tiles
 	spawn_new_tiles();
 }
@@ -242,6 +274,7 @@ void StateLevel::spawn_new_tiles()
 				break;
 			default: abort(); break;
 			}
+			previous_tile->y_offset = _position - total_pos;
 			++spawned_tiles;
 		}
 		else break;

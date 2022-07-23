@@ -21,6 +21,7 @@ void Configuration::load_from_file()
 	show_fps = read_u8(*file).value_or(0);
 	show_gameplay_debug_info = read_u8(*file).value_or(0);
 	enable_vsync = read_u8(*file).value_or(1);
+	god_mode = read_u8(*file).value_or(0);
 }
 
 void Configuration::save_to_file() const
@@ -35,6 +36,7 @@ void Configuration::save_to_file() const
 		write_u8(*file, show_fps);
 		write_u8(*file, show_gameplay_debug_info);
 		write_u8(*file, enable_vsync);
+		write_u8(*file, god_mode);
 	}
 	std::filesystem::rename(Path::user("temp_config.cfg"), Path::user("config.cfg"));
 }

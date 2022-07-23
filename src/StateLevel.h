@@ -60,6 +60,8 @@ public:
 	mutable Texture slider_tile;
 	mutable Texture slider_tile_clearing;
 
+	std::vector<std::pair<uint16_t,Vec2>> touch_down_sorted_positions;
+
 	SongInfo _song_info;
 
 	std::shared_ptr<Tile> previous_tile;

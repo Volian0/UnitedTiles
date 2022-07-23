@@ -8,6 +8,7 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
 include_directories("include")
+include_directories("src")
 file(GLOB UnitedTilesSRC CONFIGURE_DEPENDS "src/*.h" "src/*.cpp" "src/tiles/*.cpp" "src/tiles/*.h" "src/ui/*.cpp" "src/ui/.*h")
 
 add_executable(UnitedTiles ${UnitedTilesSRC})
@@ -31,3 +32,5 @@ find_package(CURL REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${CMAKE_DL_LIBS} Threads::Threads ${CURL_LIBRARIES})
 
 file(COPY res/ DESTINATION res/)
+
+add_executable(midi2usong tools/midi2usong/src/main.cpp)

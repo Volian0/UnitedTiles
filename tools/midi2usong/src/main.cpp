@@ -12,7 +12,7 @@ int main(int args_size, char** args)
 try
 {
 	MidiFile midi;
-	midi.read("input.mid");
+	midi.read("/home/volian/liszt3.mid");
 	if (!midi.status() || midi.getTrackCount() == 0)
 		throw std::runtime_error("MIDI file is invalid");
 	//midi.deltaTicks();
@@ -23,10 +23,10 @@ try
 	uint32_t track_other = 3;
 
 	SongInfo usong;
-	usong.version = 0;
-	usong.length_units_per_single_tile = 48;
-	usong.note_ticks_per_single_tile = 48;
-	usong.starting_tempo = 4.8L;
+	usong.version = 1;
+	usong.length_units_per_single_tile = 24;
+	usong.note_ticks_per_single_tile = 24;
+	usong.starting_tempo = 8.8L;
 
 	uint32_t track_count = midi.getTrackCount();
 
@@ -80,14 +80,14 @@ try
 				//std::cout << relative_tick << std::endl;
 			}
 			//single tile
-			if (length == 48)
+			if (length == 24)
 			{
 				if (expect_double_tile)
 					throw std::runtime_error("Expected 2nd double tile, got single tile");
 				tile.type = TileInfo::Type::SINGLE;
 			}
 			//double tile
-			else if (length == 24)
+			else if (length == 12)
 			{
 				if (!expect_double_tile)
 				{
@@ -104,7 +104,7 @@ try
 				}
 			}
 			//long tile
-			else if (length > 48)
+			else if (length > 24)
 			{
 				if (expect_double_tile)
 					throw std::runtime_error("Expected 2nd double tile, got long tile");

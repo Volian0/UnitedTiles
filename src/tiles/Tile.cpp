@@ -12,6 +12,7 @@
 #include <iostream>
 #include <algorithm>
 #include <unordered_set>
+#include <limits>
 
 Tile::Tile(StateLevel* level, TileColumn column_)
 	:_level{level},
@@ -130,17 +131,31 @@ void Tile::render_fg() const
 void Tile::update()
 {
 	my_update();
-	std::vector<std::pair<uint16_t,Vec2>> touch_down_sorted_positions;
-	for (const auto& [finger_id, touch_pos] : _level->touch_down)
-	{
-		touch_down_sorted_positions.emplace_back(finger_id, touch_pos);
-	}
-	std::sort(touch_down_sorted_positions.begin(), touch_down_sorted_positions.end(),
-		[](const std::pair<uint16_t, Vec2>& pos_a, const std::pair<uint16_t, Vec2>& pos_b) { return pos_a.second.y < pos_b.second.y; });
+	//std::vector<std::pair<uint16_t,Vec2>> touch_down_sorted_positions;
+	//for (const auto& [finger_id, touch_pos] : _level->touch_down)
+	//{
+	//	touch_down_sorted_positions.emplace_back(finger_id, touch_pos);
+	//}
+	//std::sort(touch_down_sorted_positions.begin(), touch_down_sorted_positions.end(),
+	//	[](const std::pair<uint16_t, Vec2>& pos_a, const std::pair<uint16_t, Vec2>& pos_b) { return pos_a.second.y < pos_b.second.y; });
 
-	for (const auto& [finger_id, touch_pos] : touch_down_sorted_positions)
+
+	for (auto& [finger_id, touch_pos] : _level->touch_down_sorted_positions)
 	{
-		touch_down(finger_id, { touch_pos.x, y_offset - (touch_pos.y + 1.0L) / 2.0L * 4.0L });
+		const auto click_position = y_offset - (touch_pos.y + 1.0L) / 2.0L * 4.0L;
+		//help to aim
+		if (is_active() &&
+		(get_info().type == TileInfo::Type::DOUBLE || get_info().type == TileInfo::Type::SINGLE || get_info().type == TileInfo::Type::LONG) &&
+		(get_column(touch_pos.x) & column) &&
+		click_position - 1.0L < get_tile_length() && (click_position >= 0.0L ))
+		{
+			touch_pos.y = -std::numeric_limits<Number>::infinity();
+			touch_down(finger_id, { touch_pos.x, 0.0L });	
+		}
+		else
+		{
+			touch_down(finger_id, { touch_pos.x, click_position});
+		}
 	}
 	for (const auto& [finger_id, touch_pos] : _level->touch_move)
 	{

@@ -17,4 +17,5 @@ public:
 	bool show_fps = false;
 	bool show_gameplay_debug_info = false;
 	bool enable_vsync = true;
+	bool god_mode = false;
 };
