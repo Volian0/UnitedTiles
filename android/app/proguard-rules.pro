@@ -1,0 +1,2 @@
+-keep class com.volian.** { *; } 
+-keep class org.libsdl.** { *; } 

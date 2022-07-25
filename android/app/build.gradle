@@ -1,6 +1,20 @@
 apply plugin: 'com.android.application'
 
 android {
+
+signingConfigs {
+
+	release {
+       storeFile file("$System.env.RELEASE_STORE_FILE")
+       storePassword "$System.env.RELEASE_STORE_PASSWORD"
+       keyAlias "$System.env.RELEASE_KEY_ALIAS"
+       keyPassword "$System.env.RELEASE_KEY_PASSWORD"
+       // Optional, specify signing versions used
+       v1SigningEnabled true
+       v2SigningEnabled true
+   }
+}
+
 	ndkVersion "22.1.7171670"
 	compileSdkVersion 26
     defaultConfig {
@@ -8,15 +22,21 @@ android {
         minSdkVersion 26
         targetSdkVersion 26
         versionCode 1
-        versionName "1.0"
+        versionName "0.1"
         ndk {
             abiFilters 'armeabi-v7a'
         }
     }
     buildTypes {
         release {
+	    ndk {
+                abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86' ,'x86_64'
+            }
+	    shrinkResources true
+	    signingConfig signingConfigs.release
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            debuggable false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
     externalNativeBuild {
