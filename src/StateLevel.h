@@ -60,6 +60,8 @@ public:
 	mutable Texture slider_tile;
 	mutable Texture slider_tile_clearing;
 
+	uint32_t lap_id = 0;
+
 	std::vector<std::pair<uint16_t,Vec2>> touch_down_sorted_positions;
 
 	SongInfo _song_info;
@@ -100,6 +102,8 @@ private:
 	void restart_level();
 
 	void spawn_new_tiles();
+
+	bool _started = false;
 
 	enum class State : uint8_t
 	{

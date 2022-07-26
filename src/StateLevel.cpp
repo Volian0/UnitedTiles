@@ -65,6 +65,9 @@ StateLevel::StateLevel(Game* game_, const std::string& filename)
 	tps = 0;
 	_old_tp = new_tp = last_tempo_change = {};
 	previous_position = 3.0L;
+	_position = 3.0L;
+	//_song_info.acceleration_method = SongInfo::AccelerationMethod::ACCELERATION;
+	//_song_info.acceleration_info.parameter = 4.0L;
 }
 
 void StateLevel::render_debug() const
@@ -93,7 +96,7 @@ void StateLevel::queue_notes(const std::multimap<uint32_t, NoteEvent>& notes, bo
 
 bool StateLevel::force_first_interaction() const
 {
-	return tps == 0;
+	return !_started;
 }
 
 void StateLevel::update()
@@ -123,9 +126,22 @@ void StateLevel::update()
 		return;
 	}
 
+	if (_started)
+	{
 
-	_position = previous_position + (new_tp - last_tempo_change) * tps;
+		if (_song_info.acceleration_method == SongInfo::AccelerationMethod::ACCELERATION)
+		{
+			//TODO: Is this correct!?
+			const auto starting_tempo = _song_info.starting_tempo;
+			const auto total_time = (new_tp - last_tempo_change);
+			_position = previous_position + total_time * (starting_tempo + _song_info.acceleration_info.parameter * 0.5L);
+		}
+		else
+		{
+			_position = previous_position + (new_tp - last_tempo_change) * tps;
+		}
 
+	}
 	//sort touch down
 	touch_down_sorted_positions.clear();
 	for (const auto& [finger_id, touch_pos] : touch_down)
@@ -289,6 +305,7 @@ void StateLevel::change_tempo(Number new_tps, const Timepoint& tp_now, Number po
 	previous_position = position;
 	tps = new_tps;
 	last_tempo_change = tp_now;
+	_started = true;
 }
 
 void StateLevel::game_over(Tile* tile)

@@ -191,15 +191,71 @@ bool Tile::force_first_interaction() const
 void Tile::handle_first_interaction()
 {
 	auto tile_index = static_cast<uint32_t>(_level->cleared_tiles % _level->_song_info.tiles.size());
+	const auto acceleration_method = _level->_song_info.acceleration_method;
+	static const auto new_bpm_pt2 = [](unsigned t_current_bpm, float t_current_beats, float t_current_part_base_beats, bool t_reached_fourth_lap) {
+		//TODO: is this the correct order?
+		const volatile float t_unknown = t_reached_fourth_lap ? 130.0F : 100.0F;
+
+		const volatile float v1 = std::max(0.0F, t_current_beats);
+		const volatile float v2 = t_current_bpm;
+		const volatile float n = v2 / v1;
+		const volatile float v3 = (n - t_unknown);
+		const volatile float v4 = 0.001F * v3;
+		const volatile float a = 1.3F - v4;
+		const volatile float r = n / 60.0F;
+		const volatile float v5 = a < 1.04F ? 1.04F : a;
+		const volatile float v6 = r * v5;
+		const volatile float v7 = 60.0F * v6;
+		const volatile float v8 = v7 * t_current_part_base_beats;
+		return v8;
+	};
 	if (tile_index == 0)
 	{
-		_level->change_tempo(_level->_song_info.starting_tempo, _level->new_tp, _level->_position);
+		++_level->lap_id;
+		if (_level->lap_id == 1)
+			_level->change_tempo(_level->_song_info.starting_tempo, _level->new_tp, _level->_position);
+		else if (acceleration_method == SongInfo::AccelerationMethod::CLASSIC)
+		{
+			_level->change_tempo(Number(new_bpm_pt2(_level->tps * 60.0L, 1.0F, 1.0F, _level->lap_id >= 4)) / 60.0L, _level->new_tp, _level->_position);
+		}
+		else if (acceleration_method == SongInfo::AccelerationMethod::LINEAR)
+		{
+			Number multi = _level->_song_info.acceleration_info.parameter;
+			for (uint32_t i = 1; i < _level->lap_id; ++i)
+			{
+				multi *= _level->_song_info.acceleration_info.parameter;
+			}
+			_level->change_tempo(_level->_song_info.starting_tempo * multi, _level->new_tp, _level->_position);
+		}
 	}
-	//TODO: Implement acceleration methods
-	/*else if (_level->_song_info.acceleration_method == SongInfo::AccelerationMethod::LINEAR && _level->_song_info.acceleration_info.tempo_changes.count(tile_index))
+	if (acceleration_method == SongInfo::AccelerationMethod::CLASSIC)
 	{
-		_level->change_tempo(_level->_song_info.acceleration_info.tempo_changes.at(tile_index), _level->new_tp, _level->_position);
-	}*/
+		for (const auto& change : _level->_song_info.acceleration_info.classic_tempo_changes)
+		{
+			if (tile_index == change.first)
+			{
+				if (_level->lap_id == 1)
+					_level->change_tempo(change.second, _level->new_tp, _level->_position);
+				else
+					_level->change_tempo(Number(new_bpm_pt2(_level->tps * 60.0L, 1.0F, 1.0F, _level->lap_id >= 4)) / 60.0L, _level->new_tp, _level->_position);
+			}
+		}
+	}
+	else if (acceleration_method == SongInfo::AccelerationMethod::LINEAR)
+	{
+		for (const auto& change : _level->_song_info.acceleration_info.tempo_changes)
+		{
+			if (tile_index == change.first)
+			{
+				Number multi = _level->_song_info.acceleration_info.parameter;
+				for (uint32_t i = 1; i < _level->lap_id; ++i)
+				{
+					multi *= _level->_song_info.acceleration_info.parameter;
+				}
+				_level->change_tempo(change.second * multi, _level->new_tp, _level->_position);
+			}
+		}
+	}
 }
 
 void Tile::handle_clear()

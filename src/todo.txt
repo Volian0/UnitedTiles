@@ -1,0 +1,4 @@
+[] Make long tile depend on Y offset instead of timepoint
+[] Spawn notes even after game over
+[] Implement acceleration methods
+[] Implement score saving
