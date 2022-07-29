@@ -2,7 +2,7 @@
 
 #include "Renderer.h"
 #include "Font.h"
-#include "StateDevMenu.h"
+#include "StateSplash.h"
 #include "DevTouch.h"
 #include "Colors.h"
 #include "BurstParticles.h"
@@ -30,7 +30,7 @@ Game::Game()
 	DustMotes::enabled = cfg->enable_particles_dustmotes;
 	BurstParticles::enabled = cfg->enable_particles_burst;
 
-	change_state<StateDevMenu>();
+	change_state<StateSplash>();
 }
 
 Game::~Game()

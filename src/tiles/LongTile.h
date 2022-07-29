@@ -26,5 +26,5 @@ private:
 	Number held_tile_duration = 0;
 
 	FingerID finger;
-	Timepoint tp_tapped;
+	Number y_tapped;
 };

@@ -66,8 +66,9 @@ StateLevel::StateLevel(Game* game_, const std::string& filename)
 	_old_tp = new_tp = last_tempo_change = {};
 	previous_position = 3.0L;
 	_position = 3.0L;
+	//_song_info.starting_tempo = 0.0L;
 	//_song_info.acceleration_method = SongInfo::AccelerationMethod::ACCELERATION;
-	//_song_info.acceleration_info.parameter = 4.0L;
+	//_song_info.acceleration_info.parameter = 3.0L;
 }
 
 void StateLevel::render_debug() const
@@ -89,14 +90,26 @@ void StateLevel::queue_notes(const std::multimap<uint32_t, NoteEvent>& notes, bo
 	}
 	for (const auto& [offset, note_event] : notes)
 	{
-		soundfont->add_event(custom_tp.value_or(new_tp) + 
-			Number(offset) / Number(_song_info.note_ticks_per_single_tile) / tps, note_event);
+		if (_song_info.acceleration_method == SongInfo::AccelerationMethod::ACCELERATION)
+		{
+			const auto parameter = _song_info.acceleration_info.parameter;
+			const auto start_tps = custom_tp.has_value() ? (tps + parameter * (custom_tp.value() - new_tp)) : tps;
+			const auto& timepoint = custom_tp.value_or(new_tp);
+			const auto desired_length = Number(offset) / Number(_song_info.note_ticks_per_single_tile);
+			const auto offset_s = (std::sqrt(start_tps * start_tps + 2.0L * parameter * desired_length) - start_tps) / parameter;
+			soundfont->add_event(timepoint + offset_s, note_event);
+		}
+		else
+		{
+			soundfont->add_event(custom_tp.value_or(new_tp) + 
+				Number(offset) / Number(_song_info.note_ticks_per_single_tile) / tps, note_event);
+		}
 	}
 }
 
 bool StateLevel::force_first_interaction() const
 {
-	return !_started;
+	return _state == State::IDLE;
 }
 
 void StateLevel::update()
@@ -106,7 +119,8 @@ void StateLevel::update()
 	Number delta_time = new_tp - _old_tp;
 	_dustmotes.update(delta_time);
 	_dustmotes_stars.update(delta_time);
-	_burst.update(delta_time);
+	_burst.update(delta_time * tps * 0.25L);
+	
 	_old_tp = new_tp;
 
 
@@ -126,15 +140,15 @@ void StateLevel::update()
 		return;
 	}
 
-	if (_started)
+	if (_state == State::ACTIVE)
 	{
-
 		if (_song_info.acceleration_method == SongInfo::AccelerationMethod::ACCELERATION)
 		{
 			//TODO: Is this correct!?
 			const auto starting_tempo = _song_info.starting_tempo;
 			const auto total_time = (new_tp - last_tempo_change);
-			_position = previous_position + total_time * (starting_tempo + _song_info.acceleration_info.parameter * 0.5L);
+			tps = starting_tempo + _song_info.acceleration_info.parameter * total_time;
+			_position = previous_position + total_time * (starting_tempo + _song_info.acceleration_info.parameter * 0.5L * total_time);
 		}
 		else
 		{
@@ -142,6 +156,7 @@ void StateLevel::update()
 		}
 
 	}
+
 	//sort touch down
 	touch_down_sorted_positions.clear();
 	for (const auto& [finger_id, touch_pos] : touch_down)
@@ -151,9 +166,20 @@ void StateLevel::update()
 	std::sort(touch_down_sorted_positions.begin(), touch_down_sorted_positions.end(),
 		[](const std::pair<uint16_t, Vec2>& pos_a, const std::pair<uint16_t, Vec2>& pos_b) { return pos_a.second.y < pos_b.second.y; });
 
+	//update Y offset
+	for (auto& [position, tile] : tiles)
+	{
+		tile->y_offset = _position - position;
+	}
+
 	//update tiles
 	for (const auto& [tile_pos, tile] : tiles)
 	{
+		if (_state == State::GAME_OVER)
+		{
+			break;
+		}
+		tile->update();
 		if (game->cfg->god_mode)
 		{
 			if (tile->is_active() && tile->y_offset > 3.0L)
@@ -168,38 +194,32 @@ void StateLevel::update()
 				}
 			}
 		}
-		tile->update();
-		if (_state != State::ACTIVE)
-		{
-			break;
-		}
 	}
 
 	//update Y offset
-	for (auto& [position, tile] : tiles)
-	{
-		tile->y_offset = _position - position;
-	}
+	//for (auto& [position, tile] : tiles)
+	//{
+	//	tile->y_offset = _position - position;
+	//}
 
-	if (_state != State::ACTIVE)
+	if (_state == State::ACTIVE)
 	{
-		return;
-	}
-
-	//delete old tiles
-	for (auto it = tiles.cbegin(); it != tiles.cend();)
-	{
-		auto action = it->second->get_action();
-		if (action == TileAction::GAME_OVER)
+		//delete old tiles
+		for (auto it = tiles.cbegin(); it != tiles.cend();)
 		{
-			game_over_scroll_to = it->first;
-			return game_over(it->second.get());
+			auto action = it->second->get_action();
+			if (action == TileAction::GAME_OVER)
+			{
+				spawn_new_tiles();
+				game_over_scroll_to = it->first;
+				return game_over(it->second.get());
+			}
+			if (action == TileAction::DELETE)
+			{
+				it = tiles.erase(it);
+			}
+			else ++it;
 		}
-		if (action == TileAction::DELETE)
-		{
-			it = tiles.erase(it);
-		}
-		else ++it;
 	}
 
 	//spawn new tiles
@@ -246,7 +266,7 @@ void StateLevel::restart_level()
 	previous_tile.reset();
 	cleared_tiles = 0;
 	score.set(0);
-	_state = State::ACTIVE;
+	_state = State::IDLE;
 	previous_position = 0;
 	tiles.clear();
 	spawned_tiles = 0;
@@ -299,20 +319,21 @@ void StateLevel::spawn_new_tiles()
 
 void StateLevel::change_tempo(Number new_tps, const Timepoint& tp_now, Number position)
 {
-	if (tps == new_tps)
+	if (tps == new_tps && _state == State::ACTIVE)
 		return;
 	std::cout << "Changing tempo from " << tps << " TPS to " << new_tps << " TPS" << std::endl;
 	previous_position = position;
 	tps = new_tps;
 	last_tempo_change = tp_now;
-	_started = true;
+	_state = State::ACTIVE;
 }
 
 void StateLevel::game_over(Tile* tile)
 {
 	score.silent_update();
 	game_over_tile = tile;
-	change_tempo(0, new_tp, _position);
+	//change_tempo(0, new_tp, _position);
+	previous_position = _position;
 	_state = State::GAME_OVER;
 	soundfont->play_all_events();
 	soundfont->add_event(new_tp, NoteEvent(NoteEvent::Type::ALL_OFF));
@@ -331,9 +352,29 @@ ScoreCounter::ScoreCounter(StateLevel* level_, uint32_t init_value)
 
 void ScoreCounter::render() const
 {
-	Number scale = std::clamp(1.0L - (Timepoint() - _tp_update), 0.8L, 1.0L);
+	Number diff = std::clamp(0.1L - (Timepoint() - _tp_update), 0.0L, 0.1L);
+	diff = diff * diff * 10.0L;
+	diff = diff * 2.0L + 0.8L;
+	//Number scale = std::clamp(1.0L - (Timepoint() - _tp_update), 0.8L, 1.0L);
+	_texture->tint = {64,64,64,255};
+	auto angle = (diff - 0.8L) * 32.0L * (((_odd / 2) % 2 == 0) ? -1.0L : 1.0L);
+	if (_value >= 100)
+	{
+		angle *= 0.5L;
+	}
+	if (_value >= 10000)
+	{
+		angle *= 0.5L;
+	}
+	if (_value >= 10000000)
+	{
+		angle = 0.0L;
+	}
+	_level->game->renderer->render(_texture.get(), { 0,0 }, _texture->get_psize(), { 0.00625,-0.84+0.0125*_level->game->renderer->get_aspect_ratio() },
+		{ _texture->get_rsize().x * 0.8L,_texture->get_rsize().y*diff }, { 0,-0.84 }, {}, angle);
+	_texture->tint = {255,255,255,255};
 	_level->game->renderer->render(_texture.get(), { 0,0 }, _texture->get_psize(), { 0,-0.84 },
-		{ _texture->get_rsize().x * 0.8L,_texture->get_rsize().y*scale }, { 0,0 });
+		{ _texture->get_rsize().x * 0.8L,_texture->get_rsize().y*diff }, { 0.00625,-0.84+0.0125*_level->game->renderer->get_aspect_ratio() }, {}, angle);
 }
 
 void ScoreCounter::set(uint32_t value)
@@ -341,6 +382,7 @@ void ScoreCounter::set(uint32_t value)
 	_value = value;
 	_texture = std::make_unique<Texture>(_level->game->renderer.get(), &_font, std::to_string(_value), Color{ 255, 63, 63, 255 });
 	_tp_update = _level->new_tp;
+	_odd ++;
 }
 
 void ScoreCounter::add(uint32_t value)

@@ -21,7 +21,7 @@ bool BurstParticleGroup::is_dead() const
 
 uint8_t BurstParticleGroup::get_alpha() const
 {
-	return std::clamp((1.0L - total_time / lifetime) * 255.0L, 0.0L, 255.0L);
+	return std::clamp((1.0L - total_time / lifetime) * 255.0L, 0.0L, 255.0L) / 1.1L;
 }
 
 void BurstParticleGroup::simulate(Number delta_time, Number aspect_ratio)
@@ -42,7 +42,7 @@ BurstParticles::BurstParticles(Renderer* renderer, const std::string& texture_na
 
 void BurstParticles::add(Vec2 pos, Vec2 size, uint16_t number_of_particles, Number max_lifetime, Vec2 min_velocity, Vec2 max_velocity, Color color)
 {
-	auto& group = _particle_groups.emplace_back(BurstParticleGroup{ color, max_lifetime });
+	auto& group = _particle_groups.emplace_back(BurstParticleGroup{ color, max_lifetime * 0.25L });
 	for (uint16_t i = 0; i < number_of_particles; ++i)
 	{
 		group._particles.emplace_back(BurstParticle{
@@ -71,7 +71,7 @@ void BurstParticles::render() const
 	{
 		_texture.tint = particle_group.color;
 		_texture.tint.a = uint16_t(particle_group.color.a) * uint16_t(particle_group.get_alpha()) / 255;
-		const Number size = (1.0L-particle_group.total_time/particle_group.lifetime) * 0.1L;
+		const Number size = (1.0L-particle_group.total_time/particle_group.lifetime) * 0.125L;
 		for (const auto& particle : particle_group._particles)
 		{
 			_renderer->render(&_texture, { 0,0 }, _texture.get_psize(), particle.position, { size,size * _renderer->get_aspect_ratio() }, particle.position, { 0,0 }, particle.angle * -57.295779487L);

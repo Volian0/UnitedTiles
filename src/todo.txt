@@ -1,4 +1,12 @@
-[] Make long tile depend on Y offset instead of timepoint
-[] Spawn notes even after game over
-[] Implement acceleration methods
-[] Implement score saving
+[X] Make long tile depend on Y offset instead of timepoint
+[X] Spawn notes even after game over
+[X] Implement acceleration methods
+[ ] Implement score saving
+[X] Make note playing correct for accelerated songs
+[ ] Optimize level states and acceleration math
+[ ] Mouse events corrected
+[ ] Improve tile hitboxes
+[ ] Improve midi2usong
+[ ] App crash on android startup
+[X] 2 game overs when tile is at the bottom of the screen
+[X] Long tile animation laggy

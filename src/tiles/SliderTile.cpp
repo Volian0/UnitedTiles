@@ -81,6 +81,7 @@ void SliderTile::on_changed_state()
 	if (is_state(&SliderTileClearing))
 	{
 		_level->queue_notes(get_info().note_events);
+		my_update();
 	}
 }
 

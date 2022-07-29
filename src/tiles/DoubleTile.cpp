@@ -56,17 +56,29 @@ void DoubleTile::on_changed_state()
 		{
 			_level->queue_notes(get_info().note_events);
 			tp_tapped = _level->new_tp;
+			if (_level->_song_info.acceleration_method == SongInfo::AccelerationMethod::ACCELERATION)
+			{
+				const auto parameter = _level->_song_info.acceleration_info.parameter;
+				const auto start_tps = _level->tps;
+				const auto& timepoint = _level->new_tp;
+				const auto desired_length = get_tile_length() / 2.0L;
+				const auto offset_s = (std::sqrt(start_tps * start_tps + 2.0L * parameter * desired_length) - start_tps) / parameter;
+				tp_second = *tp_tapped + offset_s;
+			}
+			else
+			{
+				tp_second = *tp_tapped + get_tile_length() / 2.0L / _level->tps;
+			}
 		}
 		else
 		{
-			Number half_tile_duration = get_tile_length() / 2.0L / _level->tps;
-			if (_level->new_tp - *tp_tapped >= half_tile_duration)
+			if (_level->new_tp >= *tp_second)
 			{
 				_level->queue_notes(get_info().note_events_2nd_tile);
 			}
 			else
 			{
-				_level->queue_notes(get_info().note_events_2nd_tile, false, *tp_tapped + half_tile_duration);
+				_level->queue_notes(get_info().note_events_2nd_tile, false, tp_second);
 			}
 		}
 	}

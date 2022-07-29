@@ -38,6 +38,7 @@ private:
 	std::unique_ptr<Texture> _texture;
 	uint32_t _value;
 	Timepoint _tp_update;
+	std::uint8_t _odd = 0;
 };
 
 class StateLevel : public GameState
@@ -103,12 +104,12 @@ private:
 
 	void spawn_new_tiles();
 
-	bool _started = false;
+	//bool _started = false;
 
 	enum class State : uint8_t
 	{
 		IDLE, ACTIVE, GAME_OVER
-	} _state = State::ACTIVE;
+	} _state = State::IDLE;
 
 	Timepoint last_tempo_change;
 	Number previous_position = 0;

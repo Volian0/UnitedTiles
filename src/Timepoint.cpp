@@ -31,11 +31,6 @@ Number Timepoint::operator-(const Timepoint& previous_timepoint) const
 	return std::chrono::duration<Number>(_timepoint - previous_timepoint._timepoint).count();
 }
 
-bool Timepoint::operator<(const Timepoint& timepoint) const
-{
-	return _timepoint < timepoint._timepoint;
-}
-
 Number Timepoint::operator%(Number duration) const
 {
 	return std::chrono::duration<Number>(_timepoint.time_since_epoch() % std::chrono::duration_cast<std::chrono::steady_clock::duration>(std::chrono::duration<Number>(duration))).count();

@@ -220,7 +220,7 @@ void Tile::handle_first_interaction()
 		}
 		else if (acceleration_method == SongInfo::AccelerationMethod::LINEAR)
 		{
-			Number multi = _level->_song_info.acceleration_info.parameter;
+			Number multi = 1.0L;
 			for (uint32_t i = 1; i < _level->lap_id; ++i)
 			{
 				multi *= _level->_song_info.acceleration_info.parameter;
@@ -247,7 +247,7 @@ void Tile::handle_first_interaction()
 		{
 			if (tile_index == change.first)
 			{
-				Number multi = _level->_song_info.acceleration_info.parameter;
+				Number multi = 1.0L;
 				for (uint32_t i = 1; i < _level->lap_id; ++i)
 				{
 					multi *= _level->_song_info.acceleration_info.parameter;

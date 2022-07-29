@@ -22,7 +22,27 @@ public:
 	[[nodiscard]] Number operator-(const Timepoint& previous_timepoint) const;
 
 	//compare with the other timepoint
-	[[nodiscard]] bool operator<(const Timepoint& timepoint) const;
+	[[nodiscard]] constexpr bool operator<(const Timepoint& timepoint) const
+	{
+		return _timepoint < timepoint._timepoint;
+	}
+	[[nodiscard]] constexpr bool operator>(const Timepoint& timepoint) const
+	{
+		return _timepoint > timepoint._timepoint;
+	}
+	[[nodiscard]] constexpr bool operator<=(const Timepoint& timepoint) const
+	{
+		return _timepoint <= timepoint._timepoint;
+	}
+	[[nodiscard]] constexpr bool operator>=(const Timepoint& timepoint) const
+	{
+		return _timepoint >= timepoint._timepoint;
+	}
+	[[nodiscard]] constexpr bool operator==(const Timepoint& timepoint) const
+	{
+		return _timepoint == timepoint._timepoint;
+	}
+
 
 	[[nodiscard]] Number operator%(Number duration) const;
 

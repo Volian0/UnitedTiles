@@ -22,7 +22,8 @@ void LongTile::my_update()
 {
 	if (is_state(&LongTileClearing))
 	{
-		held_tile_duration = (_level->new_tp - tp_tapped) * _level->tps;
+		held_tile_duration = y_offset - y_tapped;
+		//held_tile_duration = (_level->new_tp - tp_tapped) * _level->tps;
 
 		if (held_tile_duration + 1.0L >= get_tile_length())
 		{
@@ -68,7 +69,9 @@ void LongTile::on_changed_state()
 	if (is_state(&LongTileClearing))
 	{
 		_level->queue_notes(get_info().note_events);
-		tp_tapped = _level->new_tp;
+		//tp_tapped = _level->new_tp;
+		y_tapped = y_offset;
+		my_update();
 	}
 	else if (is_state(&LongTileFullyCleared))
 	{

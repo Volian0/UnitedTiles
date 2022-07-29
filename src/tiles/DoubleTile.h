@@ -24,5 +24,6 @@ private:
 	[[nodiscard]] TileColumn next_column(const std::shared_ptr<Tile>& previous_tile);
 
 	std::optional<Timepoint> tp_tapped;
+	std::optional<Timepoint> tp_second;
 	bool left_tile_cleared;
 };

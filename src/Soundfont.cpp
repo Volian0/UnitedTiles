@@ -11,10 +11,10 @@
 Soundfont::Soundfont(const std::string& filename, uint16_t sample_rate, bool stereo)
 {
 	ExtractedRes soundfont_file(filename, "soundfonts");
-	//std::scoped_lock lock(_mutex);
+	std::scoped_lock lock(_mutex); //unsafe?
 	_ptr = tsf_load_filename(soundfont_file.get_path().c_str());
 	tsf_set_output(reinterpret_cast<tsf*>(_ptr), stereo ? TSF_STEREO_INTERLEAVED : TSF_MONO, sample_rate); //sample rate
-	tsf_set_volume(reinterpret_cast<tsf*>(_ptr), 1.75L);
+	tsf_set_volume(reinterpret_cast<tsf*>(_ptr), 1.0L);
 }
 
 Soundfont::~Soundfont()

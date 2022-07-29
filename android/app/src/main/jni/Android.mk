@@ -56,7 +56,7 @@ LOCAL_C_INCLUDES += $(LOCAL_PATH)
 LOCAL_SRC_FILES := $(wildcard $(LOCAL_PATH)/src/*.cpp)
 LOCAL_SRC_FILES += $(wildcard $(LOCAL_PATH)/src/tiles/*.cpp)
 LOCAL_SRC_FILES += $(wildcard $(LOCAL_PATH)/src/ui/*.cpp)
-LOCAL_CPPFLAGS := -std=c++17
+LOCAL_CPPFLAGS := -std=c++20
 LOCAL_STATIC_LIBRARIES += SDL2
 LOCAL_STATIC_LIBRARIES += SDL2_image
 LOCAL_STATIC_LIBRARIES += SDL2_ttf
