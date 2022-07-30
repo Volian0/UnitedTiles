@@ -3,9 +3,11 @@
 #include "Renderer.h"
 #include "Font.h"
 #include "StateSplash.h"
+#include "StateDevMenu.h"
 #include "DevTouch.h"
 #include "Colors.h"
 #include "BurstParticles.h"
+#include "RNG.h"
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
@@ -30,7 +32,7 @@ Game::Game()
 	DustMotes::enabled = cfg->enable_particles_dustmotes;
 	BurstParticles::enabled = cfg->enable_particles_burst;
 
-	change_state<StateSplash>();
+	change_state<StateDevMenu>();
 }
 
 Game::~Game()
@@ -104,7 +106,12 @@ void Game::run()
 				renderer->render(&fps_texture, { 0,0 }, fps_texture.get_psize(), { -1,-1 }, fps_texture.get_rsize(), {}, { -1, -1 });
 			}
 			if (cfg->enable_hit_markers) { _dev_touch.render(renderer.get()); }
-			renderer->display(); }
+			renderer->display();
+			if (cfg->fake_lag)
+			{
+				std::this_thread::sleep_for(std::chrono::milliseconds{RNG::integer(1,250)});
+			}	
+		}
 
 		//check for SDL errors
 		std::string sdlerror(SDL_GetError());

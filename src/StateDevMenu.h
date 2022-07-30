@@ -26,6 +26,8 @@ private:
 	std::unique_ptr<Texture> _bg;
 	std::unique_ptr<Texture> _logo;
 	std::unique_ptr<Texture> _dev_button_texture;
+	std::unique_ptr<Texture> _text_version;
+	std::unique_ptr<Texture> _text_volian;
 	std::shared_ptr<Soundfont> soundfont;
 	std::vector<DevButton> _dev_buttons;
 	DustMotes _dustmotes;

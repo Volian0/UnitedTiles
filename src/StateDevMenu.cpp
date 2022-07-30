@@ -21,6 +21,11 @@ StateDevMenu::StateDevMenu(Game* game_) : GameState(game_),
 	}
 {
 	_font = std::make_unique<Font>(game->renderer.get(), "roboto.ttf", 8.0L);
+	{
+		const auto _font2 = std::make_unique<Font>(game->renderer.get(), "roboto.ttf", 4.0L);
+		_text_version = std::make_unique<Texture>(game->renderer.get(), _font2.get(), "v0.1", Colors::GRAY);
+		_text_volian = std::make_unique<Texture>(game->renderer.get(), _font2.get(), "by Volian0", Colors::GRAY);
+	}
 	_logo = std::make_unique<Texture>(game->renderer.get(), "logo.png");
 	_bg = std::make_unique<Texture>(game->renderer.get(), "dev_background.png");
 	_dev_button_texture = std::make_unique<Texture>(game->renderer.get(), "dev_button.png");
@@ -78,6 +83,8 @@ void StateDevMenu::render() const
 	game->renderer->render(_bg.get(), { 0,0 }, _bg->get_psize(), { 0,0 }, { 1,1 }, { 0,0 });
 	_dustmotes.render();
 	game->renderer->render(_logo.get(), { 0,0 }, _logo->get_psize(), { 0,_logo_position*2.0L-1 }, Vec2(0.5, 0.5 * game->renderer->get_aspect_ratio()), { 0,0 }, {0,0});
+	game->renderer->render(_text_volian.get(), { 0,0 }, _text_volian->get_psize(), {1.0L - _text_volian->get_rsize().x,-1.0L + _text_volian->get_rsize().y}, _text_volian->get_rsize(), { 0,0 }, {0,0});
+	game->renderer->render(_text_version.get(), { 0,0 }, _text_version->get_psize(), {1.0L - _text_version->get_rsize().x,-1.0L + _text_volian->get_rsize().y * 3.0L}, _text_version->get_rsize(), { 0,0 }, {0,0});
 	for (auto& button : _dev_buttons)
 	{
 		button.render();

@@ -10,3 +10,5 @@
 [ ] App crash on android startup
 [X] 2 game overs when tile is at the bottom of the screen
 [X] Long tile animation laggy
+[ ] Correct tempo for songs
+[ ] Update SDL2 version for android

@@ -16,8 +16,34 @@
 #include <map>
 #include <vector>
 #include <cstdint>
+#include <array>
 
 class StateLevel;
+
+class LevelBackground : NonCopyable
+{
+	public:
+		LevelBackground(StateLevel* level);
+		void update(Number delta_time);
+
+		void change_state(std::uint8_t new_state);
+		void render() const;
+
+		[[nodiscard]] constexpr std::uint8_t get_state() const noexcept
+		{
+			return _state;
+		}
+
+	private:
+		StateLevel* _level;
+		Number _alpha_second = 0.0L;
+		Number _alpha_third = 0.0L;
+		std::uint8_t _state = 0;
+		DustMotes _dustmotes;
+		DustMotes _dustmotes_mini;
+		DustMotes _dustmotes_stars;
+		mutable std::array<Texture, 3> backgrounds;
+};
 
 class ScoreCounter : NonCopyable
 {
@@ -96,6 +122,8 @@ public:
 
 	uint64_t total_length = 0;
 
+	LevelBackground lv_bg;
+
 private:
 	virtual void update();
 	virtual void render() const;
@@ -116,9 +144,6 @@ private:
 
 	std::multimap<Number, std::shared_ptr<Tile>> tiles;
 	uint32_t spawned_tiles = 0;
-
-	DustMotes _dustmotes;
-	DustMotes _dustmotes_stars;
 
 	Timepoint _old_tp;
 

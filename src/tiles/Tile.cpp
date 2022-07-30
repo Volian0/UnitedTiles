@@ -212,6 +212,17 @@ void Tile::handle_first_interaction()
 	if (tile_index == 0)
 	{
 		++_level->lap_id;
+		if (acceleration_method != SongInfo::AccelerationMethod::CLASSIC)
+		{
+			if (_level->lap_id == 2)
+			{
+				_level->lv_bg.change_state(1);
+			}
+			else if (_level->lap_id == 3)
+			{
+				_level->lv_bg.change_state(2);
+			}
+		}
 		if (_level->lap_id == 1)
 			_level->change_tempo(_level->_song_info.starting_tempo, _level->new_tp, _level->_position);
 		else if (acceleration_method == SongInfo::AccelerationMethod::CLASSIC)
@@ -235,7 +246,10 @@ void Tile::handle_first_interaction()
 			if (tile_index == change.first)
 			{
 				if (_level->lap_id == 1)
-					_level->change_tempo(change.second, _level->new_tp, _level->_position);
+					{
+						_level->change_tempo(change.second, _level->new_tp, _level->_position);
+						_level->lv_bg.change_state(_level->lv_bg.get_state() + 1);
+					}
 				else
 					_level->change_tempo(Number(new_bpm_pt2(_level->tps * 60.0L, 1.0F, 1.0F, _level->lap_id >= 4)) / 60.0L, _level->new_tp, _level->_position);
 			}

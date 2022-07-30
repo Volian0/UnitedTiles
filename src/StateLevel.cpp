@@ -14,6 +14,103 @@
 #include <algorithm>
 #include <iostream>
 
+LevelBackground::LevelBackground(StateLevel* level)
+:_level{level}, _dustmotes{
+	{255, 255, 255, 127},
+	level->game->renderer.get(),
+	"glow.png",
+	0.25, 0.5,
+	3,
+	8, 8,
+	0, 2},
+	_dustmotes_stars{
+	{200, 255, 255, 127},
+	_level->game->renderer.get(),
+	"star.png",
+	0.025, 0.05,
+	8,
+	2, 3,
+	1, 1},
+	_dustmotes_mini{
+	{255, 255, 255, 63},
+	level->game->renderer.get(),
+	"glow.png",
+	0.125, 0.25,
+	2,
+	2, 4,
+	0, 2},
+	backgrounds{Texture(level->game->renderer.get(), "bg1.png"), Texture(level->game->renderer.get(), "bg2.png"), Texture(level->game->renderer.get(), "bg3.png")}
+{
+	_dustmotes.dont_spawn = true;
+	_dustmotes_stars.dont_spawn = true;
+	backgrounds[1].tint.a = 0;
+	backgrounds[2].tint.a = 0;
+	backgrounds[1].blend_mode = 1;
+	backgrounds[2].blend_mode = 1;
+}
+
+void LevelBackground::update(Number delta_time)
+{
+	_dustmotes.update(delta_time);
+	_dustmotes_stars.update(delta_time);
+	_dustmotes_mini.update(delta_time);
+	if (_state >= 1 && _alpha_second < 1.0L)
+	{
+		_alpha_second = std::min(_alpha_second + delta_time, 1.0L);
+		backgrounds[1].tint.a = _alpha_second * 255.0L;
+	}
+	if (_state >= 2 && _alpha_third < 1.0L)
+	{
+		_alpha_third = std::min(_alpha_third + delta_time, 1.0L);
+		backgrounds[2].tint.a = _alpha_third * 255.0L;
+	}
+
+	_dustmotes.update(delta_time);
+	_dustmotes_stars.update(delta_time);
+}
+
+void LevelBackground::change_state(std::uint8_t new_state)
+{
+	_state = new_state;
+	if (_state == 1)
+	{
+		_dustmotes_mini.dont_spawn = true;
+		_dustmotes.dont_spawn = false;
+	}
+	else if (_state == 2)
+	{
+		_dustmotes_stars.dont_spawn = false;
+	}
+	else
+	{
+		std::abort();
+	}
+}
+
+void LevelBackground::render() const
+{
+	//render first background
+	if (_alpha_second < 1.0L)
+	{
+		_level->game->renderer->render(&backgrounds[0], {}, backgrounds[0].get_psize(), {}, {1.0L, 1.0L}, {});
+	}
+
+	//render second background
+	if (_alpha_third < 1.0L && _alpha_second > 0.0L)
+	{
+		_level->game->renderer->render(&backgrounds[1], {}, backgrounds[1].get_psize(), {}, {1.0L, 1.0L}, {});
+	}
+
+	//render third background
+	if (_alpha_third > 0.0L)
+	{
+		_level->game->renderer->render(&backgrounds[2], {}, backgrounds[2].get_psize(), {}, {1.0L, 1.0L}, {});
+	}
+	_dustmotes_mini.render();
+	_dustmotes.render();
+	_dustmotes_stars.render();
+}
+
 StateLevel::StateLevel(Game* game_, const std::string& filename)
 	:GameState(game_),
 	score{this},
@@ -31,23 +128,8 @@ StateLevel::StateLevel(Game* game_, const std::string& filename)
 	slider_tile{game->renderer.get(), "slider.png"},
 	slider_tile_clearing{game->renderer.get(), "slider_clearing.png"},
 	_debug_font{game->renderer.get(), "roboto.ttf", 4},
-	_dustmotes{
-	{255, 255, 255, 127},
-	game_->renderer.get(),
-	"glow.png",
-	0.25, 0.5,
-	3,
-	8, 8,
-	0, 2},
-	_dustmotes_stars{
-	{200, 255, 255, 127},
-	game_->renderer.get(),
-	"star.png",
-	0.025, 0.05,
-	8,
-	2, 3,
-	1},
-	_burst{game_->renderer.get(), "white.png"}
+	_burst{game_->renderer.get(), "white.png"},
+	lv_bg{this}
 {
 	tile_divider.blend_mode = 1;
 	txt_single_tile_cleared.blend_mode = 1;
@@ -66,7 +148,7 @@ StateLevel::StateLevel(Game* game_, const std::string& filename)
 	_old_tp = new_tp = last_tempo_change = {};
 	previous_position = 3.0L;
 	_position = 3.0L;
-	//_song_info.starting_tempo = 0.0L;
+	//_song_info.starting_tempo = 10.0L;
 	//_song_info.acceleration_method = SongInfo::AccelerationMethod::ACCELERATION;
 	//_song_info.acceleration_info.parameter = 3.0L;
 }
@@ -76,10 +158,14 @@ void StateLevel::render_debug() const
 	Texture dbg_tps{ game->renderer.get(), &_debug_font, "TPS: " + std::to_string(tps), Colors::WHITE };
 	Texture dbg_tiles_n{ game->renderer.get(), &_debug_font, "Active tiles: " + std::to_string(tiles.size()), Colors::WHITE };
 	Texture dbg_cleared_n{ game->renderer.get(), &_debug_font, "Cleared tiles: " + std::to_string(cleared_tiles), Colors::WHITE };
+	Texture dbg_position{ game->renderer.get(), &_debug_font, "Position: " + std::to_string(_position), Colors::WHITE };
+	Texture dbg_lap{ game->renderer.get(), &_debug_font, "Lap: " + std::to_string(lap_id), Colors::WHITE };
 
 	game->renderer->render(&dbg_cleared_n, {}, dbg_cleared_n.get_psize(), Vec2(-1, 1), dbg_cleared_n.get_rsize(), {}, { -1,1 });
 	game->renderer->render(&dbg_tiles_n, {}, dbg_tiles_n.get_psize(), Vec2(-1, 1 - (dbg_cleared_n.get_rsize().y) * 2.0L), dbg_tiles_n.get_rsize(), {}, { -1,1 });
-	game->renderer->render(&dbg_tps, {}, dbg_tps.get_psize(), Vec2(-1, 1 - (dbg_cleared_n.get_rsize().y + dbg_tps.get_rsize().y) * 2.0L), dbg_tps.get_rsize(), {}, { -1,1 });
+	game->renderer->render(&dbg_tps, {}, dbg_tps.get_psize(), Vec2(-1, 1 - (dbg_cleared_n.get_rsize().y + dbg_tiles_n.get_rsize().y) * 2.0L), dbg_tps.get_rsize(), {}, { -1,1 });
+	game->renderer->render(&dbg_position, {}, dbg_position.get_psize(), Vec2(-1, 1 - (dbg_cleared_n.get_rsize().y + dbg_tiles_n.get_rsize().y + dbg_tps.get_rsize().y) * 2.0L), dbg_position.get_rsize(), {}, { -1,1 });
+	game->renderer->render(&dbg_lap, {}, dbg_lap.get_psize(), Vec2(-1, 1 - (dbg_cleared_n.get_rsize().y + dbg_tiles_n.get_rsize().y + dbg_tps.get_rsize().y + dbg_position.get_rsize().y) * 2.0L), dbg_lap.get_rsize(), {}, { -1,1 });
 }
 
 void StateLevel::queue_notes(const std::multimap<uint32_t, NoteEvent>& notes, bool forceplay_old, const std::optional<Timepoint> custom_tp)
@@ -117,10 +203,8 @@ void StateLevel::update()
 	new_tp = Timepoint();
 
 	Number delta_time = new_tp - _old_tp;
-	_dustmotes.update(delta_time);
-	_dustmotes_stars.update(delta_time);
 	_burst.update(delta_time * tps * 0.25L);
-	
+	lv_bg.update(delta_time);
 	_old_tp = new_tp;
 
 
@@ -229,9 +313,10 @@ void StateLevel::update()
 void StateLevel::render() const
 {
 	game->renderer->render(&bg, {}, bg.get_psize(), {}, { 1,1 }, {});
-	_dustmotes_stars.render();
-	_dustmotes.render();
-	game->renderer->render(&bg_o, {}, bg_o.get_psize(), {}, { 1,1 }, {});
+	lv_bg.render();
+	//_dustmotes_stars.render();
+	//_dustmotes.render();
+	//game->renderer->render(&bg_o, {}, bg_o.get_psize(), {}, { 1,1 }, {});
 	game->renderer->render(&tile_divider, {}, tile_divider.get_psize(), {}, { 0.01,1 }, {});
 	game->renderer->render(&tile_divider, {}, tile_divider.get_psize(), {-0.5,0}, { 0.01,1 }, {});
 	game->renderer->render(&tile_divider, {}, tile_divider.get_psize(), {0.5,0}, { 0.01,1 }, {});

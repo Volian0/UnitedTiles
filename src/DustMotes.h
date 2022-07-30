@@ -31,6 +31,8 @@ public:
 	void update(Number delta_time);
 	void render() const;
 
+	bool dont_spawn=false;
+
 	static bool enabled;
 
 private:

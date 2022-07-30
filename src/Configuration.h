@@ -18,4 +18,5 @@ public:
 	bool show_gameplay_debug_info = false;
 	bool enable_vsync = true;
 	bool god_mode = false;
+	bool fake_lag = false;
 };

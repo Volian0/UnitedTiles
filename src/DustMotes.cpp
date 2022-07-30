@@ -41,7 +41,7 @@ DustMotes::DustMotes(Color color, Renderer* renderer, const std::string& texture
 void DustMotes::update(Number delta_time)
 {
 	if (!enabled) { return; }
-	_accumulated_time += delta_time;
+	if (!dont_spawn) _accumulated_time += delta_time;
 
 	//remove old particles
 	_dustmotes.erase(std::remove_if(_dustmotes.begin(), _dustmotes.end(), [&](const DustMote& dustmote) { return dustmote.is_dead(); }), _dustmotes.end());
