@@ -114,9 +114,7 @@ void LevelBackground::render() const
 StateLevel::StateLevel(Game* game_, const std::string& filename)
 	:GameState(game_),
 	score{this},
-	bg{game->renderer.get(), "level_background.png"},
 	tile_divider{game->renderer.get(), "tile_divider.png"},
-	bg_o{game->renderer.get(), "level_background_overlay.png"},
 	txt_single_tile{game->renderer.get(), "single_tile.png"},
 	txt_game_over_tile{game->renderer.get(), "game_over_tile.png"},
 	txt_single_tile_cleared{game->renderer.get(), "single_tile_cleared.png"},
@@ -131,15 +129,25 @@ StateLevel::StateLevel(Game* game_, const std::string& filename)
 	_burst{game_->renderer.get(), "white.png"},
 	lv_bg{this}
 {
+	
+	/*SongList list;
+	list.songs.emplace_back("Canon", "Johann Pachelbel", "Canon.usong");
+	list.songs.emplace_back("Für Elise", "Ludwig van Beethoven", "Fur Elise.usong");
+	list.songs.emplace_back("Anitra's Dance", "Edvard Grieg", "Anitras Dance.usong");
+	list.songs.emplace_back("Etude in d minor", "Franz Liszt", "Etude in d minor.usong");
+	list.songs.emplace_back("Etude in C major", "Franz Liszt", "Etude in C major.usong");
+	auto ofile = open_ofile("newsonglist.txt");
+	list.to_file(ofile.value());
+	ofile->flush();
+	std::abort();*/
+	
 	tile_divider.blend_mode = 1;
 	txt_single_tile_cleared.blend_mode = 1;
-	bg_o.blend_mode = 1;
 	slider_tile.blend_mode = 1;
 	slider_tile_clearing.blend_mode = 1;
 	txt_long_tile_end.blend_mode = 1;
 	txt_long_tile_circle.blend_mode = 1;
 	tile_divider.tint = { 200, 255, 255, 80 };
-	bg_o.tint = { 63, 63, 63, 15 };
 	soundfont = game->audio->load_soundfont("test.sf2");
 	ExtractedRes song_info_res(filename, "songs");
 	auto song_info_file = open_ifile(song_info_res.get_path()).value();
@@ -312,7 +320,6 @@ void StateLevel::update()
 
 void StateLevel::render() const
 {
-	game->renderer->render(&bg, {}, bg.get_psize(), {}, { 1,1 }, {});
 	lv_bg.render();
 	//_dustmotes_stars.render();
 	//_dustmotes.render();

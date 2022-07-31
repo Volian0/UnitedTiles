@@ -22,7 +22,7 @@ Texture::Texture(Renderer* renderer, Font* font, const std::string& text, Color 
 	type{ Type::FONT },
 	info{ FontInfo{ font->filename, font->size, text, color } }
 {
-	SDL_Surface* surface = TTF_RenderText_Blended(reinterpret_cast<TTF_Font*>(font->_ptr), text.c_str(), { color.r,color.g,color.b,color.a });
+	SDL_Surface* surface = TTF_RenderUTF8_Blended(reinterpret_cast<TTF_Font*>(font->_ptr), text.c_str(), { color.r,color.g,color.b,color.a });
 	_ptr = SDL_CreateTextureFromSurface(reinterpret_cast<SDL_Renderer*>(_renderer->_ptr), surface);
 	SDL_FreeSurface(surface);
 	update_size();
@@ -51,7 +51,7 @@ void Texture::reload()
 	{
 		const FontInfo& font_info = std::get<FontInfo>(info);
 		Font font(_renderer, font_info.filename, font_info.size);
-		SDL_Surface* surface = TTF_RenderText_Blended(reinterpret_cast<TTF_Font*>(font._ptr), font_info.text.c_str(), { font_info.color.r,font_info.color.g,font_info.color.b,font_info.color.a });
+		SDL_Surface* surface = TTF_RenderUTF8_Blended(reinterpret_cast<TTF_Font*>(font._ptr), font_info.text.c_str(), { font_info.color.r,font_info.color.g,font_info.color.b,font_info.color.a });
 		_ptr = SDL_CreateTextureFromSurface(reinterpret_cast<SDL_Renderer*>(_renderer->_ptr), surface);
 		SDL_FreeSurface(surface);
 	}

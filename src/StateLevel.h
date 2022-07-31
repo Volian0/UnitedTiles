@@ -147,9 +147,6 @@ private:
 
 	Timepoint _old_tp;
 
-	mutable Texture bg;
-	mutable Texture bg_o;
-
 	std::optional<Timepoint> game_over_reset;
 
 	void change_tempo(Number new_tps, const Timepoint& tp_now, Number position);

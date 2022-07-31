@@ -12,9 +12,9 @@ using namespace smf;
 int main(int args_size, char** args)
 try
 {
-	constexpr std::string_view filename = "/home/volian/new_canon.mid";
+	constexpr std::string_view filename = "/home/volian/witness2.mid";
 	constexpr uint32_t single_tile_length = 48;
-	constexpr long double start_tps = 2.53333333333L;
+	constexpr long double start_tps = 5.2L;
 	constexpr long double multiplier = 1.18248206376L;
 
 	MidiFile midi;
