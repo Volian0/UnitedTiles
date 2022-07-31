@@ -13,6 +13,8 @@ class LongTile : public StatableTile<&LongTileDefault, &LongTileMissed, &LongTil
 public:
 	LongTile(class StateLevel* level_);
 
+	static Number y_finger_tapped;
+
 private:
 	[[nodiscard]] bool should_game_over() const final;
 	[[nodiscard]] bool should_die() const final;

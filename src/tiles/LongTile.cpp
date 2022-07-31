@@ -22,7 +22,7 @@ void LongTile::my_update()
 {
 	if (is_state(&LongTileClearing))
 	{
-		held_tile_duration = y_offset - y_tapped;
+		held_tile_duration = y_offset - y_tapped - 0.25L;
 		//held_tile_duration = (_level->new_tp - tp_tapped) * _level->tps;
 
 		if (held_tile_duration + 1.0L >= get_tile_length())
@@ -43,6 +43,7 @@ void LongTile::touch_down(uint16_t finger_id, Vec2 pos)
 			{
 				if (pos.y < 1.0L)
 				{
+					//y_finger_tapped = pos.y;
 					finger = finger_id;
 					change_state(&LongTileClearing);
 				}
@@ -64,13 +65,15 @@ void LongTile::touch_up(uint16_t finger_id, Vec2 pos)
 	}
 }
 
+Number LongTile::y_finger_tapped = 0.0L;
+
 void LongTile::on_changed_state()
 {
 	if (is_state(&LongTileClearing))
 	{
 		_level->queue_notes(get_info().note_events);
 		//tp_tapped = _level->new_tp;
-		y_tapped = y_offset;
+		y_tapped = y_offset - y_finger_tapped;
 		my_update();
 	}
 	else if (is_state(&LongTileFullyCleared))

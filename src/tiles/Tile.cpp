@@ -8,6 +8,7 @@
 #include "../Colors.h"
 #include "EmptyTile.h"
 #include "SliderTile.h"
+#include "LongTile.h"
 
 #include <iostream>
 #include <algorithm>
@@ -142,12 +143,12 @@ void Tile::update()
 
 	for (auto& [finger_id, touch_pos] : _level->touch_down_sorted_positions)
 	{
-		const auto click_position = y_offset - (touch_pos.y + 1.0L) / 2.0L * 4.0L;
+		const auto& click_position = LongTile::y_finger_tapped = y_offset - (touch_pos.y + 1.0L) / 2.0L * 4.0L;
 		//help to aim
 		if (is_active() &&
 		(get_info().type == TileInfo::Type::DOUBLE || get_info().type == TileInfo::Type::SINGLE || get_info().type == TileInfo::Type::LONG) &&
 		(get_column(touch_pos.x) & column) &&
-		click_position - 1.0L < get_tile_length() && (click_position >= 0.0L ))
+		click_position - 1.0L < std::min(get_tile_length(), 1.0L) && (click_position >= 0.0L ))
 		{
 			touch_pos.y = -std::numeric_limits<Number>::infinity();
 			touch_down(finger_id, { touch_pos.x, 0.0L });	
