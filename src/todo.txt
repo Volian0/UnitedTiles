@@ -11,4 +11,8 @@
 [X] 2 game overs when tile is at the bottom of the screen
 [X] Long tile animation laggy
 [ ] Correct tempo for songs
-[ ] Update SDL2 version for android
+[X] Update SDL2 version for android
+[ ] Check Canon single note
+[ ] Check Dance ending too soon
+[ ] Make a tool for editing usong and check Csikos Post
+[ ] Long tile correct mouse events

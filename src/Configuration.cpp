@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <filesystem>
+#include <iostream>
 
 void Configuration::load_from_file()
 {
@@ -39,6 +40,12 @@ void Configuration::save_to_file() const
 		write_u8(*file, enable_vsync);
 		write_u8(*file, god_mode);
 		write_u8(*file, fake_lag);
+		file->close();
+		if (!file.value())
+		{
+			std::cout << "error with config!" << std::endl;
+			std::abort();
+		}
 	}
 	std::filesystem::rename(Path::user("temp_config.cfg"), Path::user("config.cfg"));
 }

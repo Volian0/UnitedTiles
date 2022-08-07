@@ -4,6 +4,7 @@
 #include "Font.h"
 #include "StateSplash.h"
 #include "StateDevMenu.h"
+#include "StateLevel.h"
 #include "DevTouch.h"
 #include "Colors.h"
 #include "BurstParticles.h"
@@ -33,6 +34,7 @@ Game::Game()
 	BurstParticles::enabled = cfg->enable_particles_burst;
 
 	change_state<StateDevMenu>();
+	//change_state<StateLevel>(0);
 }
 
 Game::~Game()
@@ -59,9 +61,7 @@ void Game::run()
 	while (_state)
 	{
 		//handle events
-		_state->touch_up.clear();
-		_state->touch_down.clear();
-		_state->touch_move.clear();
+		_state->touch_events.clear();
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
 		{
@@ -72,13 +72,22 @@ void Game::run()
 				renderer->reload();
 			}
 			else if (event.type == SDL_FINGERDOWN || event.type == SDL_FINGERUP || event.type == SDL_FINGERMOTION) {
-				Vec2 position{ std::clamp(Number(event.tfinger.x) * 2.0L - 1.0L, -1.0L, 1.0L),
+				const Vec2 position{ std::clamp(Number(event.tfinger.x) * 2.0L - 1.0L, -1.0L, 1.0L),
+					std::clamp(Number(event.tfinger.y) * 2.0L - 1.0L, -1.0L, 1.0L) };
+				/*Vec2 position{ std::clamp(Number(event.tfinger.x) * 2.0L - 1.0L, -1.0L, 1.0L),
 					std::clamp(Number(event.tfinger.y) * 2.0L - 1.0L, -1.0L, 1.0L) };
 				std::unordered_map<uint32_t, std::reference_wrapper<std::map<uint16_t, Vec2>>>
 				{   { SDL_FINGERDOWN,   _state->touch_down },
 					{ SDL_FINGERUP,     _state->touch_up   },
 					{ SDL_FINGERMOTION, _state->touch_move }
-				}.at(event.type).get().emplace(event.tfinger.fingerId, position);
+				}.at(event.type).get().emplace(event.tfinger.fingerId, position);*/
+				_state->touch_events.emplace_back(TouchEvent{[&](){
+					if (event.type == SDL_FINGERDOWN)
+						return TouchEvent::Type::DOWN;
+					if (event.type == SDL_FINGERMOTION)
+						return TouchEvent::Type::MOVE;
+					return TouchEvent::Type::UP;
+				}(), event.tfinger.fingerId, position});
 			}
 		}
 
@@ -104,6 +113,14 @@ void Game::run()
 					fps_font_color = Colors::YELLOW;
 				Texture fps_texture(renderer.get(), &fps_font, "FPS: " + std::to_string(fps), fps_font_color);
 				renderer->render(&fps_texture, { 0,0 }, fps_texture.get_psize(), { -1,-1 }, fps_texture.get_rsize(), {}, { -1, -1 });
+				auto lfps = _fps_counter.get_low_fps();
+				auto lfps_font_color = Colors::GREEN;
+				if (lfps < 30)
+					lfps_font_color = Colors::RED;
+				else if (lfps < 60)
+					lfps_font_color = Colors::YELLOW;
+				Texture lfps_texture(renderer.get(), &fps_font, "Low FPS: " + std::to_string(lfps), lfps_font_color);
+				renderer->render(&lfps_texture, { 0,0 }, lfps_texture.get_psize(), { -1,-1 + lfps_texture.get_rsize().y * 2.0L}, lfps_texture.get_rsize(), {}, { -1, -1 });
 			}
 			if (cfg->enable_hit_markers) { _dev_touch.render(renderer.get()); }
 			renderer->display();

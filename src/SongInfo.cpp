@@ -2,7 +2,11 @@
 
 #include "SongInfo.h"
 
+#include "Path.h"
 #include "File.h"
+
+#include <iostream>
+#include <filesystem>
 
 NoteEvent::NoteEvent(Type type_, uint8_t key_, uint8_t velocity_)
 	:type{type_},
@@ -167,7 +171,7 @@ void SongInfo::to_file(std::ofstream& file) const
 	}
 }
 
-SongList::SongList(std::ifstream& file)
+/*SongList::SongList(std::ifstream& file)
 {
 	uint32_t song_size = read_u32(file).value();
 	for (uint32_t i = 0; i < song_size; ++i)
@@ -188,6 +192,143 @@ void SongList::to_file(std::ofstream& file) const
 		write_string(file, song.composer);
 		write_string(file, song.filename);
 	}
+}*/
+
+ComposerInfo::ComposerInfo(std::ifstream& file)
+: name{*read_string(file)}, description{*read_string(file)},
+birth_year{*read_u16(file)}, death_year{*read_u16(file)}
+{
+}
+
+void ComposerInfo::to_file(std::ofstream& file) const
+{
+	write_string(file, name);
+	write_string(file, description);
+	write_u16(file, birth_year);
+	write_u16(file, death_year);
+}
+
+SongBasicInfo::SongBasicInfo(std::ifstream& file)
+:create_year{*read_u16(file)}, name{*read_string(file)}, description{*read_string(file)}, filename{*read_string(file)}
+{
+	const uint8_t composers_size = read_u8(file).value();
+	for (uint8_t i = 0; i < composers_size; ++i)
+	{
+		composer_ids.emplace_back(read_u16(file).value());
+	}
+}
+
+void SongBasicInfo::to_file(std::ofstream& file) const
+{
+	write_u16(file, create_year);
+	write_string(file, name);
+	write_string(file, description);
+	write_string(file, filename);
+	write_u8(file, composer_ids.size());
+	for (auto composer_id : composer_ids)
+	{
+		write_u16(file, composer_id);
+	}
+}
+
+SongScore::SongScore(std::ifstream& file)
+:reached_lap{*read_u32(file)}, reached_score{*read_u32(file)}
+{
+
+}
+
+void SongScore::to_file(std::ofstream& file) const
+{
+	write_u32(file, reached_lap);
+	write_u32(file, reached_score);
+}
+
+SongDatabase::SongDatabase(std::ifstream& file)
+{
+	const uint16_t composer_size = read_u16(file).value();
+	for (uint16_t i = 0; i < composer_size; ++i)
+	{
+		const uint16_t composer_id = read_u16(file).value();
+		composers_infos.emplace_back(composer_id, file);
+	}
+
+	const uint16_t song_size = read_u16(file).value();
+	for (uint16_t i = 0; i < song_size; ++i)
+	{
+		const uint16_t song_id = read_u16(file).value();
+		songs_infos.emplace_back(song_id, file);
+	}
+}
+
+void SongDatabase::to_file(std::ofstream& file) const
+{
+	write_u16(file, composers_infos.size());
+	for (const auto& [id, info] : composers_infos)
+	{
+		write_u16(file, id);
+		info.to_file(file);
+	}
+
+	write_u16(file, songs_infos.size());
+	for (const auto& [id, info] : songs_infos)
+	{
+		write_u16(file, id);
+		info.to_file(file);
+	}
+}
+
+SongUserDatabase::SongUserDatabase(std::ifstream& file)
+{
+	const uint16_t song_size = read_u16(file).value();
+	for (uint16_t i = 0; i < song_size; ++i)
+	{
+		const auto id = read_u16(file).value();
+		scores.emplace(id, file);
+	}
+}
+
+void SongUserDatabase::to_file(std::ofstream& file) const
+{
+	write_u16(file, scores.size());
+	for (const auto& [id, score] : scores)
+	{
+		write_u16(file, id);
+		score.to_file(file);
+	}
+}
+
+void SongUserDatabase::update_score(uint16_t song_id, uint32_t new_lap, uint32_t new_score)
+{
+	auto& score = scores[song_id];
+	if (new_lap <= score.reached_lap && new_score <= score.reached_score)
+	{
+		return;
+	}
+	if (score.reached_lap < new_lap)
+	score.reached_lap = new_lap;
+	if (score.reached_score < new_score)
+	score.reached_score = new_score;
+	{
+		auto file = open_ofile(Path::user("temp_scores.db"));
+		to_file(file.value());
+		file->close();
+		if (!file.value())
+		{
+			std::cout << "error with score!" << std::endl;
+			std::abort();
+		}
+	}
+	std::filesystem::rename(Path::user("temp_scores.db"), Path::user("scores.db"));
+}
+
+void SongUserDatabase::load_from_file()
+{
+	auto file = open_ifile(Path::user("scores.db"));
+	if (!file)
+	{
+		return;
+	}
+	*this = file.value();
 }
 
 SongInfo legacy_song_load(uint16_t version, std::ifstream& file)

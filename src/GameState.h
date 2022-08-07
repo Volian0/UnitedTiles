@@ -9,6 +9,13 @@
 
 class Game;
 
+struct TouchEvent
+{
+	enum class Type : uint8_t {DOWN, MOVE, UP} type;
+	uint16_t finger_id;
+	Vec2 position;
+};
+
 class GameState : NonCopyable
 {
 public:
@@ -17,10 +24,7 @@ public:
 
 	virtual ~GameState() = default;
 
-	//std::map<uint16_t, Vec2> touch_held;
-	std::map<uint16_t, Vec2> touch_move;
-	std::map<uint16_t, Vec2> touch_up;
-	std::map<uint16_t, Vec2> touch_down;
+	std::vector<TouchEvent> touch_events;
 
 	Game* game;
 

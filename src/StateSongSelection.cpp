@@ -5,6 +5,8 @@
 #include "File.h"
 #include "Path.h"
 #include "StateLevel.h"
+#include "ui/Label.h"
+#include "RNG.h"
 
 uint32_t StateSongSelection::song_index = 0;
 
@@ -12,13 +14,15 @@ StateSongSelection::StateSongSelection(Game* game_)
 	:GameState(game_)
 {
 	_font = std::make_unique<Font>(game->renderer.get(), "roboto.ttf", 8.0L);
+	_font2 = std::make_unique<Font>(game->renderer.get(), "roboto.ttf", 4.0L);
 	_bg = std::make_unique<Texture>(game->renderer.get(), "dev_background.png");
 	_dev_button_texture = std::make_unique<Texture>(game->renderer.get(), "dev_button.png");
 	_dev_button_texture->blend_mode = 1;
 
-	ExtractedRes song_list_res("songs.txt", "database");
+	ExtractedRes song_list_res("songs.db", "database");
 	auto song_list_file = open_ifile(song_list_res.get_path()).value();
-	song_list = song_list_file;
+	song_database = song_list_file;
+	song_user_database.load_from_file();
 	left_button    = std::make_unique<DevButton>(Vec2{-0.8, 0.85}, 0.125, 0, "<<"  , _dev_button_texture.get(), _font.get(), this);
 	right_button   = std::make_unique<DevButton>(Vec2{0.8, 0.85}, 0.125, 0, ">>"  , _dev_button_texture.get(), _font.get(), this);
 	confirm_button = std::make_unique<DevButton>(Vec2{0, 0.85}, 0.5, 0, "Play", _dev_button_texture.get(), _font.get(), this);
@@ -31,21 +35,21 @@ void StateSongSelection::update()
 	{
 		if (song_index == 0)
 		{
-			song_index = song_list.songs.size();
+			song_index = song_database.songs_infos.size();
 		}
 		song_index--;
 	}
 	if (right_button->update())
 	{
 		song_index++;
-		if (song_index == song_list.songs.size())
+		if (song_index == song_database.songs_infos.size())
 		{
 			song_index = 0;
 		}
 	}
 	if (confirm_button->update())
 	{
-		return game->change_state<StateLevel>(std::string(song_list.songs.at(song_index).filename));
+		return game->change_state<StateLevel>(uint16_t(song_database.songs_infos.at(song_index).first));
 	}
 	if (return_button->update())
 	{
@@ -60,10 +64,58 @@ void StateSongSelection::render() const
 	right_button->render();
 	confirm_button->render();
 	return_button->render();
-	Texture song_name(game->renderer.get(), _font.get(), song_list.songs.at(song_index).name, { 255, 255, 255, 255 });
-	Texture composer_name(game->renderer.get(), _font.get(), "by " + song_list.songs.at(song_index).composer, { 255, 255, 255, 255 });
-	Texture file_name(game->renderer.get(), _font.get(), "(filename: "+song_list.songs.at(song_index).filename+")", { 127, 127, 127, 200 });
-	game->renderer->render(&song_name, { 0,0 }, song_name.get_psize(), { 0,0 }, song_name.get_rsize(), { 0,0 });
-	game->renderer->render(&composer_name, { 0,0 }, composer_name.get_psize(), { 0,song_name.get_rsize().y }, composer_name.get_rsize() * 0.5L, { 0,0 }, { 0,-1 });
-	game->renderer->render(&file_name, { 0,0 }, file_name.get_psize(), { 0,-song_name.get_rsize().y }, file_name.get_rsize() * 0.5L, { 0,0 }, {0,1});
+
+	const auto& song_info = song_database.songs_infos.at(song_index).second;
+	std::string song_name = song_info.name;
+	std::string composers;
+	std::vector<std::string_view> composer_list;
+	for (auto composer_id : song_info.composer_ids)
+	{
+		for (const auto& composer : song_database.composers_infos)
+		{
+			if (composer.first == composer_id)
+			{
+				composer_list.emplace_back(composer.second.name);
+			}
+		}
+	}
+
+	for (uint8_t i = 0; i < composer_list.size(); ++i)
+	{
+		composers += composer_list[i];
+		if (i != composer_list.size() - 1)
+		{
+			composers += ", ";
+		}
+	}
+
+	Label lsong_name(song_name, 0.9L, {0.0L, -0.1L - 0.25L}, {}, _font.get(), game->renderer.get());
+	Label lcomposers(composers, 0.9L, {0.0L, 0.05L - 0.25L}, {}, _font2.get(), game->renderer.get());
+	lcomposers.label_text_texture->tint = Colors::GRAY;
+	lsong_name.render(game->renderer.get());
+	lcomposers.render(game->renderer.get());
+	if (song_user_database.scores.count(song_database.songs_infos.at(song_index).first))
+	{
+		const auto& score = song_user_database.scores.at(song_database.songs_infos.at(song_index).first);
+		Label llap(std::to_string(score.reached_lap), 0.45L, {-0.5, 0.25L+0.1L}, {}, _font.get(), game->renderer.get());
+		Label lscore(std::to_string(score.reached_score), 0.45L, {0.5, 0.25L+0.1L}, {}, _font.get(), game->renderer.get());
+		Label llap2("Lap reached", 0.45L, {-0.5, 0.25L-0.05L}, {}, _font2.get(), game->renderer.get());
+		Label lscore2("High Score", 0.45L, {0.5, 0.25L-0.05L}, {}, _font2.get(), game->renderer.get());
+		llap2.label_text_texture->tint = Colors::GRAY;
+		lscore2.label_text_texture->tint = Colors::GRAY;
+		lscore.label_text_texture->tint = {255, 64, 64, 255};
+		llap.render(game->renderer.get());
+		lscore.render(game->renderer.get());
+		llap2.render(game->renderer.get());
+		lscore2.render(game->renderer.get());
+	}
+
+
+
+	//Texture song_name(game->renderer.get(), _font.get(), song_database.songs_infos.at(song_index).second.name, { 255, 255, 255, 255 });
+	//Texture composer_name(game->renderer.get(), _font.get(), "by " + song_list.songs.at(song_index).composer, { 255, 255, 255, 255 });
+	//Texture file_name(game->renderer.get(), _font.get(), "(filename: "+song_list.songs.at(song_index).filename+")", { 127, 127, 127, 200 });
+	//game->renderer->render(&song_name, { 0,0 }, song_name.get_psize(), { 0,0 }, song_name.get_rsize(), { 0,0 });
+	//game->renderer->render(&composer_name, { 0,0 }, composer_name.get_psize(), { 0,song_name.get_rsize().y }, composer_name.get_rsize() * 0.5L, { 0,0 }, { 0,-1 });
+	//game->renderer->render(&file_name, { 0,0 }, file_name.get_psize(), { 0,-song_name.get_rsize().y }, file_name.get_rsize() * 0.5L, { 0,0 }, {0,1});
 }

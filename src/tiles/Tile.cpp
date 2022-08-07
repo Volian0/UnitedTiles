@@ -141,7 +141,7 @@ void Tile::update()
 	//	[](const std::pair<uint16_t, Vec2>& pos_a, const std::pair<uint16_t, Vec2>& pos_b) { return pos_a.second.y < pos_b.second.y; });
 
 
-	for (auto& [finger_id, touch_pos] : _level->touch_down_sorted_positions)
+	/*for (auto& [finger_id, touch_pos] : _level->touch_down_sorted_positions)
 	{
 		const auto& click_position = LongTile::y_finger_tapped = y_offset - (touch_pos.y + 1.0L) / 2.0L * 4.0L;
 		//help to aim
@@ -165,6 +165,38 @@ void Tile::update()
 	for (const auto& [finger_id, touch_pos] : _level->touch_up)
 	{
 		touch_up(finger_id, { touch_pos.x, y_offset - (touch_pos.y + 1.0L) / 2.0L * 4.0L });
+	}*/
+	for (auto& touch_event : _level->touch_events)
+	{
+		auto& touch_pos = touch_event.position;
+		const auto finger_id = touch_event.finger_id;
+		if (touch_event.type == TouchEvent::Type::DOWN)
+		{
+
+			const auto& click_position = LongTile::y_finger_tapped = y_offset - (touch_pos.y + 1.0L) / 2.0L * 4.0L;
+			//help to aim
+			if (is_active() &&
+			(get_info().type == TileInfo::Type::DOUBLE || get_info().type == TileInfo::Type::SINGLE || get_info().type == TileInfo::Type::LONG) &&
+			(get_column(touch_pos.x) & column) &&
+			click_position - 1.0L < std::min(get_tile_length(), 1.0L) && (click_position >= 0.0L ))
+			{
+				touch_pos.y = -std::numeric_limits<Number>::infinity();
+				touch_down(finger_id, { touch_pos.x, 0.0L });	
+			}
+			else
+			{
+				touch_down(finger_id, { touch_pos.x, click_position});
+			}
+
+		}
+		else if (touch_event.type == TouchEvent::Type::MOVE)
+		{
+			touch_move(finger_id, { touch_pos.x, y_offset - (touch_pos.y + 1.0L) / 2.0L * 4.0L });
+		}
+		else if (touch_event.type == TouchEvent::Type::UP)
+		{
+			touch_up(finger_id, { touch_pos.x, y_offset - (touch_pos.y + 1.0L) / 2.0L * 4.0L });
+		}
 	}
 }
 

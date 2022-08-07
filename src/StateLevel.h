@@ -57,6 +57,11 @@ public:
 	void silent_add(uint32_t value);
 	void silent_update();
 
+	[[nodiscard]] constexpr uint32_t get_score() const noexcept
+	{
+		return _value;
+	}
+
 private:
 	bool was_silent_added = false;
 	StateLevel* _level;
@@ -72,7 +77,9 @@ class StateLevel : public GameState
 	friend Tile;
 
 public:
-	StateLevel(Game* game_, const std::string& filename);
+	StateLevel(Game* game_, uint16_t song_id_);
+
+	const uint16_t song_id;
 
 	mutable Texture txt_single_tile;
 	mutable Texture txt_game_over_tile;
@@ -89,7 +96,7 @@ public:
 
 	uint32_t lap_id = 0;
 
-	std::vector<std::pair<uint16_t,Vec2>> touch_down_sorted_positions;
+	//std::vector<std::pair<uint16_t,Vec2>> touch_down_sorted_positions;
 
 	SongInfo _song_info;
 
@@ -142,7 +149,7 @@ private:
 	Timepoint last_tempo_change;
 	Number previous_position = 0;
 
-	std::multimap<Number, std::shared_ptr<Tile>> tiles;
+	std::map<Number, std::shared_ptr<Tile>> tiles;
 	uint32_t spawned_tiles = 0;
 
 	Timepoint _old_tp;

@@ -111,7 +111,7 @@ void LevelBackground::render() const
 	_dustmotes_stars.render();
 }
 
-StateLevel::StateLevel(Game* game_, const std::string& filename)
+StateLevel::StateLevel(Game* game_, uint16_t song_id_)
 	:GameState(game_),
 	score{this},
 	tile_divider{game->renderer.get(), "tile_divider.png"},
@@ -127,20 +127,80 @@ StateLevel::StateLevel(Game* game_, const std::string& filename)
 	slider_tile_clearing{game->renderer.get(), "slider_clearing.png"},
 	_debug_font{game->renderer.get(), "roboto.ttf", 4},
 	_burst{game_->renderer.get(), "white.png"},
-	lv_bg{this}
+	lv_bg{this},
+	song_id{song_id_}
 {
+	/*std::vector<ComposerInfo> composers{
+		ComposerInfo{"Franz Liszt", "Hungarian composer, pianist and teacher of the Romantic era", 1811, 1886},
+		ComposerInfo{"Frédéric Chopin", "Polish composer and virtuoso pianist of the Romantic period", 1810, 1849},
+		ComposerInfo{"Hermann Necke", "German composer, conductor, music director, pianist, and violinist of the Romantic period", 1850, 1912},
+		ComposerInfo{"Johann Pachelbel", "German composer, organist, and teacher who brought the south German organ schools to their peak", 1653, 1706},
+		ComposerInfo{"Pyotr Ilyich Tchaikovsky", "Russian composer of the Romantic period", 1840, 1893},
+		ComposerInfo{"Ludwig van Beethoven", "German composer and pianist", 1770, 1827},
+		ComposerInfo{"Edvard Grieg", "Norwegian composer and pianist. He is widely considered one of the main Romantic era composers", 1843, 1907}
+	};
 	
+	std::vector<SongBasicInfo> songs{
+		SongBasicInfo{1888, "Anitra's Dance", "", "Anitras Dance", {6}},
+		SongBasicInfo{0, "Canon in D", "accompanied canon by the German Baroque composer Johann Pachelbel", "Canon", {3}},
+		SongBasicInfo{0, "Csikós Post", "galop in the key of E minor", "Csikos Post", {2}},
+		SongBasicInfo{0, "Danse chinoise", "", "Danse chinoise", {4}},
+		SongBasicInfo{0, "Etude in C major", "", "Etude in C major", {0}},
+		SongBasicInfo{0, "Etude in D minor", "", "Etude in d minor", {0}},
+		SongBasicInfo{1810, "Für Elise", "one of Ludwig van Beethoven's most popular compositions", "Fur Elise", {5}},
+		SongBasicInfo{0, "Prelude Op. 28, No. 4", "by Chopin's request, this piece was played at his own funeral", "Prelude Op 28 No 4", {1}}
+	};
+
+	SongDatabase database;
+
+	for (uint16_t i = 0; i < composers.size(); ++i)
+	{
+		database.composers_infos.emplace_back(i, composers.at(i));
+	}
+
+	database.songs_infos = {
+		{1, songs.at(1)},//canon in d
+		{7, songs.at(7)},//prelude op 28 no 4
+		{3, songs.at(3)},//danse chinoise
+		{6, songs.at(6)},//fur elise
+		{0, songs.at(0)},//anitras dance
+		{2, songs.at(2)},//csikos post
+		{5, songs.at(5)},//etude in d minor
+		{4, songs.at(4)}//etude in c major
+		
+		};
+	auto ofile = open_ofile("songs.db");
+	database.to_file(ofile.value());
+	ofile->close();
+	std::abort();*/
+
 	/*SongList list;
 	list.songs.emplace_back("Canon", "Johann Pachelbel", "Canon.usong");
 	list.songs.emplace_back("Für Elise", "Ludwig van Beethoven", "Fur Elise.usong");
 	list.songs.emplace_back("Anitra's Dance", "Edvard Grieg", "Anitras Dance.usong");
 	list.songs.emplace_back("Etude in d minor", "Franz Liszt", "Etude in d minor.usong");
 	list.songs.emplace_back("Etude in C major", "Franz Liszt", "Etude in C major.usong");
+	list.songs.emplace_back("Csikós Post", "Hermann Necke", "Csikos Post.usong");
 	auto ofile = open_ofile("newsonglist.txt");
 	list.to_file(ofile.value());
 	ofile->flush();
 	std::abort();*/
 	
+	std::string filename;
+	{
+		ExtractedRes song_list_res("songs.db", "database");
+		auto song_list_file = open_ifile(song_list_res.get_path()).value();
+		SongDatabase song_database = song_list_file;
+		//find filename
+		for (const auto& [id, info] : song_database.songs_infos)
+		{
+			if (id == song_id)
+			{
+				filename = info.filename + ".usong";
+				break;
+			}
+		}
+	}
 	tile_divider.blend_mode = 1;
 	txt_single_tile_cleared.blend_mode = 1;
 	slider_tile.blend_mode = 1;
@@ -163,17 +223,29 @@ StateLevel::StateLevel(Game* game_, const std::string& filename)
 
 void StateLevel::render_debug() const
 {
+	constexpr std::chrono::steady_clock::period steady_p;
+	constexpr std::chrono::system_clock::period system_p;
+	constexpr std::chrono::high_resolution_clock::period high_p;
+	static const std::string steady_s = std::to_string(steady_p.num) + "/" + std::to_string(steady_p.den);
+	static const std::string system_s = std::to_string(system_p.num) + "/" + std::to_string(system_p.den);
+	static const std::string high_s = std::to_string(high_p.num) + "/" + std::to_string(high_p.den);
+	static const std::string all_clocks = steady_s + ";" + system_s + ";" + high_s;
+
 	Texture dbg_tps{ game->renderer.get(), &_debug_font, "TPS: " + std::to_string(tps), Colors::WHITE };
 	Texture dbg_tiles_n{ game->renderer.get(), &_debug_font, "Active tiles: " + std::to_string(tiles.size()), Colors::WHITE };
 	Texture dbg_cleared_n{ game->renderer.get(), &_debug_font, "Cleared tiles: " + std::to_string(cleared_tiles), Colors::WHITE };
 	Texture dbg_position{ game->renderer.get(), &_debug_font, "Position: " + std::to_string(_position), Colors::WHITE };
 	Texture dbg_lap{ game->renderer.get(), &_debug_font, "Lap: " + std::to_string(lap_id), Colors::WHITE };
+	Texture dbg_notes{ game->renderer.get(), &_debug_font, "Notes playing: " + std::to_string(soundfont->get_notes_on_size()), soundfont->get_notes_on_size() ? Colors::WHITE : Colors::RED };
+	Texture dbg_clock{ game->renderer.get(), &_debug_font, "Clock: " + all_clocks, Colors::WHITE };
 
 	game->renderer->render(&dbg_cleared_n, {}, dbg_cleared_n.get_psize(), Vec2(-1, 1), dbg_cleared_n.get_rsize(), {}, { -1,1 });
 	game->renderer->render(&dbg_tiles_n, {}, dbg_tiles_n.get_psize(), Vec2(-1, 1 - (dbg_cleared_n.get_rsize().y) * 2.0L), dbg_tiles_n.get_rsize(), {}, { -1,1 });
 	game->renderer->render(&dbg_tps, {}, dbg_tps.get_psize(), Vec2(-1, 1 - (dbg_cleared_n.get_rsize().y + dbg_tiles_n.get_rsize().y) * 2.0L), dbg_tps.get_rsize(), {}, { -1,1 });
 	game->renderer->render(&dbg_position, {}, dbg_position.get_psize(), Vec2(-1, 1 - (dbg_cleared_n.get_rsize().y + dbg_tiles_n.get_rsize().y + dbg_tps.get_rsize().y) * 2.0L), dbg_position.get_rsize(), {}, { -1,1 });
 	game->renderer->render(&dbg_lap, {}, dbg_lap.get_psize(), Vec2(-1, 1 - (dbg_cleared_n.get_rsize().y + dbg_tiles_n.get_rsize().y + dbg_tps.get_rsize().y + dbg_position.get_rsize().y) * 2.0L), dbg_lap.get_rsize(), {}, { -1,1 });
+	game->renderer->render(&dbg_notes, {}, dbg_notes.get_psize(), Vec2(-1, 1 - (dbg_cleared_n.get_rsize().y + dbg_tiles_n.get_rsize().y + dbg_tps.get_rsize().y + dbg_position.get_rsize().y + dbg_lap.get_rsize().y) * 2.0L), dbg_notes.get_rsize(), {}, { -1,1 });
+	game->renderer->render(&dbg_clock, {}, dbg_clock.get_psize(), Vec2(-1, 1 - (dbg_cleared_n.get_rsize().y + dbg_tiles_n.get_rsize().y + dbg_tps.get_rsize().y + dbg_position.get_rsize().y + dbg_lap.get_rsize().y + dbg_notes.get_rsize().y) * 2.0L), dbg_clock.get_rsize(), {}, { -1,1 });
 }
 
 void StateLevel::queue_notes(const std::multimap<uint32_t, NoteEvent>& notes, bool forceplay_old, const std::optional<Timepoint> custom_tp)
@@ -250,23 +322,20 @@ void StateLevel::update()
 	}
 
 	//sort touch down
-	touch_down_sorted_positions.clear();
+	/*touch_down_sorted_positions.clear();
 	for (const auto& [finger_id, touch_pos] : touch_down)
 	{
 		touch_down_sorted_positions.emplace_back(finger_id, touch_pos);
 	}
 	std::sort(touch_down_sorted_positions.begin(), touch_down_sorted_positions.end(),
 		[](const std::pair<uint16_t, Vec2>& pos_a, const std::pair<uint16_t, Vec2>& pos_b) { return pos_a.second.y < pos_b.second.y; });
-
-	//update Y offset
-	for (auto& [position, tile] : tiles)
-	{
-		tile->y_offset = _position - position;
-	}
+	*/
 
 	//update tiles
 	for (const auto& [tile_pos, tile] : tiles)
 	{
+		//update Y offset
+		tile->y_offset = _position - tile_pos;
 		if (_state == State::GAME_OVER)
 		{
 			break;
@@ -282,6 +351,7 @@ void StateLevel::update()
 					{
 						tile->touch_down(0, {get_column_x_pos(tile->column) + 1.0L, 0.0L});
 					}
+					LongTile::y_finger_tapped = 0.0L;
 					tile->touch_down(0, {get_column_x_pos(tile->column), 0.0L});
 				}
 			}
@@ -382,23 +452,24 @@ void StateLevel::spawn_new_tiles()
 		Number total_pos = Number(total_length) / Number(_song_info.length_units_per_single_tile);
 		if (_position > total_pos)
 		{
+			//TODO: Add checking for not inserted tiles
 			total_length += _song_info.tiles[i].length;
 			switch (_song_info.tiles[i].type)
 			{
 			case TileInfo::Type::SINGLE:
-				previous_tile = tiles.emplace(total_pos, std::make_shared<SingleTile>(this))->second;
+				previous_tile = tiles.emplace(total_pos, std::make_shared<SingleTile>(this)).first->second;
 				break;
 			case TileInfo::Type::LONG:
-				previous_tile = tiles.emplace(total_pos, std::make_shared<LongTile>(this))->second;
+				previous_tile = tiles.emplace(total_pos, std::make_shared<LongTile>(this)).first->second;
 				break;
 			case TileInfo::Type::DOUBLE:
-				previous_tile = tiles.emplace(total_pos, std::make_shared<DoubleTile>(this))->second;
+				previous_tile = tiles.emplace(total_pos, std::make_shared<DoubleTile>(this)).first->second;
 				break;
 			case TileInfo::Type::EMPTY:
-				previous_tile = tiles.emplace(total_pos, std::make_shared<EmptyTile>(this))->second;
+				previous_tile = tiles.emplace(total_pos, std::make_shared<EmptyTile>(this)).first->second;
 				break;
 			case TileInfo::Type::SLIDER:
-				previous_tile = tiles.emplace(total_pos, std::make_shared<SliderTile>(this))->second;
+				previous_tile = tiles.emplace(total_pos, std::make_shared<SliderTile>(this)).first->second;
 				break;
 			default: abort(); break;
 			}
@@ -413,7 +484,7 @@ void StateLevel::change_tempo(Number new_tps, const Timepoint& tp_now, Number po
 {
 	if (tps == new_tps && _state == State::ACTIVE)
 		return;
-	std::cout << "Changing tempo from " << tps << " TPS to " << new_tps << " TPS" << std::endl;
+	//std::cout << "Changing tempo from " << tps << " TPS to " << new_tps << " TPS" << std::endl;
 	previous_position = position;
 	tps = new_tps;
 	last_tempo_change = tp_now;
@@ -433,6 +504,13 @@ void StateLevel::game_over(Tile* tile)
 	soundfont->add_event(new_tp, NoteEvent(NoteEvent::Type::ON, 52, 127));
 	soundfont->add_event(new_tp, NoteEvent(NoteEvent::Type::ON, 55, 127));
 	game_over_reset = new_tp;
+
+	if (game->cfg->god_mode == false)
+	{
+		SongUserDatabase user_database;
+		user_database.load_from_file();
+		user_database.update_score(song_id, lap_id, score.get_score());
+	}
 }
 
 ScoreCounter::ScoreCounter(StateLevel* level_, uint32_t init_value)
@@ -444,7 +522,7 @@ ScoreCounter::ScoreCounter(StateLevel* level_, uint32_t init_value)
 
 void ScoreCounter::render() const
 {
-	Number diff = std::clamp(0.1L - (Timepoint() - _tp_update), 0.0L, 0.1L);
+	Number diff = std::clamp(0.1L - (_level->new_tp - _tp_update), 0.0L, 0.1L);
 	diff = diff * diff * 10.0L;
 	diff = diff * 2.0L + 0.8L;
 	//Number scale = std::clamp(1.0L - (Timepoint() - _tp_update), 0.8L, 1.0L);

@@ -15,9 +15,11 @@ private:
 	virtual void update();
 	virtual void render() const;
 
-	SongList song_list;
+	SongDatabase song_database;
+	SongUserDatabase song_user_database;
 
 	std::unique_ptr<Font> _font;
+	std::unique_ptr<Font> _font2;
 	std::unique_ptr<Texture> _bg;
 	std::unique_ptr<Texture> _dev_button_texture;
 

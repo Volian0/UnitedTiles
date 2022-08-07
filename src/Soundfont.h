@@ -8,6 +8,7 @@
 #include <mutex>
 #include <map>
 #include <unordered_set>
+#include <array>
 
 class Soundfont : NonCopyable
 {
@@ -27,6 +28,8 @@ public:
 	void play_event(const NoteEvent& event);
 	void play_all_events();
 	void play_events(const Timepoint& bound = {});
+
+	uint8_t get_notes_on_size();
 
 private:
 	mutable std::mutex _mutex;

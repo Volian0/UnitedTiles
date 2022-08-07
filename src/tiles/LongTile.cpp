@@ -10,12 +10,12 @@ LongTile::LongTile(StateLevel* level_)
 
 bool LongTile::should_game_over() const
 {
-	return y_offset > 1.0L + 4.0L;
+	return y_offset > 1.0L + 4.0L + 1.0L;
 }
 
 bool LongTile::should_die() const
 {
-	return y_offset > get_tile_length() + 4.0L;;
+	return y_offset > get_tile_length() + 4.0L + 1.0L;
 }
 
 void LongTile::my_update()

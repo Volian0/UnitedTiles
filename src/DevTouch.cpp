@@ -29,9 +29,10 @@ void DevTouch::update(GameState* state)
 
 	markers.erase(std::remove_if(markers.begin(), markers.end(), [&](const DevTouchMarker& marker) { return marker.should_die(tp_now); }), markers.end());
 
-	for (const auto& td : state->touch_down)
+	for (const auto& td : state->touch_events)
 	{
-		markers.emplace_back(DevTouchMarker{ td.second, std::make_unique<Texture>(state->game->renderer.get(), &font, std::to_string(td.first), Color{ 255,255,255,255 }), tp_now });
+		if (td.type == TouchEvent::Type::DOWN)
+			markers.emplace_back(DevTouchMarker{ td.position, std::make_unique<Texture>(state->game->renderer.get(), &font, std::to_string(td.finger_id), Color{ 255,255,255,255 }), tp_now });
 	}
 }
 

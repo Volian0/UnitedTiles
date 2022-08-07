@@ -119,3 +119,8 @@ void Soundfont::play_events(const Timepoint& bound)
 	_events.erase(_events.begin(), lower_bound);
 }
 
+uint8_t Soundfont::get_notes_on_size()
+{
+	std::scoped_lock lock(_mutex_events);
+	return _notes_on.size();
+}

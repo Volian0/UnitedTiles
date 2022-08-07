@@ -15,29 +15,31 @@ DevButton::DevButton(Vec2 position_, Number width_, uint32_t id_, const std::str
 	_font{font}
 {
 	set_text(text);
+	_text_texture->tint = Color{40, 40, 40, 255};
+	_texture->tint = Colors::WHITE;
 }
 
 bool DevButton::update()
 {
 	_pressed = false;
-	if (!is_held())
-	for (auto& [key, value] : _state->touch_down)
+	for (const auto& touch_event : _state->touch_events)
 	{
-		if (in_range(value))
+		if (touch_event.type == TouchEvent::Type::DOWN)
 		{
-			_held_finger_id.emplace(key);
-			break;
-		}
-	}
-	if (is_held())
-	{
-		uint16_t finger_id = _held_finger_id.value();
-		if (_state->touch_up.count(finger_id))
-		{
-			_held_finger_id.reset();
-			if (in_range(_state->touch_up[finger_id]))
+			if (!is_held() && in_range(touch_event.position))
 			{
-				_pressed = true;
+				_held_finger_id.emplace(touch_event.finger_id);
+			}
+		}
+		else if (touch_event.type == TouchEvent::Type::UP)
+		{
+			if (is_held() && touch_event.finger_id == _held_finger_id.value())
+			{
+				_held_finger_id.reset();
+				if (in_range(touch_event.position))
+				{
+					_pressed = true;
+				}
 			}
 		}
 	}
@@ -49,7 +51,7 @@ void DevButton::render() const
 	if (is_held())
 	{
 		_text_texture->tint = Colors::BLACK;
-		_texture->tint = Colors::GRAY;
+		_texture->tint = Color{200, 200, 200, 255};
 	}
 
 	Renderer* renderer = _state->game->renderer.get();
@@ -65,7 +67,7 @@ void DevButton::render() const
 
 	_state->game->renderer->render(_text_texture.get(), { 0,0 }, _text_texture->get_psize(), position, _text_texture->get_rsize(), { 0,0 });
 
-	_text_texture->tint = Colors::WHITE;
+	_text_texture->tint = Color{40, 40, 40, 255};
 	_texture->tint = Colors::WHITE;
 }
 

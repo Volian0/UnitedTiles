@@ -8,6 +8,7 @@
 #include <map>
 #include <fstream>
 #include <array>
+#include <set>
 
 struct NoteEvent
 {
@@ -64,15 +65,68 @@ struct SongInfo
 
 SongInfo legacy_song_load(uint16_t version, std::ifstream& file);
 
-struct SongBasicInfo
+struct ComposerInfo
 {
-	std::string name, composer, filename;
+	std::string name;
+	std::string description;
+	uint16_t birth_year = 0;
+	uint16_t death_year = 0;
+	[[deprecated]] ComposerInfo(std::string a1, std::string a2, uint16_t a3, uint16_t a4)
+	{
+		name = a1;
+		description = a2;
+		birth_year = a3;
+		death_year = a4;
+	}
+	ComposerInfo() = default;
+	ComposerInfo(std::ifstream& file);
+	void to_file(std::ofstream& file) const;
 };
 
-struct SongList
+struct SongBasicInfo
 {
-	std::vector<SongBasicInfo> songs;
-	SongList() = default;
-	SongList(std::ifstream& file);
+	uint16_t create_year = 0;
+	std::string name;
+	std::string description;
+	std::string filename;
+	std::vector<uint16_t> composer_ids;
+	SongBasicInfo() = default;
+	[[deprecated]] SongBasicInfo(uint16_t a1, std::string a2, std::string a3, std::string a4, std::vector<uint16_t> a5)
+	{
+		create_year = a1;
+		name = a2;
+		description = a3;
+		filename = a4;
+		composer_ids = a5;
+	}
+	SongBasicInfo(std::ifstream& file);
 	void to_file(std::ofstream& file) const;
+};
+
+struct SongScore
+{
+	uint32_t reached_lap = 0;
+	uint32_t reached_score = 0;
+	SongScore() = default;
+	SongScore(std::ifstream& file);
+	void to_file(std::ofstream& file) const;
+};
+
+struct SongDatabase
+{
+	std::vector<std::pair<uint16_t, ComposerInfo>> composers_infos;
+	std::vector<std::pair<uint16_t, SongBasicInfo>> songs_infos;
+	SongDatabase() = default;
+	SongDatabase(std::ifstream& file);
+	void to_file(std::ofstream& file) const;
+};
+
+struct SongUserDatabase
+{
+	std::map<uint16_t, SongScore> scores;
+	SongUserDatabase() = default;
+	void load_from_file();
+	SongUserDatabase(std::ifstream& file);
+	void to_file(std::ofstream& file) const;
+	void update_score(uint16_t song_id, uint32_t new_lap, uint32_t new_score);
 };

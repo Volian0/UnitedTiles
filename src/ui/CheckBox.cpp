@@ -10,8 +10,11 @@ CheckBox::CheckBox(Texture* txt_u, Texture* txt_c, Font* font_, const std::strin
 
 bool CheckBox::update(GameState* state)
 {
-	for (auto& [finger, pos] : state->touch_down)
+	for (const auto& touch_event : state->touch_events)
 	{
+		if (touch_event.type != TouchEvent::Type::DOWN)
+			continue;
+		const auto& pos = touch_event.position;
 		if (pos.x < -0.8L && std::abs(pos.y - label.position.y) < 0.1L * state->game->renderer->get_aspect_ratio())
 		{
 			_checked = !_checked;
