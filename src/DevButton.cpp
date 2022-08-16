@@ -51,7 +51,7 @@ void DevButton::render() const
 	if (is_held())
 	{
 		_text_texture->tint = Colors::BLACK;
-		_texture->tint = Color{200, 200, 200, 255};
+		_texture->tint = Color{192, 192, 192, 255};
 	}
 
 	Renderer* renderer = _state->game->renderer.get();

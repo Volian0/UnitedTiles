@@ -10,26 +10,40 @@ LongTile::LongTile(StateLevel* level_)
 
 bool LongTile::should_game_over() const
 {
-	return y_offset > 1.0L + 4.0L + 1.0L;
+	return y_offset > 1.0L + 4.0L + _level->get_miss_range();
 }
 
 bool LongTile::should_die() const
 {
-	return y_offset > get_tile_length() + 4.0L + 1.0L;
+	return y_offset > get_tile_length() + 4.0L + _level->get_miss_range();
 }
 
 void LongTile::my_update()
 {
 	if (is_state(&LongTileClearing))
 	{
-		held_tile_duration = y_offset - y_tapped - 0.25L;
-		//held_tile_duration = (_level->new_tp - tp_tapped) * _level->tps;
+		held_tile_duration = y_offset - y_tapped;
 
-		if (held_tile_duration + 1.0L >= get_tile_length())
+		if (held_tile_duration + 0.25L >= get_tile_length())
 		{
 			change_state(&LongTileFullyCleared);
 		}
+		else
+		{
+			const std::pair<Number, Number>* last_tap = nullptr;
+			for (const auto& tap : taps)
+			{
+				if (tap.first <= held_tile_duration)
+					last_tap = &tap;
+				else break;
+			}
+			if (last_tap != nullptr)
+			{
+				tap_length = std::max(last_tap->second * (1.0L - (held_tile_duration - last_tap->first)), 0.0L);
+			}
+		}
 	}
+		//else tap_length = 0.0L;
 }
 
 void LongTile::touch_down(uint16_t finger_id, Vec2 pos)
@@ -74,6 +88,30 @@ void LongTile::on_changed_state()
 		_level->queue_notes(get_info().note_events);
 		//tp_tapped = _level->new_tp;
 		y_tapped = y_offset - y_finger_tapped;
+
+		//add taps here
+		{
+			const auto& note_events = get_info().note_events;
+			for (const auto& it : note_events)
+			{
+				const auto& event = it.second;
+				if (event.type != NoteEvent::Type::ON)
+					continue;
+				const auto length = Number(it.first) / _level->_song_info.note_ticks_per_single_tile + y_finger_tapped;
+				const auto strength = Number(event.velocity) / 127.0L;
+				if (!taps.empty())
+				{
+					auto& back = taps.back();
+					if (back.first >= length)
+					{
+						back.second = std::max(back.second, strength);
+						continue;
+					}
+				}
+				taps.emplace_back(length, strength);
+			}
+		}
+
 		my_update();
 	}
 	else if (is_state(&LongTileFullyCleared))
@@ -108,10 +146,18 @@ void LongTile::render_fg() const
 		{
 			texture = &_level->txt_long_tile_clearing;
 			_level->game->renderer->render(texture, {}, texture->get_psize(), pos,
-				{ 0.25, (held_tile_duration + 0.5L) / 4.0L }, {}, { 0,1 });
+				{ 0.25, (held_tile_duration) / 4.0L }, {}, { 0,1 });
 			texture = &_level->txt_long_tile_end;
-			_level->game->renderer->render(texture, {}, texture->get_psize(), pos - Vec2{ 0, (held_tile_duration + 0.5L) / 2.0L },
-				{ 0.25, 0.5L / 4.0L }, {}, { 0,1 });
+			_level->game->renderer->render(texture, {}, texture->get_psize(), pos - Vec2{ 0, (held_tile_duration) / 2.0L },
+				{ 0.25, 0.25L / 4.0L }, {}, { 0,1 });
+			texture = &_level->txt_long_tile_circle;
+			if (is_state(&LongTileClearing))
+			{
+				texture->tint = {0, tap_length*127.0L + 128.0L, 255, tap_length*200.0L};
+				_level->game->renderer->render(texture, {}, texture->get_psize(), pos - Vec2{ 0, (held_tile_duration) / 2.0L+0.100L },
+					Vec2{ 0.25L, 0.25L * _level->game->renderer->get_aspect_ratio() }*(tap_length+0.0625L), {});
+				texture->tint = Colors::WHITE;
+			}
 		}
 		else
 		{

@@ -12,6 +12,10 @@ bool CheckBox::update(GameState* state)
 {
 	for (const auto& touch_event : state->touch_events)
 	{
+		if (spanel && !spanel->in_range(touch_event.position))
+		{
+			continue;
+		}
 		if (touch_event.type != TouchEvent::Type::DOWN)
 			continue;
 		const auto& pos = touch_event.position;

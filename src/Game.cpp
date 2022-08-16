@@ -62,6 +62,9 @@ void Game::run()
 	{
 		//handle events
 		_state->touch_events.clear();
+		_state->key_events.clear();
+		_state->pressed_backspace = false;
+		_state->pressed_enter = false;
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
 		{
@@ -88,6 +91,22 @@ void Game::run()
 						return TouchEvent::Type::MOVE;
 					return TouchEvent::Type::UP;
 				}(), event.tfinger.fingerId, position});
+			}
+			else if (event.type == SDL_TEXTINPUT)
+			{
+				_state->key_events = event.text.text;
+			}
+			else if (event.type == SDL_KEYDOWN)
+			{
+				const auto sym = event.key.keysym.sym;
+				if (sym == SDLK_BACKSPACE)
+				{
+					_state->pressed_backspace = true;
+				}
+				else if (sym == SDLK_RETURN)
+				{
+					_state->pressed_enter = true;
+				}
 			}
 		}
 

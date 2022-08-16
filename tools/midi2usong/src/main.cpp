@@ -13,11 +13,12 @@ using namespace smf;
 int main(int args_size, char** args)
 try
 {
-	constexpr std::string_view filename = "/home/volian/prelude3.mid";
+	constexpr std::string_view filename = "/home/volian/sonata.mid";
 	constexpr uint32_t single_tile_length = 24;
-	constexpr long double start_tps = 2.93333333333333333333333333333333333333333333333L;
+	constexpr long double start_tps = 8.25L;
 	constexpr long double multiplier = 1.18248206376L;
-	constexpr uint32_t empty_length_end = 0;
+	constexpr uint32_t empty_length_end = 6*24;
+	constexpr bool do_tempo_thing = false;
 
 	MidiFile midi;
 	midi.read(filename.data());
@@ -209,7 +210,7 @@ try
 	if (empty_length_end != 0)
 	{
 
-		usong.tiles.back().note_events.emplace(single_tile_length, NoteEvent(NoteEvent::Type::ALL_OFF));
+		usong.tiles.back().note_events.emplace(usong.tiles.back().length, NoteEvent(NoteEvent::Type::ALL_OFF));
 
 		auto& tile = usong.tiles.emplace_back();
 					tile.type = TileInfo::Type::EMPTY;
@@ -238,8 +239,73 @@ try
 			}
 		}
 	}
+	if (do_tempo_thing)
+	{
+		midi.joinTracks();
+		//midi.deltaTicks();
+		//uint64_t delta = 0;
+		uint64_t acc_delta_tiles = 0;
+		std::map<uint64_t, long double> tempo_changes_midi;
+		std::map<uint32_t, long double> tempo_changes_tiles;
+		//std::map<uint32_t, long double> real_tempo_changes_tiles;
+		for (uint32_t event_i = 0; event_i < midi[0].getEventCount(); ++event_i)
+		{
+			auto& event = midi[0].getEvent(event_i);
+			const auto delta = event.tick;
+			if (event.isTempo() && delta != 0)
+			{
+				//std::cout << delta << std::endl;
+				tempo_changes_midi.emplace(delta, static_cast<long double>(event.getTempoBPM())/30.0L);
+			}
+		}
+		for (uint64_t i = 0;i < usong.tiles.size() - 1; ++i)
+		{
+			const auto& tile = usong.tiles[i];
+			//const auto& next_tile = usong.tiles[i+1];
+			for (uint64_t y = acc_delta_tiles + 1; y <= acc_delta_tiles + tile.length; ++y)
+			{
+				if (tempo_changes_midi.count(y))
+				{
+					//std::cout << i << std::endl;
+					//std::abort();
+					tempo_changes_tiles[i+1] = tempo_changes_midi.at(y);
+					//s/td::cout << "wowa" << std::endl;
+				}
+			}
+			acc_delta_tiles += tile.length;
+		}
+		long double current_tempo = start_tps;
+		uint64_t used_tile_id = 0;
+		for (uint64_t i = 1;i < usong.tiles.size(); ++i)
+		{
+			const auto& tile = usong.tiles[i];
+			if (tile.type == TileInfo::Type::EMPTY)
+			{
+				continue;
+			}
+			for (const auto& [tile_id, tps] : tempo_changes_tiles)
+			{
+				//std::cout << tile_id << std::endl;
+				if (tile_id > i)
+					break;
+				if (tile_id <= used_tile_id)
+				{
+					continue;
+				}
+				usong.acceleration_info.tempo_changes[i] = tps;
+				used_tile_id = tile_id;
+				//std::cout << "wow" << std::endl;
+			}
+		}
+	}
+	std::cout << std::endl << usong.acceleration_info.tempo_changes.size() << std::endl;
+	for (const auto& tc : usong.acceleration_info.tempo_changes)
+	{
+		//std::cout << tc.first << ": " << tc.second << std::endl;
+	}
 	auto output_file = open_ofile("output.usong").value();
 	usong.to_file(output_file);
+	std::cout << std::endl;
 }
 catch (const std::exception& e)
 {

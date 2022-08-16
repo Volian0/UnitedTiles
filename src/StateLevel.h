@@ -17,6 +17,7 @@
 #include <vector>
 #include <cstdint>
 #include <array>
+#include <deque>
 
 class StateLevel;
 
@@ -96,6 +97,10 @@ public:
 
 	uint32_t lap_id = 0;
 
+	//std::vector<std::pair<Number,Number>> long_tile_taps;
+	//std::pair<Number,Number> current_long_tile_tap{0.0L,0.0L};
+	//class LongTile* tapped_long_tile=nullptr;
+
 	//std::vector<std::pair<uint16_t,Vec2>> touch_down_sorted_positions;
 
 	SongInfo _song_info;
@@ -120,6 +125,11 @@ public:
 	ScoreCounter score;
 
 	Number tps = 1.0L;
+
+	constexpr Number get_miss_range() const noexcept
+	{
+		return tps * 0.1171875L;
+	}
 
 	BurstParticles _burst;
 
@@ -149,7 +159,7 @@ private:
 	Timepoint last_tempo_change;
 	Number previous_position = 0;
 
-	std::map<Number, std::shared_ptr<Tile>> tiles;
+	std::deque<std::pair<Number, std::shared_ptr<Tile>>> tiles;
 	uint32_t spawned_tiles = 0;
 
 	Timepoint _old_tp;

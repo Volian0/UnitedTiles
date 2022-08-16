@@ -18,7 +18,7 @@ public:
 	void start_rendering() const;
 	void stop_rendering() const;
 
-	[[nodiscard]] inline bool in_range(Vec2 pos) const
+	[[nodiscard]] constexpr bool in_range(Vec2 pos) const noexcept
 	{
 		Vec2 dest_pos = (position + Number(1.0L)) * Vec2(2.0L) / Number(2.0L) - (origin + Number(1.0L)) * Vec2(size) / Number(2.0L) - 1.0L;
 		return (pos.x >= dest_pos.x && pos.x <= dest_pos.x + size.x) && (pos.y >= dest_pos.y && pos.y <= dest_pos.y + size.y);

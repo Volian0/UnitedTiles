@@ -323,9 +323,15 @@ void SongUserDatabase::update_score(uint16_t song_id, uint32_t new_lap, uint32_t
 
 void SongUserDatabase::load_from_file()
 {
-	auto file = open_ifile(Path::user("scores.db"));
+	const auto& path = Path::user("scores.db");
+	auto file = open_ifile(path);
 	if (!file)
 	{
+		if (std::filesystem::is_regular_file(path))
+		{
+			std::cout << "Error with opening score file!" << std::endl;
+			std::abort();
+		}
 		return;
 	}
 	*this = file.value();

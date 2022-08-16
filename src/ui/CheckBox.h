@@ -6,6 +6,7 @@
 #include "../Texture.h"
 #include "../Font.h"
 #include "Label.h"
+#include "ScrollablePanel.h"
 
 class CheckBox //: NonCopyable
 {
@@ -20,7 +21,7 @@ public:
 	void render(Renderer* renderer) const;
 
 	bool _checked;
-
+	ScrollablePanel* spanel = nullptr;
 private:
 	Texture* _txt_c;
 	Texture* _txt_u;

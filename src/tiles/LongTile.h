@@ -26,6 +26,9 @@ private:
 	void render_fg() const final;
 
 	Number held_tile_duration = 0;
+	Number tap_length = 0;
+
+	std::vector<std::pair<Number, Number>> taps;
 
 	FingerID finger;
 	Number y_tapped;

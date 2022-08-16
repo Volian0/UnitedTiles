@@ -6,6 +6,7 @@
 #include <vector>
 #include <unordered_map>
 #include <map>
+#include <string>
 
 class Game;
 
@@ -25,6 +26,9 @@ public:
 	virtual ~GameState() = default;
 
 	std::vector<TouchEvent> touch_events;
+	std::string key_events;
+	bool pressed_backspace = false;
+	bool pressed_enter = false;
 
 	Game* game;
 

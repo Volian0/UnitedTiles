@@ -13,9 +13,9 @@ Renderer::Renderer(bool vsync_)
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
 #ifdef __ANDROID__
-	_window = SDL_CreateWindow("United Tiles", 0, 0, 0, 0, SDL_WINDOW_FULLSCREEN_DESKTOP);
+	_window = SDL_CreateWindow("United Tiles", 0, 0, 0, 0, SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_BORDERLESS | SDL_WINDOW_OPENGL);
 #else
-	_window = SDL_CreateWindow("United Tiles", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 576, 1024, SDL_WINDOW_RESIZABLE);
+	_window = SDL_CreateWindow("United Tiles", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 576, 1024, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 #endif
 	_ptr = SDL_CreateRenderer(reinterpret_cast<SDL_Window*>(_window), -1, vsync ? SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC : SDL_RENDERER_ACCELERATED);
 	update_size();
@@ -83,11 +83,6 @@ void Renderer::render(Texture* texture, glm::u32vec2 src_pos, glm::u32vec2 src_s
 glm::u16vec2 Renderer::get_size() const
 {
 	return _widescreen ? glm::u16vec2{_size.y, _size.y} : _size;
-}
-
-Number Renderer::get_aspect_ratio() const
-{
-	return _widescreen ? 1.0L : _aspect_rato;
 }
 
 extern std::atomic_bool active_audio;

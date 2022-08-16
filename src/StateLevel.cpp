@@ -137,7 +137,10 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_)
 		ComposerInfo{"Johann Pachelbel", "German composer, organist, and teacher who brought the south German organ schools to their peak", 1653, 1706},
 		ComposerInfo{"Pyotr Ilyich Tchaikovsky", "Russian composer of the Romantic period", 1840, 1893},
 		ComposerInfo{"Ludwig van Beethoven", "German composer and pianist", 1770, 1827},
-		ComposerInfo{"Edvard Grieg", "Norwegian composer and pianist. He is widely considered one of the main Romantic era composers", 1843, 1907}
+		ComposerInfo{"Edvard Grieg", "Norwegian composer and pianist, he is widely considered one of the main Romantic era composers", 1843, 1907},
+		ComposerInfo{"Erik Satie", "French composer and pianist", 1866, 1925},
+		ComposerInfo{"Euphemia Allen", "British composer (under the pen name Arthur de Lulli)", 1861, 1949},
+		ComposerInfo{"Wolfgang Amadeus Mozart", "prolific and influential composer of the Classical period", 1756, 1791}
 	};
 	
 	std::vector<SongBasicInfo> songs{
@@ -146,9 +149,14 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_)
 		SongBasicInfo{0, "Csikós Post", "galop in the key of E minor", "Csikos Post", {2}},
 		SongBasicInfo{0, "Danse chinoise", "", "Danse chinoise", {4}},
 		SongBasicInfo{0, "Etude in C major", "", "Etude in C major", {0}},
-		SongBasicInfo{0, "Etude in D minor", "", "Etude in d minor", {0}},
+		SongBasicInfo{0, "Etude in d minor", "", "Etude in d minor", {0}},
 		SongBasicInfo{1810, "Für Elise", "one of Ludwig van Beethoven's most popular compositions", "Fur Elise", {5}},
-		SongBasicInfo{0, "Prelude Op. 28, No. 4", "by Chopin's request, this piece was played at his own funeral", "Prelude Op 28 No 4", {1}}
+		SongBasicInfo{0, "Prelude Op. 28, No. 4", "by Chopin's request, this piece was played at his own funeral", "Prelude Op 28 No 4", {1}},
+		SongBasicInfo{1890, "Gnossienne No. 1", "", "Gnossienne No 1", {7}},
+		SongBasicInfo{1890, "Gnossienne No. 2", "", "Gnossienne No 2", {7}},
+		SongBasicInfo{1850, "Liebestraum No. 3", "the last of the three that Liszt wrote and the most popular", "Liebestraum No 3", {0}},
+		SongBasicInfo{1877, "Chopsticks", "a simple, widely known waltz for the piano", "Chopsticks", {8}},
+		SongBasicInfo{1788, "Piano Sonata No. 16", "described by Mozart in his own thematic catalogue as \"for beginners\"", "Piano Sonata No 16", {9}}
 	};
 
 	SongDatabase database;
@@ -159,15 +167,19 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_)
 	}
 
 	database.songs_infos = {
+		{9, songs.at(9)}, //Gnossienne No. 2
 		{1, songs.at(1)},//canon in d
 		{7, songs.at(7)},//prelude op 28 no 4
+		{11, songs.at(11)},//chopsticks
+		{8, songs.at(8)}, //Gnossienne No. 1
 		{3, songs.at(3)},//danse chinoise
 		{6, songs.at(6)},//fur elise
+		{10, songs.at(10)},//Liebestraum no 3
 		{0, songs.at(0)},//anitras dance
 		{2, songs.at(2)},//csikos post
 		{5, songs.at(5)},//etude in d minor
+		{12, songs.at(12)},//sonata no 16
 		{4, songs.at(4)}//etude in c major
-		
 		};
 	auto ofile = open_ofile("songs.db");
 	database.to_file(ofile.value());
@@ -212,7 +224,7 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_)
 	ExtractedRes song_info_res(filename, "songs");
 	auto song_info_file = open_ifile(song_info_res.get_path()).value();
 	_song_info = song_info_file;
-	tps = 0;
+	tps = 0.0L;
 	_old_tp = new_tp = last_tempo_change = {};
 	previous_position = 3.0L;
 	_position = 3.0L;
@@ -338,7 +350,7 @@ void StateLevel::update()
 		tile->y_offset = _position - tile_pos;
 		if (_state == State::GAME_OVER)
 		{
-			break;
+			continue;
 		}
 		tile->update();
 		if (game->cfg->god_mode)
@@ -457,19 +469,19 @@ void StateLevel::spawn_new_tiles()
 			switch (_song_info.tiles[i].type)
 			{
 			case TileInfo::Type::SINGLE:
-				previous_tile = tiles.emplace(total_pos, std::make_shared<SingleTile>(this)).first->second;
+				previous_tile = tiles.emplace_back(total_pos, std::make_shared<SingleTile>(this)).second;
 				break;
 			case TileInfo::Type::LONG:
-				previous_tile = tiles.emplace(total_pos, std::make_shared<LongTile>(this)).first->second;
+				previous_tile = tiles.emplace_back(total_pos, std::make_shared<LongTile>(this)).second;
 				break;
 			case TileInfo::Type::DOUBLE:
-				previous_tile = tiles.emplace(total_pos, std::make_shared<DoubleTile>(this)).first->second;
+				previous_tile = tiles.emplace_back(total_pos, std::make_shared<DoubleTile>(this)).second;
 				break;
 			case TileInfo::Type::EMPTY:
-				previous_tile = tiles.emplace(total_pos, std::make_shared<EmptyTile>(this)).first->second;
+				previous_tile = tiles.emplace_back(total_pos, std::make_shared<EmptyTile>(this)).second;
 				break;
 			case TileInfo::Type::SLIDER:
-				previous_tile = tiles.emplace(total_pos, std::make_shared<SliderTile>(this)).first->second;
+				previous_tile = tiles.emplace_back(total_pos, std::make_shared<SliderTile>(this)).second;
 				break;
 			default: abort(); break;
 			}

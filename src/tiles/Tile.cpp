@@ -166,6 +166,7 @@ void Tile::update()
 	{
 		touch_up(finger_id, { touch_pos.x, y_offset - (touch_pos.y + 1.0L) / 2.0L * 4.0L });
 	}*/
+	const auto max_miss_range = _level->get_miss_range();
 	for (auto& touch_event : _level->touch_events)
 	{
 		auto& touch_pos = touch_event.position;
@@ -178,7 +179,7 @@ void Tile::update()
 			if (is_active() &&
 			(get_info().type == TileInfo::Type::DOUBLE || get_info().type == TileInfo::Type::SINGLE || get_info().type == TileInfo::Type::LONG) &&
 			(get_column(touch_pos.x) & column) &&
-			click_position - 1.0L < std::min(get_tile_length(), 1.0L) && (click_position >= 0.0L ))
+			click_position - max_miss_range < std::min(get_tile_length(), 1.0L) && (click_position >= 0.0L ))
 			{
 				touch_pos.y = -std::numeric_limits<Number>::infinity();
 				touch_down(finger_id, { touch_pos.x, 0.0L });	

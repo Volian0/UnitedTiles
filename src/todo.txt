@@ -16,3 +16,6 @@
 [ ] Check Dance ending too soon
 [ ] Make a tool for editing usong and check Csikos Post
 [ ] Long tile correct mouse events
+
+[ ] somehow sort touch down events
+[ ] Gnossienie 1 last notes fix

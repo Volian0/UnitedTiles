@@ -35,6 +35,7 @@ StateSettings::StateSettings(Game* game_)
 	for (auto& checkbox : check_boxes)
 	{
 		checkbox.first._checked = checkbox.second;
+		checkbox.first.spanel = &scrollable_panel;
 	}
 	scrollable_panel._state = this;
 	scrollable_panel.max_offset = 0.0L;

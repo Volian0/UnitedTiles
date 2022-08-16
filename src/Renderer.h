@@ -28,7 +28,10 @@ public:
 		Vec2 src_origin = { 0.0L, 0.0L }, Number angle = 0.0L, uint8_t flip = 0);
 
 	[[nodiscard]] glm::u16vec2 get_size() const;
-	[[nodiscard]] Number get_aspect_ratio() const;
+	[[nodiscard]] constexpr Number get_aspect_ratio() const noexcept
+	{
+		return _widescreen ? 1.0L : _aspect_rato;
+	}
 	[[nodiscard]] bool active() const;
 	bool vsync;
 

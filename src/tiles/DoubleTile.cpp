@@ -14,7 +14,7 @@ DoubleTile::DoubleTile(StateLevel* level_)
 
 bool DoubleTile::should_game_over() const
 {
-	return y_offset > get_tile_length() + 4.0L + 1.0L;
+	return y_offset > get_tile_length() + 4.0L + _level->get_miss_range();
 }
 
 bool DoubleTile::should_die() const

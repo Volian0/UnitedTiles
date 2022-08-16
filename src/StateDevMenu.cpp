@@ -4,6 +4,7 @@
 #include "Renderer.h"
 #include "StateSongSelection.h"
 #include "StateSettings.h"
+#include "RNG.h"
 
 #include <SDL/SDL.h>
 
@@ -23,7 +24,7 @@ StateDevMenu::StateDevMenu(Game* game_) : GameState(game_),
 	_font = std::make_unique<Font>(game->renderer.get(), "roboto.ttf", 8.0L);
 	{
 		const auto _font2 = std::make_unique<Font>(game->renderer.get(), "roboto.ttf", 4.0L);
-		_text_version = std::make_unique<Texture>(game->renderer.get(), _font2.get(), "v0.1.2", Colors::GRAY);
+		_text_version = std::make_unique<Texture>(game->renderer.get(), _font2.get(), "v0.1.3", Colors::GRAY);
 		_text_volian = std::make_unique<Texture>(game->renderer.get(), _font2.get(), "by Volian0", Colors::GRAY);
 	}
 	_logo = std::make_unique<Texture>(game->renderer.get(), "logo.png");
@@ -35,12 +36,24 @@ StateDevMenu::StateDevMenu(Game* game_) : GameState(game_),
 	_dev_buttons.emplace_back(Vec2{}, 1, _dev_buttons.size(), "Settings", _dev_button_texture.get(), _font.get(), this);
 	_dev_buttons.emplace_back(Vec2{}, 1, _dev_buttons.size(), "Discord", _dev_button_texture.get(), _font.get(), this);
 	_dev_buttons.emplace_back(Vec2{}, 1, _dev_buttons.size(), "Exit", _dev_button_texture.get(), _font.get(), this);
-	soundfont = game->audio->load_soundfont("test.sf2");
-	Timepoint now;
-	soundfont->add_event(now + 0.05L, NoteEvent(NoteEvent::Type::ON, 50, 63));
-	soundfont->add_event(now + 0.15L, NoteEvent(NoteEvent::Type::ON, 53, 80));
-	soundfont->add_event(now + 0.25L, NoteEvent(NoteEvent::Type::ON, 57, 90));
-	soundfont->add_event(now + 1.25L, NoteEvent(NoteEvent::Type::ALL_OFF));
+	//soundfont = game->audio->load_soundfont("test.sf2");
+	/*Timepoint now;
+	const uint8_t offset = RNG::integer(0, 2) * 12;
+	soundfont->add_event(now, NoteEvent(NoteEvent::Type::ON, 65 - offset, 127));
+
+	soundfont->add_event(now + 0.1, NoteEvent(NoteEvent::Type::ALL_OFF));
+	soundfont->add_event(now + 0.1, NoteEvent(NoteEvent::Type::ON, 63 - offset, 120));
+
+	soundfont->add_event(now + 0.2, NoteEvent(NoteEvent::Type::ALL_OFF));
+	soundfont->add_event(now + 0.2, NoteEvent(NoteEvent::Type::ON, 65 - offset, 127));
+
+	soundfont->add_event(now + 0.5, NoteEvent(NoteEvent::Type::ALL_OFF));
+	soundfont->add_event(now + 0.5, NoteEvent(NoteEvent::Type::ON, 63 - offset, 120));
+
+	soundfont->add_event(now + 0.8, NoteEvent(NoteEvent::Type::ALL_OFF));
+	soundfont->add_event(now + 0.8, NoteEvent(NoteEvent::Type::ON, 65 - offset, 127));
+
+	soundfont->add_event(now + 0.9L, NoteEvent(NoteEvent::Type::ALL_OFF));*/
 }
 
 void StateDevMenu::update()
