@@ -13,11 +13,11 @@ using namespace smf;
 int main(int args_size, char** args)
 try
 {
-	constexpr std::string_view filename = "/home/volian/sonata.mid";
-	constexpr uint32_t single_tile_length = 24;
-	constexpr long double start_tps = 8.25L;
-	constexpr long double multiplier = 1.18248206376L;
-	constexpr uint32_t empty_length_end = 6*24;
+	constexpr std::string_view filename = "/home/volian/albania.mid";
+	constexpr uint32_t single_tile_length = 48;
+	constexpr long double start_tps = 4.166666666666666666666666666666666666666666666666666666666666L;
+	constexpr long double multiplier = 0.0075L;
+	constexpr uint32_t empty_length_end = 0;
 	constexpr bool do_tempo_thing = false;
 
 	MidiFile midi;
@@ -38,7 +38,7 @@ try
 	usong.length_units_per_single_tile = single_tile_length;
 	usong.note_ticks_per_single_tile = single_tile_length;
 	usong.starting_tempo = start_tps;
-	usong.acceleration_method = SongInfo::AccelerationMethod::LINEAR;
+	usong.acceleration_method = SongInfo::AccelerationMethod::ACCELERATION;
 	usong.acceleration_info.parameter = multiplier;
 
 	uint32_t track_count = midi.getTrackCount();

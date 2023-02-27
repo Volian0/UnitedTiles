@@ -63,14 +63,17 @@ public:
 		return _value;
 	}
 
+	bool show_tps = false;
+
 private:
 	bool was_silent_added = false;
 	StateLevel* _level;
-	Font _font;
-	std::unique_ptr<Texture> _texture;
-	uint32_t _value;
-	Timepoint _tp_update;
-	std::uint8_t _odd = 0;
+	mutable Font _font;
+	mutable std::unique_ptr<Texture> _texture;
+	mutable uint32_t _value;
+	mutable Timepoint _tp_update;
+	mutable std::uint8_t _odd = 0;
+	mutable std::string old_tps;
 };
 
 class StateLevel : public GameState
@@ -94,6 +97,10 @@ public:
 	mutable Texture tile_divider;
 	mutable Texture slider_tile;
 	mutable Texture slider_tile_clearing;
+	mutable Texture txt_white;
+	mutable std::optional<Texture> txt_arrow;
+
+	Color theme_tint = Colors::CYAN;
 
 	uint32_t lap_id = 0;
 
@@ -141,6 +148,8 @@ public:
 
 	LevelBackground lv_bg;
 
+	void set_theme_tint(Color t_tint);
+
 private:
 	virtual void update();
 	virtual void render() const;
@@ -155,6 +164,8 @@ private:
 	{
 		IDLE, ACTIVE, GAME_OVER
 	} _state = State::IDLE;
+
+	Timepoint tp_state_start;
 
 	Timepoint last_tempo_change;
 	Number previous_position = 0;

@@ -39,9 +39,10 @@ public:
 
 	static bool enabled;
 
+	mutable Texture _texture;
+
 private:
 	Renderer* _renderer;
-	mutable Texture _texture;
 
 	std::vector<BurstParticleGroup> _particle_groups;
 };

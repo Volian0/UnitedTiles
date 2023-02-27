@@ -19,7 +19,7 @@ public:
 	Number width;
 	const uint32_t id;
 	
-	DevButton(Vec2 position_, Number width_, uint32_t id_, const std::string& text, Texture* texture, Font* font, GameState* state);
+	DevButton(Vec2 position_, Number width_, uint32_t id_, const std::string& text, Texture* texture, Font* font, GameState* state, Number t_corner_size = 0.0625L);
 
 	bool update();
 	void render() const;
@@ -30,7 +30,14 @@ public:
 	[[nodiscard]] bool is_held() const;
 	[[nodiscard]] bool in_range(Vec2 pos) const;
 
+	constexpr void clear_held()
+	{
+		_held_finger_id.reset();
+	}
+
+	class ScrollablePanel* spanel = nullptr;
 private:
+	Number m_corner_size;
 	GameState* _state;
 	Texture* _texture;
 	std::unique_ptr<Texture> _text_texture;

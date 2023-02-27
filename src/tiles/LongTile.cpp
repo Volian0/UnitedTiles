@@ -3,6 +3,13 @@
 #include "../StateLevel.h"
 #include "../Game.h"
 
+#include <atomic>
+#include <cmath>
+#include <algorithm>
+#include <iostream>
+
+constexpr Number long_tile_helper = 0.125L + 0.03125L;
+
 LongTile::LongTile(StateLevel* level_)
 	:StatableTile(level_, next_column(level_->previous_tile))
 {
@@ -22,9 +29,9 @@ void LongTile::my_update()
 {
 	if (is_state(&LongTileClearing))
 	{
-		held_tile_duration = y_offset - y_tapped;
+		held_tile_duration = y_offset - y_tapped + long_tile_helper;
 
-		if (held_tile_duration + 0.25L >= get_tile_length())
+		if (held_tile_duration + 0.21875L >= get_tile_length())
 		{
 			change_state(&LongTileFullyCleared);
 		}
@@ -97,7 +104,7 @@ void LongTile::on_changed_state()
 				const auto& event = it.second;
 				if (event.type != NoteEvent::Type::ON)
 					continue;
-				const auto length = Number(it.first) / _level->_song_info.note_ticks_per_single_tile + y_finger_tapped;
+				const auto length = Number(it.first) / _level->_song_info.note_ticks_per_single_tile + y_finger_tapped + long_tile_helper;
 				const auto strength = Number(event.velocity) / 127.0L;
 				if (!taps.empty())
 				{
@@ -116,7 +123,7 @@ void LongTile::on_changed_state()
 	}
 	else if (is_state(&LongTileFullyCleared))
 	{
-		_level->_burst.add(Vec2(get_column_x_pos(column), (_level->_position - _level->get_tile_pos(this) - get_tile_length() / 2.0L) / 4.0L * 2.0L - 1.0L), Vec2(0.25L, get_height()), get_tile_length() * 4.0L / _level->game->renderer->get_aspect_ratio(), 1.5L, Vec2(-1, -1), Vec2(1, 0), Colors::CYAN);
+		_level->_burst.add(Vec2(get_column_x_pos(column), (_level->_position - _level->get_tile_pos(this) - get_tile_length() / 2.0L) / 4.0L * 2.0L - 1.0L), Vec2(0.25L, get_height()), get_tile_length() * 4.0L / _level->game->renderer->get_aspect_ratio(), 1.5L, Vec2(-1, -1), Vec2(1, 0), Colors::WHITE);
 	}
 }
 
@@ -153,10 +160,14 @@ void LongTile::render_fg() const
 			texture = &_level->txt_long_tile_circle;
 			if (is_state(&LongTileClearing))
 			{
-				texture->tint = {0, tap_length*127.0L + 128.0L, 255, tap_length*200.0L};
+				Color previous_tint = texture->tint;
+
+
+
+				texture->tint = {(tap_length*127.0L + 128.0L) * (Number(previous_tint.r) / 255.0), (tap_length*127.0L + 128.0L) * (Number(previous_tint.g) / 255.0), previous_tint.b, tap_length*200.0L};
 				_level->game->renderer->render(texture, {}, texture->get_psize(), pos - Vec2{ 0, (held_tile_duration) / 2.0L+0.100L },
 					Vec2{ 0.25L, 0.25L * _level->game->renderer->get_aspect_ratio() }*(tap_length+0.0625L), {});
-				texture->tint = Colors::WHITE;
+				texture->tint = previous_tint;
 			}
 		}
 		else

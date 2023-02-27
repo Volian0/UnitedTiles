@@ -3,6 +3,7 @@
 #include "Game.h"
 #include "Renderer.h"
 #include "StateSongSelection.h"
+#include "StateSongMenu.h"
 #include "StateSettings.h"
 #include "RNG.h"
 
@@ -71,7 +72,7 @@ void StateDevMenu::update()
 
 	if (_dev_buttons[0].update())
 	{
-		return game->change_state<StateSongSelection>();
+		return game->change_state<StateSongMenu>();
 	}
 	else if (_dev_buttons[1].update())
 	{

@@ -4,6 +4,7 @@
 #include "Font.h"
 #include "StateSplash.h"
 #include "StateDevMenu.h"
+#include "StateSongMenu.h"
 #include "StateLevel.h"
 #include "DevTouch.h"
 #include "Colors.h"
@@ -33,7 +34,7 @@ Game::Game()
 	DustMotes::enabled = cfg->enable_particles_dustmotes;
 	BurstParticles::enabled = cfg->enable_particles_burst;
 
-	change_state<StateDevMenu>();
+	change_state<StateSongMenu>();
 	//change_state<StateLevel>(0);
 }
 
@@ -145,7 +146,7 @@ void Game::run()
 			renderer->display();
 			if (cfg->fake_lag)
 			{
-				std::this_thread::sleep_for(std::chrono::milliseconds{RNG::integer(1,250)});
+				std::this_thread::sleep_for(std::chrono::milliseconds{RNG::integer(100,250)});
 			}	
 		}
 

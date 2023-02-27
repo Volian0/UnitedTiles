@@ -44,7 +44,7 @@ bool TextInput::update()
                     m_label.reset();
                 }
                 else
-                m_label = std::make_unique<Label>(m_text, m_max_width, m_position, Vec2{}, m_font, m_state->game->renderer.get());
+                    m_label = std::make_unique<Label>(m_text, m_max_width, m_position, Vec2{-1.0L, 0.0L}, m_font, m_state->game->renderer.get());
                 updated = true;
             }
         }
@@ -88,18 +88,20 @@ void TextInput::render() const
     if (has_focus())
         m_white_txt->tint = {128, 64, 64, 255};
     //std::cout << "ok" << std::endl;
-    renderer->render(m_white_txt, {}, m_white_txt->get_psize(), m_position, {m_max_width,get_height()}, {});
+    //renderer->render(m_white_txt, {}, m_white_txt->get_psize(), m_position, {m_max_width,get_height()}, {});
     //std::cout << "ok2" << std::endl;
     if (m_label)
     {
         //std::cout << "ok3" << std::endl;
+        m_label->position = m_position;
+        m_label->position.x -= m_max_width;
         m_label->render(renderer);
     }
 }
 
 Number TextInput::get_height() const noexcept
 {
-    return m_state->game->renderer->get_aspect_ratio() * 0.1L;
+    return m_state->game->renderer->get_aspect_ratio() * 24.0L / 512.0L;
  }
 
 bool TextInput::append_text()
@@ -108,7 +110,7 @@ bool TextInput::append_text()
     {
         m_sizes.emplace_back(m_state->key_events.size());
         m_text += m_state->key_events;
-        m_label = std::make_unique<Label>(m_text, m_max_width, m_position, Vec2{}, m_font, m_state->game->renderer.get());
+        m_label = std::make_unique<Label>(m_text, m_max_width, m_position, Vec2{-1.0L, 0.0L}, m_font, m_state->game->renderer.get());
         return true;
     }
     return false;

@@ -5,14 +5,16 @@
 #include "Texture.h"
 #include "Game.h"
 #include "Colors.h"
+#include "ui/ScrollablePanel.h"
 
-DevButton::DevButton(Vec2 position_, Number width_, uint32_t id_, const std::string& text, Texture* texture, Font* font, GameState* state)
+DevButton::DevButton(Vec2 position_, Number width_, uint32_t id_, const std::string& text, Texture* texture, Font* font, GameState* state, Number t_corner_size)
 	:position{position_},
 	width{width_},
 	id{id_},
 	_texture{texture},
 	_state{state},
-	_font{font}
+	_font{font},
+	m_corner_size{t_corner_size}
 {
 	set_text(text);
 	_text_texture->tint = Color{40, 40, 40, 255};
@@ -55,7 +57,7 @@ void DevButton::render() const
 	}
 
 	Renderer* renderer = _state->game->renderer.get();
-	Vec2 corner_size(0.0625L, 0.0625L * renderer->get_aspect_ratio());
+	Vec2 corner_size(m_corner_size, m_corner_size * renderer->get_aspect_ratio());
 
 	renderer->render(_texture, { 0,0 }, _texture->get_psize(), Vec2(-width, 0) + position, corner_size, { 0,0 }, { -1,1 }, 0, 0);
 	renderer->render(_texture, { 0,0 }, _texture->get_psize(), Vec2(-width, 0) + position, corner_size, { 0,0 }, { -1,-1 }, 0, 2);
@@ -88,6 +90,10 @@ bool DevButton::is_held() const
 
 bool DevButton::in_range(Vec2 pos) const
 {
+	if (spanel && !spanel->in_range(pos))
+	{
+		return false;
+	}
 	Vec2 diff = glm::abs(position - pos);
 	return (diff.x <= width && diff.y <= 0.125L * _state->game->renderer->get_aspect_ratio());
 }

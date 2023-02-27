@@ -5,6 +5,7 @@
 #include <SDL/SDL.h>
 
 #include <atomic>
+#include <iostream>
 
 Renderer::Renderer(bool vsync_)
 	:vsync{ vsync_ }
@@ -39,6 +40,7 @@ void Renderer::display()
 
 void Renderer::reload()
 {
+	std::cout << "Reloading renderer" << std::endl;
 	for (RendererReloadable* reloadable : _reloadables)
 	{
 		reloadable->unload();
@@ -102,6 +104,11 @@ void Renderer::set_clip_rect(Vec2 pos, Vec2 size, Vec2 origin)
 
 	size *= Vec2(_size);
 	pos = (pos + Number(1.0L)) * Vec2(_size) / Number(2.0L) - (origin + Number(1.0L)) * Vec2(size) / Number(2.0L);
+	/*std::cout << _clip_position.x << ", " << _clip_position.y << std::endl;
+	std::cout << _clip_size.x << ", " << _clip_size.y << std::endl;
+	std::cout << _clip_origin.x << ", " << _clip_origin.y << std::endl;
+	std::cout << pos.x << ", " << pos.y << std::endl;
+	std::cout << size.x << ", " << size.y << std::endl; std::abort();*/
 	SDL_Rect dest_rect{ std::round(pos.x), std::round(pos.y), std::round(size.x), std::round(size.y) };
 
 	SDL_RenderSetClipRect(reinterpret_cast<SDL_Renderer*>(_ptr), &dest_rect);

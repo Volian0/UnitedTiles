@@ -4,6 +4,7 @@
 #include "Game.h"
 #include "Renderer.h"
 #include "StateDevMenu.h"
+#include "StateSongMenu.h"
 
 #include <algorithm>
 
@@ -50,11 +51,11 @@ void StateSettings::update()
 			checkbox.second.get() = checkbox.first._checked;
 		}
 		game->append_cfg();
-		return game->change_state<StateDevMenu>();
+		return game->change_state<StateSongMenu>();
 	}
 	if (_b_discard.update())
 	{
-		return game->change_state<StateDevMenu>();
+		return game->change_state<StateSongMenu>();
 	}
 	//set button positions
 	Number button_y_pos = -1.0L + ((1.0L / 8.0L) + 0.1L) * game->renderer->get_aspect_ratio();
@@ -62,7 +63,7 @@ void StateSettings::update()
 	scrollable_panel.position = { 0, -1.0L + button_height };
 	scrollable_panel.size = { 2.0L, 2.0L };
 	scrollable_panel.min_offset = -1.0L;
-	scrollable_panel.update();
+	scrollable_panel.update(game->renderer->get_aspect_ratio());
 	_b_apply.position.y = button_y_pos;
 	_b_discard.position.y = button_y_pos;
 	for (uint8_t i = 0; i < check_boxes.size(); ++i)

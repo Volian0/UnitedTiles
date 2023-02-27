@@ -8,8 +8,11 @@
 void BurstParticle::simulate(Number delta_time, Number aspect_ratio)
 {
 	velocity.y += delta_time * 4.0L;
+	//velocity.y = 0;
+	//velocity.x = 0;
 	Vec2 new_pos = velocity * delta_time;
 	new_pos.y *= aspect_ratio;
+	new_pos.y += delta_time * 2.0;
 	position += new_pos;
 	angle = glm::atan(velocity.x, velocity.y);
 }
@@ -21,7 +24,7 @@ bool BurstParticleGroup::is_dead() const
 
 uint8_t BurstParticleGroup::get_alpha() const
 {
-	return std::clamp((1.0L - total_time / lifetime) * 255.0L, 0.0L, 255.0L) / 1.1L;
+	return std::clamp((1.0L - total_time / lifetime) * 255.0L, 0.0L, 255.0L) / 1.25L; //1.1 -> 1.25
 }
 
 void BurstParticleGroup::simulate(Number delta_time, Number aspect_ratio)
@@ -66,17 +69,22 @@ void BurstParticles::update(Number delta_time)
 
 void BurstParticles::render() const
 {
+	Color previous_tint = _texture.tint;
 	if (!enabled) { return; }
 	for (const auto& particle_group : _particle_groups)
 	{
 		_texture.tint = particle_group.color;
 		_texture.tint.a = uint16_t(particle_group.color.a) * uint16_t(particle_group.get_alpha()) / 255;
+		_texture.tint.r *= Number(previous_tint.r) / 255.0L;
+		_texture.tint.g *= Number(previous_tint.g) / 255.0L;
+		_texture.tint.b *= Number(previous_tint.b) / 255.0L;
 		const Number size = (1.0L-particle_group.total_time/particle_group.lifetime) * 0.125L;
 		for (const auto& particle : particle_group._particles)
 		{
 			_renderer->render(&_texture, { 0,0 }, _texture.get_psize(), particle.position, { size,size * _renderer->get_aspect_ratio() }, particle.position, { 0,0 }, particle.angle * -57.295779487L);
 		}
 	}
+	_texture.tint = previous_tint;
 }
 
 bool BurstParticles::enabled = true;

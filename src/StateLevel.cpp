@@ -4,6 +4,7 @@
 #include "Path.h"
 #include "Game.h"
 #include "StateSongSelection.h"
+#include "StateSongMenu.h"
 
 #include "tiles/DoubleTile.h"
 #include "tiles/EmptyTile.h"
@@ -13,6 +14,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <cmath>
 
 LevelBackground::LevelBackground(StateLevel* level)
 :_level{level}, _dustmotes{
@@ -64,6 +66,9 @@ void LevelBackground::update(Number delta_time)
 		_alpha_third = std::min(_alpha_third + delta_time, 1.0L);
 		backgrounds[2].tint.a = _alpha_third * 255.0L;
 	}
+	_level->theme_tint.r = _alpha_second * 85.0L * 2.0L + _alpha_third * 85.0L;
+	//_level->theme_tint.g = 255.0L - _alpha_second * 85.0L - _alpha_third * (42.0L);
+	_level->theme_tint.g = 255.0L - _alpha_second * 85.0L + _alpha_third * (21.0L);
 
 	_dustmotes.update(delta_time);
 	_dustmotes_stars.update(delta_time);
@@ -123,7 +128,9 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_)
 	txt_long_tile_clearing{game->renderer.get(), "long_tile_clearing.png"},
 	txt_long_tile_circle{game->renderer.get(), "long_tile_circle.png"},
 	txt_long_tile_end{game->renderer.get(), "long_tile_end.png"},
+	txt_arrow{std::make_optional<Texture>(game->renderer.get(), "arrow.png")},
 	slider_tile{game->renderer.get(), "slider.png"},
+	txt_white{game->renderer.get(), "white.png"},
 	slider_tile_clearing{game->renderer.get(), "slider_clearing.png"},
 	_debug_font{game->renderer.get(), "roboto.ttf", 4},
 	_burst{game_->renderer.get(), "white.png"},
@@ -214,6 +221,7 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_)
 		}
 	}
 	tile_divider.blend_mode = 1;
+	txt_arrow->blend_mode = 1;
 	txt_single_tile_cleared.blend_mode = 1;
 	slider_tile.blend_mode = 1;
 	slider_tile_clearing.blend_mode = 1;
@@ -228,9 +236,17 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_)
 	_old_tp = new_tp = last_tempo_change = {};
 	previous_position = 3.0L;
 	_position = 3.0L;
+	if (_song_info.acceleration_method == SongInfo::AccelerationMethod::ACCELERATION)
+	{
+		score.show_tps = true;
+	}
 	//_song_info.starting_tempo = 10.0L;
 	//_song_info.acceleration_method = SongInfo::AccelerationMethod::ACCELERATION;
 	//_song_info.acceleration_info.parameter = 3.0L;
+	txt_white.blend_mode = 1;
+	tp_state_start={};
+	//set_theme_tint(theme_tint);
+	//_song_info.starting_tempo *= 16.0L;
 }
 
 void StateLevel::render_debug() const
@@ -290,6 +306,18 @@ bool StateLevel::force_first_interaction() const
 	return _state == State::IDLE;
 }
 
+void StateLevel::set_theme_tint(Color t_tint)
+{
+	txt_single_tile_cleared.tint = t_tint;
+	txt_single_tile_cleared.tint.a = 160;
+	txt_long_tile.tint = t_tint;
+	txt_long_tile_ext.tint = t_tint;
+	txt_long_tile_clearing.tint = t_tint;
+	txt_long_tile_circle.tint = t_tint;
+	txt_long_tile_end.tint = t_tint;
+	_burst._texture.tint = t_tint;
+}
+
 void StateLevel::update()
 {
 	new_tp = Timepoint();
@@ -297,12 +325,13 @@ void StateLevel::update()
 	Number delta_time = new_tp - _old_tp;
 	_burst.update(delta_time * tps * 0.25L);
 	lv_bg.update(delta_time);
+	set_theme_tint(theme_tint);
 	_old_tp = new_tp;
 
 
 	if (game_over_reset.has_value() && new_tp - game_over_reset.value() > 2.0L)
 	{
-		return game->change_state<StateSongSelection>();
+		return game->change_state<StateSongMenu>();
 	}
 
 	if (game_over_scroll_to.has_value() && _state == State::GAME_OVER)
@@ -403,12 +432,52 @@ void StateLevel::update()
 void StateLevel::render() const
 {
 	lv_bg.render();
+
 	//_dustmotes_stars.render();
 	//_dustmotes.render();
 	//game->renderer->render(&bg_o, {}, bg_o.get_psize(), {}, { 1,1 }, {});
 	game->renderer->render(&tile_divider, {}, tile_divider.get_psize(), {}, { 0.01,1 }, {});
 	game->renderer->render(&tile_divider, {}, tile_divider.get_psize(), {-0.5,0}, { 0.01,1 }, {});
 	game->renderer->render(&tile_divider, {}, tile_divider.get_psize(), {0.5,0}, { 0.01,1 }, {});
+
+	if (_state == State::IDLE)
+	{
+		//const uint8_t arrow_n = std::clamp<uint8_t>(std::clamp<Number>(12.0L / _song_info.starting_tempo, 2.0L, 3.0L), 2, 3);
+		const uint8_t arrow_n = [&](){
+			const auto tempo = _song_info.starting_tempo;
+			if (tempo > 8.0L)
+			{
+				return 1;
+			}
+			if (tempo > 4.0L)
+			{
+				return 2;
+			}
+			return 3;
+		}();
+		const Number offset_a = 1.0L / Number(arrow_n);
+		const Number seconds_per_tile = 4.0L / _song_info.starting_tempo / Number(arrow_n);
+		Number arrow_offset = (new_tp % seconds_per_tile) / 4.0L * _song_info.starting_tempo;
+		for (uint8_t i = 0; i < arrow_n; ++i)
+		{
+			const Number y_pos_offset = arrow_offset * 2.0L - 1.0L;
+			const Number size = (1.0L - y_pos_offset * y_pos_offset * y_pos_offset * y_pos_offset) /  4.0L;
+			//const Number size = 0.25L;
+			const uint8_t tint_r = std::clamp(arrow_offset * 2.0L * 255.0L, 0.0L, 255.0L);
+			const uint8_t tint_g = std::clamp(255.0L * 2.0L - arrow_offset * 2.0L * 255.0L, 0.0L, 255.0L);
+			//const uint8_t tint_g2 = std::clamp(255.0L * 1.0L - arrow_offset * 2.0L * 255.0L, 0.0L, 255.0L);
+			txt_arrow->tint.r = tint_r;
+			txt_arrow->tint.g = tint_g;
+			txt_arrow->tint.b = 32;
+			txt_arrow->tint.a = std::clamp(size * 4.0L * 255.0L, 0.0L, 255.0L);
+			/*txt_arrow->tint.b = tint_g;
+			txt_arrow->tint.g = tint_g2;
+			txt_arrow->tint.r = 0;*/
+			game->renderer->render(&txt_arrow.value(), {}, txt_arrow->get_psize(), {0.0L, y_pos_offset}, {size, size*game->renderer->get_aspect_ratio()}, {});
+			arrow_offset += offset_a;
+		}	
+	}
+
 	//render tiles
 	for (const auto& [position, tile] : tiles)
 	{
@@ -418,7 +487,18 @@ void StateLevel::render() const
 	}
 	//render score counter
 	_burst.render();
-	score.render();
+
+	if (_state != State::IDLE || !score.show_tps)
+		score.render();
+
+
+
+	//experimental
+	const Number total_time = new_tp - tp_state_start;
+	if (total_time < 0.25L) {
+		txt_white.tint = {0, 0, 0, uint8_t(std::clamp((0.25L - total_time) * 255.0L * 4.0L, 0.0L, 255.0L))};
+		game->renderer->render(&txt_white, {}, txt_white.get_psize(), {}, {1.0L, 1.0L}, {}); }
+	//experimental
 
 	if (game->cfg->show_gameplay_debug_info) render_debug();
 }
@@ -501,6 +581,7 @@ void StateLevel::change_tempo(Number new_tps, const Timepoint& tp_now, Number po
 	tps = new_tps;
 	last_tempo_change = tp_now;
 	_state = State::ACTIVE;
+	txt_arrow.reset();
 }
 
 void StateLevel::game_over(Tile* tile)
@@ -534,6 +615,24 @@ ScoreCounter::ScoreCounter(StateLevel* level_, uint32_t init_value)
 
 void ScoreCounter::render() const
 {
+	if (show_tps)
+	{
+		std::string my_tps = std::to_string(_level->tps);
+		if (my_tps.size() > 5)
+		{
+			my_tps = my_tps.substr(0, 5);
+		}
+		if (!old_tps.empty() && !my_tps.empty() && old_tps[0] != my_tps[0])
+		{
+			_odd += 2;
+			_tp_update = _level->new_tp;
+		}
+		old_tps = my_tps;
+		_texture = std::make_unique<Texture>(_level->game->renderer.get(), &_font, my_tps, Color{ 255, 63, 63, 255 });
+		_value = 100;
+		//return;
+	}
+
 	Number diff = std::clamp(0.1L - (_level->new_tp - _tp_update), 0.0L, 0.1L);
 	diff = diff * diff * 10.0L;
 	diff = diff * 2.0L + 0.8L;
@@ -561,10 +660,14 @@ void ScoreCounter::render() const
 
 void ScoreCounter::set(uint32_t value)
 {
+	if (show_tps)
+	{
+		return;
+	}
 	_value = value;
 	_texture = std::make_unique<Texture>(_level->game->renderer.get(), &_font, std::to_string(_value), Color{ 255, 63, 63, 255 });
 	_tp_update = _level->new_tp;
-	_odd ++;
+	_odd++;
 }
 
 void ScoreCounter::add(uint32_t value)

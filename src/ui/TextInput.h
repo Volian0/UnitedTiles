@@ -43,11 +43,12 @@ class TextInput
 
     Number get_height() const noexcept;
 
+    Vec2 m_position;
 private:
     Texture* m_white_txt;
     std::string m_text;
     Number m_max_width;
-    Vec2 m_position;
+    
     Font* m_font;
     GameState* m_state;
     std::unique_ptr<Label> m_label;
