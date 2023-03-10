@@ -24,6 +24,7 @@ private:
 	Texture _dev_button_texture;
 	DevButton _b_discard;
 	DevButton _b_apply;
+	DevButton _b_soundfonts;
 
 	Texture cb_u, cb_c;
 

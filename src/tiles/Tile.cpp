@@ -246,6 +246,22 @@ void Tile::handle_first_interaction()
 	if (tile_index == 0)
 	{
 		++_level->lap_id;
+		if (_level->lap_id == 4)
+		{
+			const auto perfect_score = _level->_song_info.calculate_perfect_score();
+			const auto user_score = _level->score.get_score();
+			//std::cout <<  << " <-- perfect | current --> " <<  << std::endl;
+			if (user_score > perfect_score)
+			{
+				std::cout << "User score is bigger than the perfect score!" << std::endl;
+				std::cout << perfect_score << " <-- perfect | current --> " << user_score << std::endl;
+				//std::abort();
+			}
+			else if (user_score == perfect_score)
+			{
+				_level->perfect_score = true;
+			}
+		}
 		if (acceleration_method != SongInfo::AccelerationMethod::CLASSIC)
 		{
 			if (_level->lap_id == 2)

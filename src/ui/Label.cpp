@@ -1,6 +1,6 @@
 #include "Label.h"
 
-Label::Label(const std::string& label_text, Number max_width_, Vec2 position_, Vec2 origin_, Font* font, Renderer* renderer_)
+Label::Label(const std::string& label_text, Number max_width_, Vec2 position_, Vec2 origin_, const Font* font, Renderer* renderer_)
 	:label_text_texture{std::make_shared<Texture>(renderer_, font, label_text, Colors::WHITE)},
 	origin{origin_},
 	max_width{max_width_},

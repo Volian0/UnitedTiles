@@ -30,6 +30,8 @@ public:
 	bool pressed_backspace = false;
 	bool pressed_enter = false;
 
+	//bool thread_safe = false;
+
 	Game* game;
 
 protected:

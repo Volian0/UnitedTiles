@@ -60,6 +60,11 @@ private:
     ScrollablePanel spanel;
     DevButton settings_button;
 
+    static std::string last_search; 
+    static Number last_position;
+    static std::optional<std::uint16_t> last_song;
+    bool need_to_restore = true;
+
     [[nodiscard]] constexpr auto get_x_pos(Number t_pos) const noexcept -> Number
     {
         return t_pos / 256.0L - 1.0L;

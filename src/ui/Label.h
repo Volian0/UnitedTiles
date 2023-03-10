@@ -10,7 +10,7 @@
 class Label// : NonCopyable
 {
 public:
-	Label(const std::string& label_text, Number max_width_, Vec2 position_, Vec2 origin_, Font* font, Renderer* renderer_);
+	Label(const std::string& label_text, Number max_width_, Vec2 position_, Vec2 origin_, const Font* font, Renderer* renderer_);
 	
 	Vec2 position;
 	const Vec2 origin;

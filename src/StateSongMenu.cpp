@@ -13,6 +13,10 @@
 #include <map>
 #include <string_view>
 
+std::string StateSongMenu::last_search{}; 
+Number StateSongMenu::last_position{0.0L};
+std::optional<std::uint16_t> StateSongMenu::last_song{};
+
 StateSongMenu::StateSongMenu(Game* game_)
 	:GameState(game_),
     _dev_button_texture{game->renderer.get(), "dev_button.png"},
@@ -21,7 +25,7 @@ StateSongMenu::StateSongMenu(Game* game_)
     font24{game->renderer.get(), "roboto.ttf", 4.6875L * 0.75L},
     //font16{game->renderer.get(), "roboto.ttf", 3.125L * 0.75L},
     medal_textures{Texture{game->renderer.get(), "medal_bronze.png"}, Texture{game->renderer.get(), "medal_silver.png"},Texture{game->renderer.get(), "medal_gold.png"},Texture{game->renderer.get(), "cup.png"}},
-    input_song{"", get_x_size(432), {get_x_pos(274), 0.0L}, &font24, this, &txt_white},
+    input_song{last_search, get_x_size(432), {get_x_pos(274), 0.0L}, &font24, this, &txt_white},
     settings_gear{game->renderer.get(), "gear.png"},
     glass_icon{game->renderer.get(), "glass.png"},
     settings_button{Vec2{get_x_pos(482.0L), 0.0L}, get_x_size(40.0L), 0, " ", &_dev_button_texture, &font24, this, 0.0625L * 0.625L}
@@ -38,7 +42,7 @@ StateSongMenu::StateSongMenu(Game* game_)
 	ExtractedRes song_list_res("songs.db", "database");
 	auto song_list_file = open_ifile(song_list_res.get_path()).value();
 	song_database = song_list_file;
-	song_user_database.load_from_file();
+	song_user_database.load_from_files();
 
     std::map<uint16_t, std::string_view> composer_names;
     const auto& song_scores = song_user_database.scores;
@@ -56,7 +60,7 @@ StateSongMenu::StateSongMenu(Game* game_)
             {},
             0,
             song_id,
-            {{get_x_pos(414), 0}, get_x_size(144), 0, "Play", &_dev_button_texture, &font32, this, 0.0625L * 0.75L}
+            {{get_x_pos(414), 0}, get_x_size(144), 0, (last_song && *last_song == song_id) ? "Replay" : "Play", &_dev_button_texture, &font32, this, 0.0625L * 0.75L}
         });
         song_panel.play_button.spanel = &spanel;
         if (song_scores.count(song_id))
@@ -65,6 +69,10 @@ StateSongMenu::StateSongMenu(Game* game_)
             //song_panel.medal_level = 4;
             const uint32_t completed_laps = std::max<int64_t>(int64_t(score.reached_lap) - 1, 0);
             song_panel.medal_level = std::min<int64_t>(completed_laps, 3);
+            if (score.got_perfect_score)
+            {
+                song_panel.medal_level = 4;
+            }
             song_panel.score.emplace(std::to_string(score.reached_score), get_x_size(60), Vec2{get_x_pos(266), 0}, Vec2{-1,0}, &font24, game->renderer.get());
             song_panel.score->label_text_texture->tint = {96, 96, 96, 255};
             for (uint8_t i = 0; i < 4; ++i)
@@ -124,8 +132,9 @@ void StateSongMenu::update()
     input_song.m_position.y = get_y_pos(84, aspect_ratio);
 
     //first, let's update the searchbox
-    if (input_song.update())
+    if (input_song.update() || need_to_restore)
     {
+        last_search = input_song.get_text();
         spanel.reset();
         //preform the search here!
         allowed_song_ids.clear();
@@ -175,12 +184,17 @@ void StateSongMenu::update()
 
     //then, let's set max offset and update the scrollable panel
     spanel.min_offset = std::min((visible_size_y - all_size_y) * 2.0L, 0.0L);
+    if (need_to_restore)
+    {
+        spanel.set_offset(last_position);
+    }
     const auto scrolled = spanel.update(aspect_ratio);
 
     //next, let's set the perfect positions for everything
     uint32_t current_y_pixel_position = 118;
     uint16_t current_song_index = 0;
     const Number scroll_offset = spanel.get_offset();
+    last_position = scroll_offset;
     for (auto& song_panel : song_panels)
     {
         if (!all_songs)
@@ -233,6 +247,7 @@ void StateSongMenu::update()
             song_panel.play_button.clear_held();
         if (song_panel.play_button.update())
 	    {
+            last_song = song_panel.song_id;
 		    return game->change_state<StateLevel>(uint16_t(song_panel.song_id));
 	    }
 
@@ -240,6 +255,8 @@ void StateSongMenu::update()
     }
 
     //finally, check button events
+
+    need_to_restore = false;
 }
 
 void StateSongMenu::render() const
@@ -263,9 +280,9 @@ void StateSongMenu::render() const
     const Vec2 song_medal_size{get_x_size(32),get_y_size(32,aspect_ratio)};
     const Vec2 song_diamond_size{get_x_size(24),get_y_size(24,aspect_ratio)};
 
-    settings_button.render();
+    //settings_button.render();
     game->renderer->render(&settings_gear, {}, settings_gear.get_psize(),
-        settings_button.position, song_medal_size, {});
+        settings_button.position, top_medal_size, {});
 
     for (uint8_t i = 0; i < 4; ++i)
     {
@@ -287,6 +304,14 @@ void StateSongMenu::render() const
 
     game->renderer->render(&txt_white, {}, txt_white.get_psize(),
     {get_x_pos(256),get_y_pos(84,aspect_ratio)}, {get_x_size(492), get_y_size(48,aspect_ratio)}, {});
+
+    if (spanel.is_scrolled())
+    {
+        txt_white.tint = {48, 48, 48, 255};
+        const auto progress = spanel.get_progress();
+        game->renderer->render(&txt_white, {}, txt_white.get_psize(),
+        {get_x_pos(10.0L + (1.0L - progress) * 468.0L),get_y_pos(84,aspect_ratio)}, {get_x_size(24), get_y_size(48,aspect_ratio)}, {}, {-1.0L,0.0L});
+    }
 
     game->renderer->render(&glass_icon, {}, glass_icon.get_psize(),
         {get_x_pos(34), get_y_pos(84, aspect_ratio)}, song_diamond_size, {});
@@ -326,7 +351,13 @@ void StateSongMenu::render() const
                 continue;
             }
         }
-        const Vec2 zero_point{song_panel.song_name.position.x - (get_x_pos(106) + 1.0L), song_panel.song_name.position.y - get_y_pos(24, aspect_ratio, 1.0L)};
+        //const Vec2 zero_point{song_panel.song_name.position.x - (get_x_pos(106) + 1.0L), song_panel.song_name.position.y - get_y_pos(24, aspect_ratio, 1.0L)};
+        const Vec2 zero_point{-1.0L, song_panel.song_name.position.y - get_y_pos(24, aspect_ratio, 1.0L)};
+
+        if (zero_point.y >= 1.0L)
+        {
+            continue;
+        }
 
         const std::array<Vec2, 4> medals_positions{
             Vec2{zero_point.x + get_x_pos(122) + 1.0L,zero_point.y + get_y_pos(88,aspect_ratio, 1.0L)},

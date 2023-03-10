@@ -3,7 +3,7 @@
 #include "Tile.h"
 
 inline constexpr auto SliderTileDefault = TileStateInfo{ TileAction::GAME_OVER };
-inline constexpr auto SliderTileClearing = TileStateInfo{ TileAction::NOTHING };
+inline constexpr auto SliderTileClearing = TileStateInfo{ TileAction::NOTHING, ScoreInfo{1,true} };
 inline constexpr auto SliderTileMissed = TileStateInfo{ TileAction::NOTHING };
 inline constexpr auto SliderTileCleared = TileStateInfo{ TileAction::DELETE, ScoreInfo{1} };
 

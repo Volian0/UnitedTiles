@@ -104,6 +104,8 @@ public:
 
 	uint32_t lap_id = 0;
 
+	bool perfect_score = false;
+
 	//std::vector<std::pair<Number,Number>> long_tile_taps;
 	//std::pair<Number,Number> current_long_tile_tap{0.0L,0.0L};
 	//class LongTile* tapped_long_tile=nullptr;

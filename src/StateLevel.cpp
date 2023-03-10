@@ -5,6 +5,7 @@
 #include "Game.h"
 #include "StateSongSelection.h"
 #include "StateSongMenu.h"
+#include "ExtraSoundfonts.h"
 
 #include "tiles/DoubleTile.h"
 #include "tiles/EmptyTile.h"
@@ -12,9 +13,12 @@
 #include "tiles/SingleTile.h"
 #include "tiles/SliderTile.h"
 
+#include <picosha2/picosha2.h>
+
 #include <algorithm>
 #include <iostream>
 #include <cmath>
+#include <filesystem>
 
 LevelBackground::LevelBackground(StateLevel* level)
 :_level{level}, _dustmotes{
@@ -228,7 +232,25 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_)
 	txt_long_tile_end.blend_mode = 1;
 	txt_long_tile_circle.blend_mode = 1;
 	tile_divider.tint = { 200, 255, 255, 80 };
-	soundfont = game->audio->load_soundfont("test.sf2");
+
+	std::string soundfont_filename = "";
+	if (game->cfg->preferred_soundfont && game->cfg->preferred_soundfont <= extra_soundfonts.size())
+	{
+		const auto path = Path::user(std::to_string(game->cfg->preferred_soundfont) + ".sf2", "downloaded");
+		if (std::filesystem::exists(path))
+		{
+			std::ifstream file(path, std::ios::binary);
+        	std::vector<unsigned char> hash(picosha2::k_digest_size);
+        	picosha2::hash256(file, hash.begin(), hash.end());
+        	const std::string hex_str = picosha2::bytes_to_hex_string(hash.begin(), hash.end());
+        	if (hex_str == extra_soundfonts.at(game->cfg->preferred_soundfont - 1).hash)
+			{
+				soundfont_filename = path;
+			}
+		}
+	}
+	soundfont = game->audio->load_soundfont(soundfont_filename);
+
 	ExtractedRes song_info_res(filename, "songs");
 	auto song_info_file = open_ifile(song_info_res.get_path()).value();
 	_song_info = song_info_file;
@@ -386,14 +408,21 @@ void StateLevel::update()
 		{
 			if (tile->is_active() && tile->y_offset > 3.0L)
 			{
-				if (tile->get_info().type != TileInfo::Type::SLIDER)
+				//if (tile->get_info().type != TileInfo::Type::SLIDER)
 				{
 					if (tile->get_info().type == TileInfo::Type::DOUBLE)
 					{
 						tile->touch_down(0, {get_column_x_pos(tile->column) + 1.0L, 0.0L});
 					}
 					LongTile::y_finger_tapped = 0.0L;
-					tile->touch_down(0, {get_column_x_pos(tile->column), 0.0L});
+					if (tile->get_info().type == TileInfo::Type::SLIDER)
+					{
+						tile->touch_down(0, {0.0L, 0.0L});
+					}
+					else
+					{
+						tile->touch_down(0, {get_column_x_pos(tile->column), 0.0L});
+					}
 				}
 			}
 		}
@@ -535,12 +564,16 @@ void StateLevel::restart_level()
 
 void StateLevel::spawn_new_tiles()
 {
-	if (spawned_tiles == _song_info.tiles.size())
+	/*if (spawned_tiles == _song_info.tiles.size())
 	{
 		spawned_tiles = 0;
-	}
-	for (uint32_t i = spawned_tiles; i < _song_info.tiles.size(); ++i)
+	}*/
+	for (uint32_t i = spawned_tiles; true; ++i)
 	{
+		if (spawned_tiles == _song_info.tiles.size())
+		{
+			spawned_tiles = 0;
+		}
 		Number total_pos = Number(total_length) / Number(_song_info.length_units_per_single_tile);
 		if (_position > total_pos)
 		{
@@ -601,8 +634,8 @@ void StateLevel::game_over(Tile* tile)
 	if (game->cfg->god_mode == false)
 	{
 		SongUserDatabase user_database;
-		user_database.load_from_file();
-		user_database.update_score(song_id, lap_id, score.get_score());
+		user_database.load_from_files();
+		user_database.update_score(song_id, lap_id, score.get_score(), perfect_score);
 	}
 }
 

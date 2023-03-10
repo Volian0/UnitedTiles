@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <filesystem>
+#include <algorithm>
 
 NoteEvent::NoteEvent(Type type_, uint8_t key_, uint8_t velocity_)
 	:type{type_},
@@ -171,6 +172,29 @@ void SongInfo::to_file(std::ofstream& file) const
 	}
 }
 
+std::uint32_t SongInfo::calculate_perfect_score() const
+{
+	std::uint32_t score = 0;
+	for (const auto& tile : tiles)
+	{
+		//SINGLE, LONG, DOUBLE, EMPTY, SLIDER
+		switch(tile.type)
+		{
+		case TileInfo::Type::SINGLE:
+			score += 1;
+			break;
+		case TileInfo::Type::SLIDER:
+		case TileInfo::Type::LONG:
+		case TileInfo::Type::DOUBLE:
+			score += 2;
+			break;
+		case TileInfo::Type::EMPTY:
+			break;
+		}
+	}
+	return score * 3;
+}
+
 /*SongList::SongList(std::ifstream& file)
 {
 	uint32_t song_size = read_u32(file).value();
@@ -287,13 +311,72 @@ SongUserDatabase::SongUserDatabase(std::ifstream& file)
 	}
 }
 
-void SongUserDatabase::to_file(std::ofstream& file) const
+[[deprecated]] void SongUserDatabase::to_file(std::ofstream& file) const
 {
 	write_u16(file, scores.size());
 	for (const auto& [id, score] : scores)
 	{
 		write_u16(file, id);
 		score.to_file(file);
+	}
+}
+
+SongUserDatabase::SongUserDatabase()
+{
+	std::filesystem::create_directory(Path::user("","scores"));
+}
+
+void SongUserDatabase::load_from_files(bool t_load_legacy)
+{
+	for (const auto& entry : std::filesystem::directory_iterator(Path::user("","scores")))
+	{
+		const auto& path = entry.path();
+		if (std::filesystem::is_regular_file(path) && path.extension() == ".scr")
+		{
+			const std::string stem = path.stem();
+			if (stem.size() >= 1 && stem.size() <= 5 && std::all_of(stem.begin(), stem.end(), ::isdigit))
+			{
+				std::uint32_t song_id = std::stoull(stem);
+				if (song_id <= 0xFFFF)
+				{
+					auto file = open_ifile(path);
+					if (!file)
+						continue;
+					auto reached_lap = read_u32(*file);
+					auto reached_score = read_u32(*file);
+					auto perfect_score = read_u8(*file);
+					file->close();
+					if (file.value() && reached_lap && reached_score && perfect_score)
+					{
+						SongScore score;
+						score.reached_lap = reached_lap.value();
+						score.reached_score = reached_score.value();
+						score.got_perfect_score = perfect_score.value();
+						scores.emplace(song_id, score);
+					}
+				}
+			}
+		}
+	}
+	if (t_load_legacy)
+	{
+		SongUserDatabase db;
+		db.load_from_file();
+		for (const auto& [id, score] : db.scores)
+		{
+			if (scores.count(id))
+			{
+				auto& other_score = scores.at(id);
+				if (other_score.reached_lap < score.reached_lap)
+					other_score.reached_lap = score.reached_lap;
+				if (other_score.reached_score < score.reached_score)
+					other_score.reached_score = score.reached_score;
+			}
+			else
+			{
+				scores.emplace(id, score);
+			}
+		}
 	}
 }
 
@@ -321,7 +404,37 @@ void SongUserDatabase::update_score(uint16_t song_id, uint32_t new_lap, uint32_t
 	std::filesystem::rename(Path::user("temp_scores.db"), Path::user("scores.db"));
 }
 
-void SongUserDatabase::load_from_file()
+void SongUserDatabase::update_score(uint16_t song_id, uint32_t new_lap, uint32_t new_score, bool new_perfect_score)
+{
+	auto& score = scores[song_id];
+	if (new_lap <= score.reached_lap && new_score <= score.reached_score && !new_perfect_score)
+	{
+		return;
+	}
+	if (score.reached_lap < new_lap)
+		score.reached_lap = new_lap;
+	if (score.reached_score < new_score)
+		score.reached_score = new_score;
+	if (new_perfect_score)
+		score.got_perfect_score = true;
+
+	const std::string tmp_path  = Path::user(std::to_string(song_id) + ".tmp","scores");
+	auto file = open_ofile(tmp_path);
+	write_u32(file.value(), score.reached_lap);
+	write_u32(file.value(), score.reached_score);
+	write_u8(file.value(), score.got_perfect_score ? 1 : 0);
+	file->close();
+	if (!file.value())
+	{
+		std::cout << "Error with saving score!" << std::endl;
+		std::abort();
+		return;
+	}
+	const std::string dest_path = Path::user(std::to_string(song_id) + ".scr","scores");
+	std::filesystem::rename(tmp_path, dest_path);
+}
+
+[[deprecated]] void SongUserDatabase::load_from_file()
 {
 	const auto& path = Path::user("scores.db");
 	auto file = open_ifile(path);

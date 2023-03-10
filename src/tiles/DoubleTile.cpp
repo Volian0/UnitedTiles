@@ -51,7 +51,7 @@ void DoubleTile::on_changed_state()
 {
 	if (is_state(&DoubleTilePartiallyCleared) || is_state(&DoubleTileFullyCleared))
 	{
-		_level->_burst.add(Vec2(get_column_x_pos(missed_column), (_level->_position - _level->get_tile_pos(this) - get_tile_length() / 2.0L) / 4.0L * 2.0L - 1.0L), Vec2(0.25L, get_height()), get_tile_length() * 4.0L / _level->game->renderer->get_aspect_ratio(), 1.5L, Vec2(-1, -1), Vec2(1, 0), Colors::BLACK);
+		_level->_burst.add(Vec2(get_column_x_pos(missed_column), (_level->_position - _level->get_tile_pos(this) - get_tile_length() / 2.0L) / 4.0L * 2.0L - 1.0L), Vec2(0.25L, get_height()), get_tile_length() * 3.0L / _level->game->renderer->get_aspect_ratio(), 1.5L, Vec2(-1, -1), Vec2(1, 0), Colors::BLACK);
 		if (is_state(&DoubleTilePartiallyCleared))
 		{
 			_level->queue_notes(get_info().note_events);

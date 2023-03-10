@@ -10,6 +10,7 @@
 #include "Colors.h"
 #include "BurstParticles.h"
 #include "RNG.h"
+#include "NetworkFile.h"
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
@@ -20,6 +21,7 @@
 #include <unordered_map>
 #include <functional>
 #include <thread>
+#include <atomic>
 
 Game::Game()
 {
@@ -50,6 +52,8 @@ Game::~Game()
 	deinit_libraries();
 }
 
+std::atomic_bool mutex_network_usage = false;
+
 void Game::run()
 {
 	_state_changed = false;
@@ -61,6 +65,15 @@ void Game::run()
 	//while there is an active state...
 	while (_state)
 	{
+		//NetworkFile::m_global_mutex.lock();
+		//std::this_thread::yield();
+		while (mutex_network_usage)
+		{
+			std::this_thread::yield();
+			//std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			//std::cout << "Waiting..." << std::endl;
+		}
+		std::scoped_lock lock{NetworkFile::m_global_mutex};
 		//handle events
 		_state->touch_events.clear();
 		_state->key_events.clear();

@@ -61,6 +61,7 @@ struct SongInfo
 	SongInfo() = default;
 	SongInfo(std::ifstream& file);
 	void to_file(std::ofstream& file) const;
+	std::uint32_t calculate_perfect_score() const;
 };
 
 SongInfo legacy_song_load(uint16_t version, std::ifstream& file);
@@ -107,9 +108,10 @@ struct SongScore
 {
 	uint32_t reached_lap = 0;
 	uint32_t reached_score = 0;
+	bool got_perfect_score = false; //3 laps completed (4th lap reached) and perfect score
 	SongScore() = default;
-	SongScore(std::ifstream& file);
-	void to_file(std::ofstream& file) const;
+	[[deprecated]] SongScore(std::ifstream& file);
+	[[deprecated]] void to_file(std::ofstream& file) const;
 };
 
 struct SongDatabase
@@ -124,9 +126,11 @@ struct SongDatabase
 struct SongUserDatabase
 {
 	std::map<uint16_t, SongScore> scores;
-	SongUserDatabase() = default;
-	void load_from_file();
+	SongUserDatabase();
+	[[deprecated]] void load_from_file();
+	void load_from_files(bool t_load_legacy = true);
 	SongUserDatabase(std::ifstream& file);
-	void to_file(std::ofstream& file) const;
-	void update_score(uint16_t song_id, uint32_t new_lap, uint32_t new_score);
+	[[deprecated]] void to_file(std::ofstream& file) const;
+	[[deprecated]] void update_score(uint16_t song_id, uint32_t new_lap, uint32_t new_score);
+	void update_score(uint16_t song_id, uint32_t new_lap, uint32_t new_score, bool new_perfect_score);
 };

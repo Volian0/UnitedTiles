@@ -25,7 +25,7 @@ StateDevMenu::StateDevMenu(Game* game_) : GameState(game_),
 	_font = std::make_unique<Font>(game->renderer.get(), "roboto.ttf", 8.0L);
 	{
 		const auto _font2 = std::make_unique<Font>(game->renderer.get(), "roboto.ttf", 4.0L);
-		_text_version = std::make_unique<Texture>(game->renderer.get(), _font2.get(), "v0.1.3", Colors::GRAY);
+		_text_version = std::make_unique<Texture>(game->renderer.get(), _font2.get(), "v0.2", Colors::GRAY);
 		_text_volian = std::make_unique<Texture>(game->renderer.get(), _font2.get(), "by Volian0", Colors::GRAY);
 	}
 	_logo = std::make_unique<Texture>(game->renderer.get(), "logo.png");

@@ -145,7 +145,7 @@ TileColumn SliderTile::next_column(const std::shared_ptr<Tile>& previous_tile) c
 
 bool SliderTile::in_range(Vec2 pos) const
 {
-	return std::abs((std::abs(std::fmod(pos.y + Number(_column_index) * 0.5L, 3.0L) - 1.5L) - 0.75L) - pos.x) < 0.75L;
+	return std::abs((std::abs(std::fmod(pos.y + Number(_column_index) * 0.5L, 3.0L) - 1.5L) - 0.75L) - pos.x) <= 0.75L;
 }
 
 uint8_t SliderTile::get_column_index() const

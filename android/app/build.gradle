@@ -2,6 +2,8 @@ apply plugin: 'com.android.application'
 
 android {
 
+    namespace "com.volian.unitedtiles"
+
 signingConfigs {
 
 	release {
@@ -21,8 +23,8 @@ signingConfigs {
         applicationId "com.volian.unitedtiles"
         minSdkVersion 23
         targetSdkVersion 33
-        versionCode 4
-        versionName "0.1.3"
+        versionCode 5
+        versionName "0.2"
         ndk {
             abiFilters 'armeabi-v7a'
         }
@@ -30,7 +32,7 @@ signingConfigs {
     buildTypes {
         release {
 	    ndk {
-                abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86' ,'x86_64'
+                abiFilters 'armeabi-v7a', 'arm64-v8a'//, 'x86' ,'x86_64'
                 //abiFilters 'armeabi-v7a'
             }
 	    shrinkResources true
@@ -45,5 +47,9 @@ signingConfigs {
             path "src/main/jni/Android.mk"
 
         }
+    }
+
+    packagingOptions {
+        jniLibs.useLegacyPackaging true
     }
 }

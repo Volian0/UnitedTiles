@@ -6,6 +6,7 @@
 #include <map>
 #include <iostream>
 #include <optional>
+#include <algorithm>
 
 class ScrollablePanel : NonCopyable
 {
@@ -19,6 +20,11 @@ public:
 
 	void start_rendering() const;
 	void stop_rendering() const;
+
+	constexpr void set_offset(Number t_offset)
+	{
+		_offset = std::clamp(t_offset, min_offset, max_offset);
+	}
 
 	[[nodiscard]] constexpr bool in_range(Vec2 pos) const noexcept
 	{
@@ -45,12 +51,17 @@ public:
 		_offset = 0;
 	}
 
-	constexpr auto is_scrolled() -> bool
+	constexpr auto is_scrolled() const -> bool
 	{
 		return !static_cast<bool>(last_y_pos) && static_cast<bool>(_last_finger_position);
 	}
 
 	std::optional<Number> last_y_pos;
+
+	[[nodiscard]] constexpr auto get_progress() const -> Number
+	{
+		return std::clamp((_offset - min_offset) / (max_offset - min_offset), 0.0L, 1.0L);
+	}
 
 private:
 	Number _offset = 0;

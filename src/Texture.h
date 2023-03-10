@@ -16,7 +16,7 @@ class Texture : RendererReloadable
 
 public:
 	Texture(Renderer* renderer, const std::string& filename);
-	Texture(Renderer* renderer, Font* font, const std::string& text, Color color);
+	Texture(Renderer* renderer, const Font* font, const std::string& text, Color color);
 	~Texture();
 
 	enum class Type : uint8_t {

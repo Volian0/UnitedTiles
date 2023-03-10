@@ -24,6 +24,7 @@ void Configuration::load_from_file()
 	enable_vsync = read_u8(*file).value_or(1);
 	god_mode = read_u8(*file).value_or(0);
 	fake_lag = read_u8(*file).value_or(0);
+	preferred_soundfont = read_u16(*file).value_or(0);
 }
 
 void Configuration::save_to_file() const
@@ -40,6 +41,7 @@ void Configuration::save_to_file() const
 		write_u8(*file, enable_vsync);
 		write_u8(*file, god_mode);
 		write_u8(*file, fake_lag);
+		write_u16(*file, preferred_soundfont);
 		file->close();
 		if (!file.value())
 		{

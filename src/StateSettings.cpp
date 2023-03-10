@@ -5,19 +5,22 @@
 #include "Renderer.h"
 #include "StateDevMenu.h"
 #include "StateSongMenu.h"
+#include "StateSoundfonts.h"
 
 #include <algorithm>
 
 StateSettings::StateSettings(Game* game_)
 	:GameState(game_),
 	_font{ game_->renderer.get(), "roboto.ttf", 8.0L },
-	_bg{ game->renderer.get(), "dev_background.png" },
+	_bg{ game->renderer.get(), "white.png" },
 	_dev_button_texture{ game->renderer.get(), "dev_button.png" },
 	_b_discard{ {-0.5, 0}, 0.4L, 0, "Discard", &_dev_button_texture, &_font, this},
 	_b_apply{ {0.5, 0}, 0.4L, 0, "Apply", &_dev_button_texture, &_font, this },
+	_b_soundfonts{ {0.0, 0}, 0.8L, 0, "Extra Soundfonts", &_dev_button_texture, &_font, this },
 	cb_u{ game->renderer.get(), "ui/checkbox0.png"},
 	cb_c{ game->renderer.get(), "ui/checkbox1.png"}
 {
+	_bg.tint = {24, 24, 24, 255};
 	_dev_button_texture.blend_mode = 1;
 	cb_u.blend_mode = 1;
 	cb_c.blend_mode = 1;
@@ -38,6 +41,7 @@ StateSettings::StateSettings(Game* game_)
 		checkbox.first._checked = checkbox.second;
 		checkbox.first.spanel = &scrollable_panel;
 	}
+	_b_soundfonts.spanel = &scrollable_panel;
 	scrollable_panel._state = this;
 	scrollable_panel.max_offset = 0.0L;
 }
@@ -63,13 +67,20 @@ void StateSettings::update()
 	scrollable_panel.position = { 0, -1.0L + button_height };
 	scrollable_panel.size = { 2.0L, 2.0L };
 	scrollable_panel.min_offset = -1.0L;
-	scrollable_panel.update(game->renderer->get_aspect_ratio());
+	const auto scrolled = scrollable_panel.update(game->renderer->get_aspect_ratio());
 	_b_apply.position.y = button_y_pos;
 	_b_discard.position.y = button_y_pos;
 	for (uint8_t i = 0; i < check_boxes.size(); ++i)
 	{
 		check_boxes[i].first.label.position.y = -1.0L + button_height + 0.1L * game->renderer->get_aspect_ratio() + 0.2L * game->renderer->get_aspect_ratio() * Number(i) + scrollable_panel.get_offset();
 		check_boxes[i].first.update(this);
+	}
+	_b_soundfonts.position.y = -1.0L + button_height + Number(check_boxes.size() + 1) * 0.2L * game->renderer->get_aspect_ratio() + scrollable_panel.get_offset();
+	if (scrollable_panel.is_scrolled() || scrolled)
+		_b_soundfonts.clear_held();
+	if (_b_soundfonts.update())
+	{
+		return game->change_state<StateSoundfonts>();
 	}
 }
 
@@ -83,5 +94,6 @@ void StateSettings::render() const
 	{
 		checkbox.first.render(game->renderer.get());
 	}
+	_b_soundfonts.render();
 	scrollable_panel.stop_rendering();
 }

@@ -19,4 +19,5 @@ public:
 	bool enable_vsync = true;
 	bool god_mode = false;
 	bool fake_lag = false;
+	uint16_t preferred_soundfont = 0; // 0 = default soundfont
 };

@@ -8,7 +8,11 @@
 TextInput::TextInput(std::string starting_text_, Number max_width_, Vec2 position_, Font* font_, GameState* state_, Texture* white_, uint16_t max_size_)
 :m_text{std::move(starting_text_)}, m_max_width{max_width_}, m_position{position_}, m_font{font_}, m_state{state_}, m_max_size{max_size_}, m_white_txt{white_}
 {
-
+    if (!m_text.empty())
+    {
+        m_label = std::make_unique<Label>(m_text, m_max_width, m_position, Vec2{-1.0L, 0.0L}, m_font, m_state->game->renderer.get());
+        m_sizes.push_back(m_text.size());
+    }
 }
 
 struct TextInputFocus
