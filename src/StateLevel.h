@@ -152,6 +152,11 @@ public:
 
 	void set_theme_tint(Color t_tint);
 
+	[[nodiscard]] auto is_game_over() const -> bool
+	{
+		return _state == State::GAME_OVER;
+	}
+
 private:
 	virtual void update();
 	virtual void render() const;

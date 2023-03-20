@@ -20,4 +20,9 @@ public:
 	bool god_mode = false;
 	bool fake_lag = false;
 	uint16_t preferred_soundfont = 0; // 0 = default soundfont
+	bool three_section_mode = false;
+	bool show_tps_instead_of_score = false;
+	bool sustain_mode = false;
+	bool show_sdl_errors = false;
+	uint8_t soundfont_volume = 128; // x^3 / 2097152
 };

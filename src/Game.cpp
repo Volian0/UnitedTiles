@@ -3,7 +3,6 @@
 #include "Renderer.h"
 #include "Font.h"
 #include "StateSplash.h"
-#include "StateDevMenu.h"
 #include "StateSongMenu.h"
 #include "StateLevel.h"
 #include "DevTouch.h"
@@ -36,7 +35,7 @@ Game::Game()
 	DustMotes::enabled = cfg->enable_particles_dustmotes;
 	BurstParticles::enabled = cfg->enable_particles_burst;
 
-	change_state<StateSongMenu>();
+	change_state<StateSplash>();
 	//change_state<StateLevel>(0);
 }
 

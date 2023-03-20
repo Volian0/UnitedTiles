@@ -32,4 +32,6 @@ private:
 
 	FingerID finger;
 	Number y_tapped;
+
+	Number m_cleared_position;
 };

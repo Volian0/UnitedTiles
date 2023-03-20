@@ -240,6 +240,8 @@ SongBasicInfo::SongBasicInfo(std::ifstream& file)
 	{
 		composer_ids.emplace_back(read_u16(file).value());
 	}
+	unlockable_type = read_u8(file).value();
+	unlockable_amount = read_u16(file).value();
 }
 
 void SongBasicInfo::to_file(std::ofstream& file) const
@@ -253,6 +255,8 @@ void SongBasicInfo::to_file(std::ofstream& file) const
 	{
 		write_u16(file, composer_id);
 	}
+	write_u8(file, unlockable_type);
+	write_u16(file, unlockable_amount);
 }
 
 SongScore::SongScore(std::ifstream& file)

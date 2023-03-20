@@ -3,7 +3,6 @@
 #include "File.h"
 #include "Path.h"
 #include "Game.h"
-#include "StateSongSelection.h"
 #include "StateSongMenu.h"
 #include "ExtraSoundfonts.h"
 
@@ -155,19 +154,23 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_)
 	};
 	
 	std::vector<SongBasicInfo> songs{
-		SongBasicInfo{1888, "Anitra's Dance", "", "Anitras Dance", {6}},
-		SongBasicInfo{0, "Canon in D", "accompanied canon by the German Baroque composer Johann Pachelbel", "Canon", {3}},
+		SongBasicInfo{1888, "Anitra's Dance", "", "Anitras Dance", {6}},																					//0
+		SongBasicInfo{0, "Canon in D", "accompanied canon by the German Baroque composer Johann Pachelbel", "Canon", {3}},									//1
 		SongBasicInfo{0, "Csikós Post", "galop in the key of E minor", "Csikos Post", {2}},
 		SongBasicInfo{0, "Danse chinoise", "", "Danse chinoise", {4}},
 		SongBasicInfo{0, "Etude in C major", "", "Etude in C major", {0}},
-		SongBasicInfo{0, "Etude in d minor", "", "Etude in d minor", {0}},
+		SongBasicInfo{0, "Etude in d minor", "", "Etude in d minor", {0}},																					//5
 		SongBasicInfo{1810, "Für Elise", "one of Ludwig van Beethoven's most popular compositions", "Fur Elise", {5}},
 		SongBasicInfo{0, "Prelude Op. 28, No. 4", "by Chopin's request, this piece was played at his own funeral", "Prelude Op 28 No 4", {1}},
 		SongBasicInfo{1890, "Gnossienne No. 1", "", "Gnossienne No 1", {7}},
 		SongBasicInfo{1890, "Gnossienne No. 2", "", "Gnossienne No 2", {7}},
-		SongBasicInfo{1850, "Liebestraum No. 3", "the last of the three that Liszt wrote and the most popular", "Liebestraum No 3", {0}},
+		SongBasicInfo{1850, "Liebestraum No. 3", "the last of the three that Liszt wrote and the most popular", "Liebestraum No 3", {0}},					//10
 		SongBasicInfo{1877, "Chopsticks", "a simple, widely known waltz for the piano", "Chopsticks", {8}},
-		SongBasicInfo{1788, "Piano Sonata No. 16", "described by Mozart in his own thematic catalogue as \"for beginners\"", "Piano Sonata No 16", {9}}
+		SongBasicInfo{1788, "Piano Sonata No. 16", "described by Mozart in his own thematic catalogue as \"for beginners\"", "Piano Sonata No 16", {9}},
+		SongBasicInfo{1917, "Sonatine bureaucratique", "the final entry in his humoristic piano music of the 1910s", "Sonatine bureaucratique", {7}, 3, 3},	//13
+		SongBasicInfo{1829, "Étude Op. 10, No. 1", "also known as the Waterfall étude", "Etude Op 10 No 1", {1}, 4, 2}, 									//14
+		SongBasicInfo{1897, "Petite ouverture à danser", "the piece was one of many Satie left unpublished", "Petite ouverture a danser", {7}, 1, 5}, 		//15
+		SongBasicInfo{1867, "Waltz, Op. 12, No. 2", "", "Waltz Op 12 No 2", {6}, 2, 4} 																		//16
 	};
 
 	SongDatabase database;
@@ -183,11 +186,15 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_)
 		{7, songs.at(7)},//prelude op 28 no 4
 		{11, songs.at(11)},//chopsticks
 		{8, songs.at(8)}, //Gnossienne No. 1
+		{15, songs.at(15)}, //Petite ouverture a danser 
 		{3, songs.at(3)},//danse chinoise
+		{16, songs.at(16)}, //Waltz Op 12 No 2
 		{6, songs.at(6)},//fur elise
+		{13, songs.at(13)}, //Sonatine bureaucratique
 		{10, songs.at(10)},//Liebestraum no 3
 		{0, songs.at(0)},//anitras dance
 		{2, songs.at(2)},//csikos post
+		{14, songs.at(14)}, //Etude Op 10 No 1
 		{5, songs.at(5)},//etude in d minor
 		{12, songs.at(12)},//sonata no 16
 		{4, songs.at(4)}//etude in c major
@@ -265,6 +272,40 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_)
 	//_song_info.starting_tempo = 10.0L;
 	//_song_info.acceleration_method = SongInfo::AccelerationMethod::ACCELERATION;
 	//_song_info.acceleration_info.parameter = 3.0L;
+	if (false) //double length tiles mode
+	{
+		_song_info.starting_tempo /= 2.0L;
+		_song_info.length_units_per_single_tile *= 2;
+		_song_info.note_ticks_per_single_tile *= 2;
+		/*for (auto& tile : _song_info.tiles)
+		{
+					
+		}*/
+	}
+
+	if (true) // 3 section mode
+	{
+		if (_song_info.acceleration_method == SongInfo::AccelerationMethod::LINEAR)
+		{
+			auto& tc = _song_info.acceleration_info.tempo_changes;
+			if (tc.empty() && _song_info.tiles.size() >= 3)
+			{
+				const std::array<uint32_t, 2> indexes{
+					_song_info.tiles.size() / uint64_t{3},
+					uint64_t(_song_info.tiles.size()) * uint64_t{2} / uint64_t{3}
+				};
+				const Number mini_param = std::cbrt(_song_info.acceleration_info.parameter);
+				tc.emplace(indexes[0], _song_info.starting_tempo * mini_param);
+				tc.emplace(indexes[1], _song_info.starting_tempo * mini_param * mini_param);
+			}
+		}
+	}
+
+	if (true) //always show TPS mode
+	{
+		score.show_tps = true;
+	}
+
 	txt_white.blend_mode = 1;
 	tp_state_start={};
 	//set_theme_tint(theme_tint);
@@ -497,7 +538,7 @@ void StateLevel::render() const
 			//const uint8_t tint_g2 = std::clamp(255.0L * 1.0L - arrow_offset * 2.0L * 255.0L, 0.0L, 255.0L);
 			txt_arrow->tint.r = tint_r;
 			txt_arrow->tint.g = tint_g;
-			txt_arrow->tint.b = 32;
+			txt_arrow->tint.b = 64;
 			txt_arrow->tint.a = std::clamp(size * 4.0L * 255.0L, 0.0L, 255.0L);
 			/*txt_arrow->tint.b = tint_g;
 			txt_arrow->tint.g = tint_g2;
@@ -518,14 +559,14 @@ void StateLevel::render() const
 	_burst.render();
 
 	if (_state != State::IDLE || !score.show_tps)
-		score.render();
+		score.render(); 
 
 
 
 	//experimental
 	const Number total_time = new_tp - tp_state_start;
 	if (total_time < 0.25L) {
-		txt_white.tint = {0, 0, 0, uint8_t(std::clamp((0.25L - total_time) * 255.0L * 4.0L, 0.0L, 255.0L))};
+		txt_white.tint = {16, 16, 16, uint8_t(std::clamp((0.25L - total_time) * 255.0L * 4.0L, 0.0L, 255.0L))};
 		game->renderer->render(&txt_white, {}, txt_white.get_psize(), {}, {1.0L, 1.0L}, {}); }
 	//experimental
 

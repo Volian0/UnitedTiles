@@ -9,6 +9,7 @@
 #include "Timepoint.h"
 #include "DustMotes.h"
 #include "Soundfont.h"
+#include "DevButton.h"
 
 #include <memory>
 #include <vector>
@@ -22,10 +23,16 @@ private:
 	virtual void update();
 	virtual void render() const;
 
-	std::unique_ptr<Font> _font;
-	std::unique_ptr<Texture> _text;
+	mutable Texture m_logo;
+	mutable Texture m_white;
+	Font m_font;
+	mutable Texture m_text;
+	mutable std::optional<Timepoint> m_first_tp;
+	
+	DustMotes m_dustmotes;
 
-	std::optional<Timepoint> _first_tp;
-	Timepoint _new_tp;
-	Number _required_time = 2.0L;
+	Number m_required_time = 3.0L;
+	Number m_passed_time = 0.0L;
+	//Number m_angle = 0.0L;
+	std::optional<Timepoint> m_tp_now;
 };

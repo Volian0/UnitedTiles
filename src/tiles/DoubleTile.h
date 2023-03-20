@@ -2,6 +2,8 @@
 
 #include "Tile.h"
 
+#include <array>
+
 inline constexpr auto DoubleTileDefault = TileStateInfo{ TileAction::GAME_OVER };
 inline constexpr auto DoubleTileMissed = TileStateInfo{ TileAction::NOTHING };
 inline constexpr auto DoubleTilePartiallyCleared = TileStateInfo{ TileAction::GAME_OVER, ScoreInfo{1} };
@@ -26,4 +28,6 @@ private:
 	std::optional<Timepoint> tp_tapped;
 	std::optional<Timepoint> tp_second;
 	bool left_tile_cleared;
+
+	std::array<Number, 2> m_cleared_positions;
 };

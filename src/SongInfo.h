@@ -91,14 +91,18 @@ struct SongBasicInfo
 	std::string description;
 	std::string filename;
 	std::vector<uint16_t> composer_ids;
+	uint8_t unlockable_type = 0; //0: free, 1: bronze, 2: silver, 3: gold, 4: diamond
+	uint16_t unlockable_amount = 0;
 	SongBasicInfo() = default;
-	[[deprecated]] SongBasicInfo(uint16_t a1, std::string a2, std::string a3, std::string a4, std::vector<uint16_t> a5)
+	[[deprecated]] SongBasicInfo(uint16_t a1, std::string a2, std::string a3, std::string a4, std::vector<uint16_t> a5, uint8_t a6 = 0, uint16_t a7 = 0)
 	{
 		create_year = a1;
 		name = a2;
 		description = a3;
 		filename = a4;
 		composer_ids = a5;
+		unlockable_type = a6;
+		unlockable_amount = a7;
 	}
 	SongBasicInfo(std::ifstream& file);
 	void to_file(std::ofstream& file) const;

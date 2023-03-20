@@ -13,11 +13,11 @@ using namespace smf;
 int main(int args_size, char** args)
 try
 {
-	constexpr std::string_view filename = "/home/volian/albania.mid";
+	constexpr std::string_view filename = "/home/volian/walc.mid";
 	constexpr uint32_t single_tile_length = 48;
-	constexpr long double start_tps = 4.166666666666666666666666666666666666666666666666666666666666L;
-	constexpr long double multiplier = 0.0075L;
-	constexpr uint32_t empty_length_end = 0;
+	constexpr long double start_tps = 4.3333333333333333333333333L;
+	constexpr long double multiplier = 1.18248206376L;
+	constexpr uint32_t empty_length_end = 3 * 48;
 	constexpr bool do_tempo_thing = false;
 
 	MidiFile midi;
@@ -38,7 +38,7 @@ try
 	usong.length_units_per_single_tile = single_tile_length;
 	usong.note_ticks_per_single_tile = single_tile_length;
 	usong.starting_tempo = start_tps;
-	usong.acceleration_method = SongInfo::AccelerationMethod::ACCELERATION;
+	usong.acceleration_method = SongInfo::AccelerationMethod::LINEAR;
 	usong.acceleration_info.parameter = multiplier;
 
 	uint32_t track_count = midi.getTrackCount();
@@ -204,8 +204,11 @@ try
 			}
 		}
 	}
+
 	if (expect_double_tile)
 		throw std::runtime_error("Expected 2nd double tile, got nothing");
+
+
 
 	if (empty_length_end != 0)
 	{
@@ -216,7 +219,10 @@ try
 					tile.type = TileInfo::Type::EMPTY;
 					tile.length = empty_length_end;
 
+		std::cout << "inserted empty tiles of length " << usong.tiles.back().length << std::endl;
+
 	}
+
 
 	// normalize volume of tiles (max = 127)
 	for (auto& tile : usong.tiles)
@@ -239,6 +245,7 @@ try
 			}
 		}
 	}
+
 	if (do_tempo_thing)
 	{
 		midi.joinTracks();

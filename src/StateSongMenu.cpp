@@ -1,7 +1,6 @@
 #include "StateSongMenu.h"
 
 #include "Game.h"
-#include "StateDevMenu.h"
 #include "File.h"
 #include "Path.h"
 #include "StateLevel.h"
@@ -60,7 +59,9 @@ StateSongMenu::StateSongMenu(Game* game_)
             {},
             0,
             song_id,
-            {{get_x_pos(414), 0}, get_x_size(144), 0, (last_song && *last_song == song_id) ? "Replay" : "Play", &_dev_button_texture, &font32, this, 0.0625L * 0.75L}
+            {{get_x_pos(414), 0}, get_x_size(144), 0, (last_song && *last_song == song_id) ? "Replay" : "Play", &_dev_button_texture, &font32, this, 0.0625L * 0.75L},
+            song_info.unlockable_type,
+            song_info.unlockable_amount 
         });
         song_panel.play_button.spanel = &spanel;
         if (song_scores.count(song_id))
@@ -95,6 +96,17 @@ StateSongMenu::StateSongMenu(Game* game_)
         }*/
         song_panel.composer_name.label_text_texture->tint = {128, 128, 128, 255};
     }
+    for (auto& panel : song_panels)
+    {
+        if (panel.req_type)
+        {
+            if (medal_n.at(panel.req_type - 1) < panel.req_amount)
+            {
+                //panel.locked = true;
+                panel.req_amount_label.emplace(std::to_string(panel.req_amount), get_x_size(48), Vec2{get_x_pos(418), 0}, Vec2{-1,0}, &font32, game->renderer.get());
+            }
+        }
+    }
     for (uint8_t i = 0; i < 4; ++i)
     {
         medals_texts[i].emplace(std::to_string(medal_n[i]), get_x_size(55), Vec2{get_x_pos(81.5L + Number(i) * 113.0L), 0.0L}, Vec2{0,0}, &font24, game->renderer.get());
@@ -104,6 +116,9 @@ StateSongMenu::StateSongMenu(Game* game_)
     spanel.max_offset = 0.0L;
     spanel._state = this;
     spanel.position.x = 0.0L;
+
+    need_to_restore = true;
+    tp_state_start = {};
 }
 
 void StateSongMenu::update()
@@ -134,7 +149,31 @@ void StateSongMenu::update()
     //first, let's update the searchbox
     if (input_song.update() || need_to_restore)
     {
-        last_search = input_song.get_text();
+        /*bool last_bit = false;
+        static const auto remove_utf8{[](const std::string& t_string){
+            std::string string;
+            for (unsigned char c : t_string)
+            {
+                if (c < 128)
+                {
+                    std::cout << int(c) << " ";
+                    string += c;
+                }
+                else
+                {
+                    c -= 128;
+                    if (c < 0b01000000)
+                    {
+                        std::cout << int(c) << " ";
+                        string += c;
+                    }
+                    last_bit = c & 0b00000001;
+                }
+            }
+            std::cout << std::endl << string << std::endl;
+            return string;
+        }};*/
+        last_search = (input_song.get_text());
         spanel.reset();
         //preform the search here!
         allowed_song_ids.clear();
@@ -142,14 +181,14 @@ void StateSongMenu::update()
         std::vector<std::pair<uint16_t, std::string>> names_and_composers;
 		for (const auto& [s_id, s_info] : song_database.songs_infos)
 		{
-            names_and_composers.emplace_back(s_id, s_info.name + " ");
+            names_and_composers.emplace_back(s_id, (s_info.name) + " ");
 			for (const auto& [c_id, c_info] : song_database.composers_infos)
 			{
 				for (const auto& sc_id : s_info.composer_ids)
 				{
 					if (c_id == sc_id)
 					{
-						names_and_composers.back().second += c_info.name;
+						names_and_composers.back().second += (c_info.name) + " ";
 					}
 				}
 			}
@@ -243,6 +282,9 @@ void StateSongMenu::update()
 
         /*if (scrolled || spanel.is_scrolled())
             song_panel.play_button.clear_held();*/
+        current_y_pixel_position += 130;
+        if (song_panel.req_amount_label)
+            continue;
         if (spanel.is_scrolled() || scrolled)
             song_panel.play_button.clear_held();
         if (song_panel.play_button.update())
@@ -250,8 +292,6 @@ void StateSongMenu::update()
             last_song = song_panel.song_id;
 		    return game->change_state<StateLevel>(uint16_t(song_panel.song_id));
 	    }
-
-        current_y_pixel_position += 130;
     }
 
     //finally, check button events
@@ -276,6 +316,7 @@ void StateSongMenu::render() const
     };
 
     const Vec2 top_medal_size{get_x_size(40),get_y_size(40,aspect_ratio)};
+    const Vec2 locked_medal_size{get_x_size(48),get_y_size(48,aspect_ratio)};
     const Vec2 big_medal_size{get_x_size(104),get_y_size(104,aspect_ratio)};
     const Vec2 song_medal_size{get_x_size(32),get_y_size(32,aspect_ratio)};
     const Vec2 song_diamond_size{get_x_size(24),get_y_size(24,aspect_ratio)};
@@ -387,7 +428,7 @@ void StateSongMenu::render() const
                 song_panel.lap->render(game->renderer.get());
             }
         }
-
+        
         txt_white.tint = {48, 48, 48, 255};
         game->renderer->render(&txt_white, {}, txt_white.get_psize(),
         square_position, light_square_size, {}, {-1.0L, 0.0L});
@@ -395,13 +436,22 @@ void StateSongMenu::render() const
         song_panel.song_name.render(game->renderer.get());
         if (song_panel.score)
             song_panel.score->render(game->renderer.get());
-        song_panel.play_button.render();
+        if (song_panel.req_amount_label)
+        {
+            auto& medal_texture = medal_textures.at(song_panel.req_type - 1);
+            game->renderer->render(&medal_texture, {}, medal_texture.get_psize(),
+            {song_panel.play_button.position.x - get_x_size(4) * 2.0L, song_panel.play_button.position.y}, locked_medal_size, {}, {1, 0});
+            song_panel.req_amount_label->position.y = song_panel.play_button.position.y;
+            song_panel.req_amount_label->render(game->renderer.get());
+        }
+        else
+            song_panel.play_button.render();
         for (uint8_t i = 0; i < 4; ++i)
         {
             const Color prev_color = medal_textures[i].tint;
             if (song_panel.medal_level < i + 1)
             {
-                medal_textures[i].tint = {0, 0, 0, 64};
+                medal_textures[i].tint = {0, 0, 0, song_panel.req_amount_label ? 0 : 64};
             }
             game->renderer->render(&medal_textures[i], {},
             medal_textures[i].get_psize(), medals_positions[i],
@@ -410,4 +460,11 @@ void StateSongMenu::render() const
         }
     }
     spanel.stop_rendering();
+    //experimental
+	const Number total_time = Timepoint{} - tp_state_start;
+	if (total_time < 0.25L) {
+        txt_white.blend_mode = 1;
+		txt_white.tint = {16, 16, 16, uint8_t(std::clamp((0.25L - total_time) * 255.0L * 4.0L, 0.0L, 255.0L))};
+		game->renderer->render(&txt_white, {}, txt_white.get_psize(), {}, {1.0L, 1.0L}, {}); txt_white.blend_mode = 0;}
+	//experimental
 }

@@ -25,6 +25,11 @@ void Configuration::load_from_file()
 	god_mode = read_u8(*file).value_or(0);
 	fake_lag = read_u8(*file).value_or(0);
 	preferred_soundfont = read_u16(*file).value_or(0);
+	three_section_mode = read_u8(*file).value_or(0);
+	show_tps_instead_of_score = read_u8(*file).value_or(0);
+	sustain_mode = read_u8(*file).value_or(0);
+	show_sdl_errors = read_u8(*file).value_or(0);
+	soundfont_volume = read_u8(*file).value_or(128);
 }
 
 void Configuration::save_to_file() const
@@ -42,6 +47,11 @@ void Configuration::save_to_file() const
 		write_u8(*file, god_mode);
 		write_u8(*file, fake_lag);
 		write_u16(*file, preferred_soundfont);
+		write_u8(*file, three_section_mode);
+		write_u8(*file, show_tps_instead_of_score);
+		write_u8(*file, sustain_mode);
+		write_u8(*file, show_sdl_errors);
+		write_u8(*file, soundfont_volume);
 		file->close();
 		if (!file.value())
 		{

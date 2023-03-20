@@ -3,6 +3,7 @@
 #include "GameState.h"
 #include "SongInfo.h"
 #include "DevButton.h"
+#include "Timepoint.h"
 #include "ui/TextInput.h"
 #include "ui/ScrollablePanel.h"
 #include "ui/Label.h"
@@ -23,8 +24,12 @@ struct SongPanel
     std::optional<Label> score;
     std::optional<Label> lap;
     uint8_t medal_level; //0=black, 1=bronze, 2=silver, 3=gold, 4=diamond
-    uint16_t song_id;
+    const uint16_t song_id;
     DevButton play_button;
+    const uint8_t req_type;
+    const uint16_t req_amount;
+    //bool locked = false;
+    mutable std::optional<Label> req_amount_label;
     //DevButton details_button;
 
     void change_position(Number y_pos);
@@ -63,7 +68,7 @@ private:
     static std::string last_search; 
     static Number last_position;
     static std::optional<std::uint16_t> last_song;
-    bool need_to_restore = true;
+    bool need_to_restore;
 
     [[nodiscard]] constexpr auto get_x_pos(Number t_pos) const noexcept -> Number
     {
@@ -85,6 +90,7 @@ private:
         return t_pos * t_aspect_ratio / 256.0L - 1.0L + t_offset;
     }
 
+    Timepoint tp_state_start;
     //std::vector<Texture> song_names;
     //std::vector<Texture> composer_names;
 };

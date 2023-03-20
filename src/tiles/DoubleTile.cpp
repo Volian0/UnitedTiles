@@ -6,6 +6,7 @@
 #include "../RNG.h"
 #include "EmptyTile.h"
 #include "SliderTile.h"
+#include "SingleTile.h"
 
 DoubleTile::DoubleTile(StateLevel* level_)
 	:StatableTile(level_, this->next_column(level_->previous_tile))
@@ -38,10 +39,12 @@ void DoubleTile::touch_down(uint16_t finger_id, Vec2 pos)
 		else if (is_state(&DoubleTileDefault))
 		{
 			left_tile_cleared = clicked_left;
+			m_cleared_positions[left_tile_cleared ? 0 : 1] = y_offset;
 			change_state(&DoubleTilePartiallyCleared);
 		}
 		else if (clicked_left ^ left_tile_cleared)
 		{
+			m_cleared_positions[left_tile_cleared ? 1 : 0] = y_offset;
 			change_state(&DoubleTileFullyCleared);
 		}
 	}
@@ -51,7 +54,7 @@ void DoubleTile::on_changed_state()
 {
 	if (is_state(&DoubleTilePartiallyCleared) || is_state(&DoubleTileFullyCleared))
 	{
-		_level->_burst.add(Vec2(get_column_x_pos(missed_column), (_level->_position - _level->get_tile_pos(this) - get_tile_length() / 2.0L) / 4.0L * 2.0L - 1.0L), Vec2(0.25L, get_height()), get_tile_length() * 3.0L / _level->game->renderer->get_aspect_ratio(), 1.5L, Vec2(-1, -1), Vec2(1, 0), Colors::BLACK);
+		_level->_burst.add(Vec2(get_column_x_pos(missed_column), (_level->_position - _level->get_tile_pos(this) - get_tile_length() / 2.0L) / 4.0L * 2.0L - 1.0L), Vec2(0.25L, get_height()), get_tile_length() * 2.0L / _level->game->renderer->get_aspect_ratio(), 1.5L, Vec2(-1, -1), Vec2(1, 0), Colors::BLACK);
 		if (is_state(&DoubleTilePartiallyCleared))
 		{
 			_level->queue_notes(get_info().note_events);
@@ -102,9 +105,24 @@ void DoubleTile::render_bg() const
 
 void DoubleTile::render_fg() const
 {
+	Vec2 pos_left = { get_column_x_pos(column == DT_LEFT ? FAR_LEFT : MID_LEFT), y_offset / 4.0L * 2.0L - 1.0L };
+	if ((is_state(&DoubleTileFullyCleared) || is_state(&DoubleTilePartiallyCleared))
+		&& !_level->is_game_over())
+	{
+		for (uint8_t i = 0; i < 2; ++i)
+		{
+			if ((!is_state(&DoubleTileFullyCleared)) && ((i == 0) ^ left_tile_cleared))
+				continue;
+
+			const auto offset = y_offset - m_cleared_positions[i];
+			if (offset < 2.0L / 3.0L)
+			{
+				SingleTile::render_clearing(offset, &_level->txt_single_tile, Vec2{pos_left.x + Number(i), pos_left.y}, get_height(), _level->game->renderer.get());
+			}
+		}
+	}
 	if (!is_state(&DoubleTileFullyCleared))
 	{
-		Vec2 pos_left = { get_column_x_pos(column == DT_LEFT ? FAR_LEFT : MID_LEFT), y_offset / 4.0L * 2.0L - 1.0L };
 		for (uint8_t i = 0; i < 2; ++i)
 		{
 			if (!tp_tapped.has_value() || ((i == 0) ^ left_tile_cleared))

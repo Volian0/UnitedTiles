@@ -88,7 +88,10 @@ int NetworkFile::progress_callback(void* t_client_ptr, curl_off_t t_dl_total, cu
     {
         network_file->m_progress = 0.0L;
     }
-    network_file->m_progress = std::clamp(Number(t_dl_now) / Number(t_dl_total), 0.0L, 1.0L);
+    else
+    {
+        network_file->m_progress = std::clamp(Number(t_dl_now) / Number(t_dl_total), 0.0L, 1.0L);
+    }
     return 0;
 }
 

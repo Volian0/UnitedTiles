@@ -123,7 +123,8 @@ void LongTile::on_changed_state()
 	}
 	else if (is_state(&LongTileFullyCleared))
 	{
-		_level->_burst.add(Vec2(get_column_x_pos(column), (_level->_position - _level->get_tile_pos(this) - get_tile_length() / 2.0L) / 4.0L * 2.0L - 1.0L), Vec2(0.25L, get_height()), get_tile_length() * 3.0L / _level->game->renderer->get_aspect_ratio(), 1.5L, Vec2(-1, -1), Vec2(1, 0), Colors::WHITE);
+		m_cleared_position = y_offset;
+		_level->_burst.add(Vec2(get_column_x_pos(column), (_level->_position - _level->get_tile_pos(this) - get_tile_length() / 2.0L) / 4.0L * 2.0L - 1.0L), Vec2(0.25L, get_height()), get_tile_length() * 2.0L / _level->game->renderer->get_aspect_ratio(), 1.5L, Vec2(-1, -1), Vec2(1, 0), Colors::WHITE);
 	}
 }
 
@@ -136,6 +137,22 @@ void LongTile::render_fg() const
 		texture = &_level->txt_single_tile_cleared;
 		_level->game->renderer->render(texture, {}, texture->get_psize(), pos,
 			{ 0.25, get_height() }, {}, { 0,1 });
+		
+		if (!_level->is_game_over())
+		{
+			const auto offset = y_offset - m_cleared_position;
+			if (offset < 2.0L / 3.0L)
+			{
+				Texture* texture = &_level->txt_white;
+				const std::uint8_t tint_a = std::clamp(191.0L - offset * (3.0L * 191.0L / 2.0L), 0.0L, 191.0L);
+				const auto prev_tint = texture->tint;
+				texture->tint = _level->theme_tint;
+				texture->tint. a = tint_a;
+				_level->game->renderer->render(texture, {}, texture->get_psize(), pos,
+				{ 0.25, get_height() }, {}, { 0,1 });
+				texture->tint = prev_tint;
+			}
+		}
 	}
 	else
 	{
@@ -158,7 +175,7 @@ void LongTile::render_fg() const
 			_level->game->renderer->render(texture, {}, texture->get_psize(), pos - Vec2{ 0, (held_tile_duration) / 2.0L },
 				{ 0.25, 0.25L / 4.0L }, {}, { 0,1 });
 			texture = &_level->txt_long_tile_circle;
-			if (is_state(&LongTileClearing))
+			if (is_state(&LongTileClearing) && !_level->is_game_over())
 			{
 				Color previous_tint = texture->tint;
 
