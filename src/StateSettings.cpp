@@ -34,6 +34,12 @@ StateSettings::StateSettings(Game* game_)
 	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Enable V-Sync", game->renderer.get()), std::forward_as_tuple(game->cfg->enable_vsync));
 	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "God mode", game->renderer.get()), std::forward_as_tuple(game->cfg->god_mode));
 	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Fake lag", game->renderer.get()), std::forward_as_tuple(game->cfg->fake_lag));
+	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Smooth tempo for laps", game->renderer.get()), std::forward_as_tuple(game->cfg->three_section_mode));
+	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Show TPS as score", game->renderer.get()), std::forward_as_tuple(game->cfg->show_tps_instead_of_score));
+	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Always sustain notes", game->renderer.get()), std::forward_as_tuple(game->cfg->sustain_mode));
+	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Show SDL errors", game->renderer.get()), std::forward_as_tuple(game->cfg->show_sdl_errors));
+	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Limit note velocity", game->renderer.get()), std::forward_as_tuple(game->cfg->limit_note_velocity));
+
 	//set correct checkbox values
 	for (auto& checkbox : check_boxes)
 	{
@@ -65,7 +71,7 @@ void StateSettings::update()
 	Number button_height = ((1.0L / 8.0L) + 0.1L) * game->renderer->get_aspect_ratio() * 2.0L;
 	scrollable_panel.position = { 0, -1.0L + button_height };
 	scrollable_panel.size = { 2.0L, 2.0L };
-	scrollable_panel.min_offset = -1.0L;
+	scrollable_panel.min_offset = -1.75L * game->renderer->get_aspect_ratio();
 	const auto scrolled = scrollable_panel.update(game->renderer->get_aspect_ratio());
 	_b_apply.position.y = button_y_pos;
 	_b_discard.position.y = button_y_pos;

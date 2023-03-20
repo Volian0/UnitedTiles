@@ -3,6 +3,7 @@
 #include "NonCopyable.h"
 #include "Timepoint.h"
 #include "SongInfo.h"
+#include "Types.h"
 
 #include <string>
 #include <mutex>
@@ -29,7 +30,11 @@ public:
 	void play_all_events();
 	void play_events(const Timepoint& bound = {});
 
+	void set_volume(Number volume);
+
 	uint8_t get_notes_on_size();
+
+	bool always_sustain = false;
 
 private:
 	mutable std::mutex _mutex;

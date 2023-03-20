@@ -257,6 +257,8 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_)
 		}
 	}
 	soundfont = game->audio->load_soundfont(soundfont_filename);
+	soundfont->set_volume(std::pow(Number(game->cfg->soundfont_volume), 3.0L) / 2097152.0L);
+	soundfont->always_sustain = game->cfg->sustain_mode;
 
 	ExtractedRes song_info_res(filename, "songs");
 	auto song_info_file = open_ifile(song_info_res.get_path()).value();
@@ -283,7 +285,7 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_)
 		}*/
 	}
 
-	if (true) // 3 section mode
+	if (game->cfg->three_section_mode) // 3 section mode
 	{
 		if (_song_info.acceleration_method == SongInfo::AccelerationMethod::LINEAR)
 		{
@@ -301,9 +303,33 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_)
 		}
 	}
 
-	if (true) //always show TPS mode
+	if (game->cfg->show_tps_instead_of_score) //always show TPS mode
 	{
 		score.show_tps = true;
+	}
+
+	if (game->cfg->limit_note_velocity)
+	{
+		for (auto& tile : _song_info.tiles)
+		{
+			for (auto& [delta, event] : tile.note_events)
+			{
+				if (event.type == NoteEvent::Type::ON)
+				{
+					event.velocity = std::max(std::uint16_t(event.velocity) * 72 / 127, 1);
+				}
+			}
+			if (tile.type == TileInfo::Type::DOUBLE)
+			{
+				for (auto& [delta, event] : tile.note_events_2nd_tile)
+				{
+					if (event.type == NoteEvent::Type::ON)
+					{
+						event.velocity = std::max(std::uint16_t(event.velocity) * 72 / 127, 1);
+					}
+				}
+			}
+		}
 	}
 
 	txt_white.blend_mode = 1;
@@ -667,9 +693,10 @@ void StateLevel::game_over(Tile* tile)
 	_state = State::GAME_OVER;
 	soundfont->play_all_events();
 	soundfont->add_event(new_tp, NoteEvent(NoteEvent::Type::ALL_OFF));
-	soundfont->add_event(new_tp, NoteEvent(NoteEvent::Type::ON, 48, 127));
-	soundfont->add_event(new_tp, NoteEvent(NoteEvent::Type::ON, 52, 127));
-	soundfont->add_event(new_tp, NoteEvent(NoteEvent::Type::ON, 55, 127));
+	const std::uint16_t game_over_velocity = game->cfg->limit_note_velocity ? 72 : 127;
+	soundfont->add_event(new_tp, NoteEvent(NoteEvent::Type::ON, 48, game_over_velocity));
+	soundfont->add_event(new_tp, NoteEvent(NoteEvent::Type::ON, 52, game_over_velocity));
+	soundfont->add_event(new_tp, NoteEvent(NoteEvent::Type::ON, 55, game_over_velocity));
 	game_over_reset = new_tp;
 
 	if (game->cfg->god_mode == false)

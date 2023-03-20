@@ -39,16 +39,25 @@ void Soundfont::cc(uint8_t control, uint8_t value)
 void Soundfont::note_on(uint8_t key, uint8_t velocity)
 {
 	std::scoped_lock lock(_mutex);
-	tsf_note_on(reinterpret_cast<tsf*>(_ptr), 0, key, Number(velocity) / 127.0L);
 	if (_notes_on.count(key))
 	{
-		std::cout << "Duplicated note on: " << unsigned(key) << std::endl;
+		if (always_sustain)
+		{
+			tsf_note_off(reinterpret_cast<tsf*>(_ptr), 0, key);
+		}
+		else
+		{
+			std::cout << "Duplicated note on: " << unsigned(key) << std::endl;
+		}
 	}
+	tsf_note_on(reinterpret_cast<tsf*>(_ptr), 0, key, Number(velocity) / 127.0L);
 	_notes_on.emplace(key);
 }
 
 void Soundfont::note_off(uint8_t key)
 {
+	if (always_sustain)
+		return;
 	std::scoped_lock lock(_mutex);
 	tsf_note_off(reinterpret_cast<tsf*>(_ptr), 0, key);
 	_notes_on.erase(key);
@@ -56,6 +65,8 @@ void Soundfont::note_off(uint8_t key)
 
 void Soundfont::all_notes_off()
 {
+	if (always_sustain)
+		return;
 	std::scoped_lock lock(_mutex);
 	tsf_note_off_all(reinterpret_cast<tsf*>(_ptr));
 	_notes_on.clear();
@@ -130,4 +141,10 @@ uint8_t Soundfont::get_notes_on_size()
 {
 	std::scoped_lock lock(_mutex_events);
 	return _notes_on.size();
+}
+
+void Soundfont::set_volume(Number volume)
+{
+	std::scoped_lock lock(_mutex);
+	tsf_set_volume(reinterpret_cast<tsf*>(_ptr), volume);
 }

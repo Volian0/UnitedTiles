@@ -21,6 +21,7 @@
 #include <functional>
 #include <thread>
 #include <atomic>
+#include <chrono>
 
 Game::Game()
 {
@@ -64,39 +65,37 @@ void Game::run()
 	//while there is an active state...
 	while (_state)
 	{
-		//NetworkFile::m_global_mutex.lock();
-		//std::this_thread::yield();
 		while (mutex_network_usage)
 		{
 			std::this_thread::yield();
-			//std::this_thread::sleep_for(std::chrono::milliseconds(100));
-			//std::cout << "Waiting..." << std::endl;
 		}
 		std::scoped_lock lock{NetworkFile::m_global_mutex};
-		//handle events
-		_state->touch_events.clear();
-		_state->key_events.clear();
-		_state->pressed_backspace = false;
-		_state->pressed_enter = false;
+
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
 		{
-			if (event.type == SDL_QUIT) {
-				return stop();
+			if (event.type == SDL_APP_WILLENTERBACKGROUND || event.type == SDL_APP_DIDENTERBACKGROUND) {
+				_in_foreground = false;
+				_in_background = true;
+				std::cout << "Entering background..." << std::endl;
 			}
-			else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
-				renderer->reload();
+			else if (event.type == SDL_APP_DIDENTERFOREGROUND)
+			{
+				_in_foreground = true;
+			}
+			else if (event.type == SDL_QUIT) {
+				if (!_in_background)
+					return stop();
+			}
+			else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED
+			|| event.type == SDL_RENDER_DEVICE_RESET || event.type == SDL_RENDER_TARGETS_RESET) {
+				if (!_in_background)
+					renderer->reload();
 			}
 			else if (event.type == SDL_FINGERDOWN || event.type == SDL_FINGERUP || event.type == SDL_FINGERMOTION) {
 				const Vec2 position{ std::clamp(Number(event.tfinger.x) * 2.0L - 1.0L, -1.0L, 1.0L),
 					std::clamp(Number(event.tfinger.y) * 2.0L - 1.0L, -1.0L, 1.0L) };
-				/*Vec2 position{ std::clamp(Number(event.tfinger.x) * 2.0L - 1.0L, -1.0L, 1.0L),
-					std::clamp(Number(event.tfinger.y) * 2.0L - 1.0L, -1.0L, 1.0L) };
-				std::unordered_map<uint32_t, std::reference_wrapper<std::map<uint16_t, Vec2>>>
-				{   { SDL_FINGERDOWN,   _state->touch_down },
-					{ SDL_FINGERUP,     _state->touch_up   },
-					{ SDL_FINGERMOTION, _state->touch_move }
-				}.at(event.type).get().emplace(event.tfinger.fingerId, position);*/
+
 				_state->touch_events.emplace_back(TouchEvent{[&](){
 					if (event.type == SDL_FINGERDOWN)
 						return TouchEvent::Type::DOWN;
@@ -120,6 +119,21 @@ void Game::run()
 				{
 					_state->pressed_enter = true;
 				}
+			}
+		}
+
+		if (_in_background)
+		{
+			if (_in_foreground)
+			{
+				std::cout << "Entering foreground..." << std::endl;
+				_in_background = false;
+				renderer->reload();
+			}
+			else
+			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(10));
+				continue;
 			}
 		}
 
@@ -162,10 +176,16 @@ void Game::run()
 			}	
 		}
 
+		_state->touch_events.clear();
+		_state->key_events.clear();
+		_state->pressed_backspace = false;
+		_state->pressed_enter = false;
+
 		//check for SDL errors
 		std::string sdlerror(SDL_GetError());
 		if (!sdlerror.empty()) {
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "United Tiles - SDL Error", sdlerror.c_str(), nullptr);
+			if (cfg->show_sdl_errors)
+				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "United Tiles - SDL Error", sdlerror.c_str(), nullptr);
 			SDL_ClearError(); }
 	}
 }

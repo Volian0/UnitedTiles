@@ -16,7 +16,7 @@ void Configuration::load_from_file()
 	}
 	audio_sample_rate = std::clamp<uint16_t>(read_u16(*file).value_or(44100), 10000, 50000);
 	audio_stereo = read_u8(*file).value_or(1);
-	enable_particles_burst = read_u8(*file).value_or(1);
+	enable_particles_burst = read_u8(*file).value_or(0);
 	enable_particles_dustmotes = read_u8(*file).value_or(1);
 	enable_hit_markers = read_u8(*file).value_or(0);
 	show_fps = read_u8(*file).value_or(0);
@@ -28,8 +28,9 @@ void Configuration::load_from_file()
 	three_section_mode = read_u8(*file).value_or(0);
 	show_tps_instead_of_score = read_u8(*file).value_or(0);
 	sustain_mode = read_u8(*file).value_or(0);
-	show_sdl_errors = read_u8(*file).value_or(0);
+	show_sdl_errors = read_u8(*file).value_or(1);
 	soundfont_volume = read_u8(*file).value_or(128);
+	limit_note_velocity = read_u8(*file).value_or(0);
 }
 
 void Configuration::save_to_file() const
@@ -52,6 +53,7 @@ void Configuration::save_to_file() const
 		write_u8(*file, sustain_mode);
 		write_u8(*file, show_sdl_errors);
 		write_u8(*file, soundfont_volume);
+		write_u8(*file, limit_note_velocity);
 		file->close();
 		if (!file.value())
 		{

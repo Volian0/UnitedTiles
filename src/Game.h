@@ -44,4 +44,6 @@ private:
 	
 	std::unique_ptr<GameState> _state;
 	bool _state_changed;
+	bool _in_background = false;
+	bool _in_foreground = true;
 };

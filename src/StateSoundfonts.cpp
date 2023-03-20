@@ -47,6 +47,10 @@ StateSoundfonts::StateSoundfonts(Game* game_)
     settings_button{Vec2{get_x_pos(482.0L), 0.0L}, get_x_size(40.0L), 0, " ", &_dev_button_texture, &font24, this, 0.0625L * 0.625L},
     txt_icons{game->renderer.get(), "misc_icons.png"},
     m_certs{"cacert.pem","misc"},
+    volume_minus{{get_x_pos(24+10), 0}, get_x_size(48), 0, "<<", &_dev_button_texture, &font32, this, 0.0625L * 0.75L},
+    volume_plus{{get_x_pos(512-24-10), 0}, get_x_size(48), 0, ">>", &_dev_button_texture, &font32, this, 0.0625L * 0.75L},
+    volume_minus_small{{get_x_pos(24+10+56), 0}, get_x_size(48), 0, "<", &_dev_button_texture, &font32, this, 0.0625L * 0.75L},
+    volume_plus_small{{get_x_pos(512-24-10-56), 0}, get_x_size(48), 0, ">", &_dev_button_texture, &font32, this, 0.0625L * 0.75L},
     panels{
         create_array<SoundfontPanel, extra_soundfonts.size()>(this)
     }
@@ -71,6 +75,28 @@ void StateSoundfonts::update()
     {
         return game->change_state<StateSettings>();
     }
+
+    volume_minus.position.y = volume_plus.position.y = volume_minus_small.position.y = volume_plus_small.position.y = get_y_pos(84, aspect_ratio);
+
+    std::int16_t volume_v = game->cfg->soundfont_volume;
+
+    if (volume_minus.update())
+    {
+        volume_v -= 16;
+    }
+    if (volume_plus.update())
+    {
+        volume_v += 16;
+    }
+    if (volume_minus_small.update())
+    {
+        volume_v--;
+    }
+    if (volume_plus_small.update())
+    {
+        volume_v++;
+    }
+    game->cfg->soundfont_volume = std::clamp<std::int16_t>(volume_v, 0, 255);
 
     const uint16_t song_n = panels.size();
     const Number all_size_y = get_y_size(130.0L * song_n/* - 10.0L*/, aspect_ratio);
@@ -177,6 +203,21 @@ void StateSoundfonts::render() const
 
     game->renderer->render(&settings_gear, {}, settings_gear.get_psize(),
         settings_button.position, top_medal_size, {});
+
+    volume_minus.render();
+    volume_plus.render();
+    volume_minus_small.render();
+    volume_plus_small.render();
+
+    const Number volume_value = std::pow(Number(game->cfg->soundfont_volume), 3.0L) / std::pow(128.0L, 3.0L);
+    std::string volume_string = std::to_string(volume_value);
+    if (volume_string.size() > 5)
+    {
+        volume_string = "Volume: " + volume_string.substr(0, 5);
+    }
+    Texture volume_text{game->renderer.get(), &font32, volume_string, Colors::WHITE};
+    game->renderer->render(&volume_text, {}, volume_text.get_psize(),
+        {0.0L, get_y_pos(84, aspect_ratio)}, volume_text.get_rsize(), {});
 
     spanel.start_rendering();
     const Vec2 dark_square_size{get_x_size(80), get_y_size(120,aspect_ratio)};

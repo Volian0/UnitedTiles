@@ -95,5 +95,5 @@ bool DevButton::in_range(Vec2 pos) const
 		return false;
 	}
 	Vec2 diff = glm::abs(position - pos);
-	return (diff.x <= width && diff.y <= 0.125L * _state->game->renderer->get_aspect_ratio());
+	return (diff.x <= width && diff.y <= m_corner_size * 2.0L * _state->game->renderer->get_aspect_ratio());
 }

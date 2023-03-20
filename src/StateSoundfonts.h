@@ -53,6 +53,12 @@ public:
     ScrollablePanel spanel;
     DevButton settings_button;
 
+    DevButton volume_minus;
+    DevButton volume_plus;
+
+    DevButton volume_minus_small;
+    DevButton volume_plus_small;
+
     ExtractedRes m_certs;
 
     std::array<SoundfontPanel, extra_soundfonts.size()> panels;

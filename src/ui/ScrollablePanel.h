@@ -2,6 +2,7 @@
 
 #include "../Types.h"
 #include "../NonCopyable.h"
+#include "../Timepoint.h"
 
 #include <map>
 #include <iostream>
@@ -65,6 +66,11 @@ public:
 
 private:
 	Number _offset = 0;
+
+	std::map<Timepoint, Number> tp_changes;
+	std::optional<Number> velocity;
+	Number velmul = 1.0L;
+	Timepoint _old_tp;
 
 	std::optional<std::pair<FingerID, Number>> _last_finger_position;
 	//std::map<FingerID, std::pair<Number, Number>> _fingers;
