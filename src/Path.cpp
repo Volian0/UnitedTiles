@@ -4,11 +4,20 @@
 
 #include <filesystem>
 
+std::string get_base_path()
+{
+	char* base_path = SDL_GetBasePath();
+	std::string path = base_path;
+	SDL_free(base_path);
+	return path;
+}
+
 std::string Path::res(const std::string& filename, const std::string& folder)
 {
 	std::string path = folder + "/" + filename;
 #ifndef __ANDROID__
-	path = "res/" + path;
+	static const std::string base_path = get_base_path();
+	path = base_path + "res/" + path;
 #endif
 	return path;
 }
@@ -23,7 +32,7 @@ std::string get_pref_path()
 
 std::string Path::user(const std::string& filename, const std::string& folder)
 {
-	static std::string user_path = get_pref_path();
+	static const std::string user_path = get_pref_path();
 	return user_path + folder + "/" + filename;
 }
 

@@ -11,4 +11,5 @@ int main(int argc, char* argv[])
 	}
 	Game game{song_filename};
 	game.run();
+	return 0; //required
 }
