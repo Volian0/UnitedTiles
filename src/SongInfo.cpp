@@ -337,13 +337,13 @@ void SongUserDatabase::load_from_files(bool t_load_legacy)
 		const auto& path = entry.path();
 		if (std::filesystem::is_regular_file(path) && path.extension() == ".scr")
 		{
-			const std::string stem = path.stem();
+			const std::string stem = path.stem().string();
 			if (stem.size() >= 1 && stem.size() <= 5 && std::all_of(stem.begin(), stem.end(), ::isdigit))
 			{
 				std::uint32_t song_id = std::stoull(stem);
 				if (song_id <= 0xFFFF)
 				{
-					auto file = open_ifile(path);
+					auto file = open_ifile(path.string());
 					if (!file)
 						continue;
 					auto reached_lap = read_u32(*file);

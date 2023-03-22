@@ -18,6 +18,7 @@
 #include <cstdint>
 #include <array>
 #include <deque>
+#include <string_view>
 
 class StateLevel;
 
@@ -81,7 +82,7 @@ class StateLevel : public GameState
 	friend Tile;
 
 public:
-	StateLevel(Game* game_, uint16_t song_id_);
+	StateLevel(Game* game_, uint16_t song_id_, std::string_view t_song_filename = {});
 
 	const uint16_t song_id;
 
@@ -160,6 +161,8 @@ public:
 private:
 	virtual void update();
 	virtual void render() const;
+
+	bool save_score = true;
 
 	void restart_level();
 

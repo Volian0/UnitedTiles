@@ -22,8 +22,10 @@
 #include <thread>
 #include <atomic>
 #include <chrono>
+#include <filesystem>
+#include <iostream>
 
-Game::Game()
+Game::Game(std::string_view t_song_filename)
 {
 	init_libraries();
 
@@ -36,7 +38,38 @@ Game::Game()
 	DustMotes::enabled = cfg->enable_particles_dustmotes;
 	BurstParticles::enabled = cfg->enable_particles_burst;
 
-	change_state<StateSplash>();
+	if (!t_song_filename.empty())
+	{
+		const std::filesystem::path song_path{t_song_filename};
+		std::cout << "Song path: " << song_path.string() << std::endl;
+		if (std::filesystem::exists(song_path))
+		{
+			if (std::filesystem::is_regular_file(song_path))
+			{
+				if (song_path.extension().string() == ".usong")
+				{
+					change_state<StateLevel>(std::uint16_t{65535}, std::string_view{t_song_filename});
+				}
+				else
+				{
+					SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "United Tiles", "Provided song has invalid extension", nullptr);	
+				}
+			}
+			else
+			{
+				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "United Tiles", "Provided song is not a file", nullptr);
+			}
+		}
+		else
+		{
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "United Tiles", "Provided song doesn't exist", nullptr);
+		}
+	}
+	else
+	{
+		change_state<StateSplash>();
+	}
+
 	//change_state<StateLevel>(0);
 }
 

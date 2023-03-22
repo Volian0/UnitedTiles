@@ -148,9 +148,8 @@ void NetworkFile::download(NetworkFile* t_network_file)
             curl_easy_setopt(curl_handle, CURLOPT_NOSIGNAL, 1L);
             //curl_easy_setopt(curl_handle, CURLOPT_ERRORBUFFER, error_buffer.data());
 
-#ifdef __ANDROID__
+
             curl_easy_setopt(curl_handle, CURLOPT_CAINFO, Path::user("cacert.pem", "extracted/misc/").data());
-#endif
 
             m_global_mutex.unlock();
             success = (curl_easy_perform(curl_handle) == CURLE_OK && file);

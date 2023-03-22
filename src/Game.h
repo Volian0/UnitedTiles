@@ -6,13 +6,14 @@
 #include "AudioDevice.h"
 
 #include <memory>
+#include <string_view>
 
 class Renderer;
 
 class Game : NonCopyable
 {
 public:
-	Game();
+	Game(std::string_view t_song_filename = {});
 	~Game();
 
 	void run();

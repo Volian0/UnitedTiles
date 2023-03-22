@@ -119,7 +119,7 @@ void LevelBackground::render() const
 	_dustmotes_stars.render();
 }
 
-StateLevel::StateLevel(Game* game_, uint16_t song_id_)
+StateLevel::StateLevel(Game* game_, uint16_t song_id_, std::string_view t_score_filename)
 	:GameState(game_),
 	score{this},
 	tile_divider{game->renderer.get(), "tile_divider.png"},
@@ -260,9 +260,18 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_)
 	soundfont->set_volume(std::pow(Number(game->cfg->soundfont_volume), 3.0L) / 2097152.0L);
 	soundfont->always_sustain = game->cfg->sustain_mode;
 
-	ExtractedRes song_info_res(filename, "songs");
-	auto song_info_file = open_ifile(song_info_res.get_path()).value();
-	_song_info = song_info_file;
+	if (t_score_filename.empty())
+	{
+		ExtractedRes song_info_res(filename, "songs");
+		auto song_info_file = open_ifile(song_info_res.get_path()).value();
+		_song_info = song_info_file;
+	}
+	else
+	{
+		auto song_info_file = open_ifile(t_score_filename.data()).value();
+		_song_info = song_info_file;
+		save_score = false;
+	}
 	tps = 0.0L;
 	_old_tp = new_tp = last_tempo_change = {};
 	previous_position = 3.0L;
@@ -284,6 +293,9 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_)
 					
 		}*/
 	}
+
+	//_song_info.acceleration_method = SongInfo::AccelerationMethod::CLASSIC;
+	//_song_info.acceleration_info.classic_tempo_changes = {std::make_pair<uint32_t, Number>(10, 2.0L), {20, 7.0L}};
 
 	if (game->cfg->three_section_mode) // 3 section mode
 	{
@@ -335,7 +347,7 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_)
 	txt_white.blend_mode = 1;
 	tp_state_start={};
 	//set_theme_tint(theme_tint);
-	//_song_info.starting_tempo *= 16.0L;
+	//_song_info.starting_tempo *= 3.0L;
 }
 
 void StateLevel::render_debug() const
@@ -699,7 +711,7 @@ void StateLevel::game_over(Tile* tile)
 	soundfont->add_event(new_tp, NoteEvent(NoteEvent::Type::ON, 55, game_over_velocity));
 	game_over_reset = new_tp;
 
-	if (game->cfg->god_mode == false)
+	if (game->cfg->god_mode == false && save_score)
 	{
 		SongUserDatabase user_database;
 		user_database.load_from_files();
@@ -716,6 +728,7 @@ ScoreCounter::ScoreCounter(StateLevel* level_, uint32_t init_value)
 
 void ScoreCounter::render() const
 {
+	const std::uint32_t v = show_tps ? 100 : _value;
 	if (show_tps)
 	{
 		std::string my_tps = std::to_string(_level->tps);
@@ -730,7 +743,6 @@ void ScoreCounter::render() const
 		}
 		old_tps = my_tps;
 		_texture = std::make_unique<Texture>(_level->game->renderer.get(), &_font, my_tps, Color{ 255, 63, 63, 255 });
-		_value = 100;
 		//return;
 	}
 
@@ -740,15 +752,15 @@ void ScoreCounter::render() const
 	//Number scale = std::clamp(1.0L - (Timepoint() - _tp_update), 0.8L, 1.0L);
 	_texture->tint = {64,64,64,255};
 	auto angle = (diff - 0.8L) * 32.0L * (((_odd / 2) % 2 == 0) ? -1.0L : 1.0L);
-	if (_value >= 100)
+	if (v >= 100)
 	{
 		angle *= 0.5L;
 	}
-	if (_value >= 10000)
+	if (v >= 10000)
 	{
 		angle *= 0.5L;
 	}
-	if (_value >= 10000000)
+	if (v >= 10000000)
 	{
 		angle = 0.0L;
 	}
@@ -761,11 +773,11 @@ void ScoreCounter::render() const
 
 void ScoreCounter::set(uint32_t value)
 {
+	_value = value;
 	if (show_tps)
 	{
 		return;
 	}
-	_value = value;
 	_texture = std::make_unique<Texture>(_level->game->renderer.get(), &_font, std::to_string(_value), Color{ 255, 63, 63, 255 });
 	_tp_update = _level->new_tp;
 	_odd++;
