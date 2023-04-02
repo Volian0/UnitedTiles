@@ -101,6 +101,8 @@ public:
 	mutable Texture txt_white;
 	mutable std::optional<Texture> txt_arrow;
 
+	mutable std::optional<Texture> txt_trail;
+
 	Color theme_tint = Colors::CYAN;
 
 	uint32_t lap_id = 0;

@@ -137,6 +137,7 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_, std::string_view t_score_
 	slider_tile_clearing{game->renderer.get(), "slider_clearing.png"},
 	_debug_font{game->renderer.get(), "roboto.ttf", 4},
 	_burst{game_->renderer.get(), "white.png"},
+	//txt_trail{std::in_place, game_->renderer.get(), "trail.png"},
 	lv_bg{this},
 	song_id{song_id_}
 {
@@ -348,6 +349,7 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_, std::string_view t_score_
 	tp_state_start={};
 	//set_theme_tint(theme_tint);
 	//_song_info.starting_tempo *= 3.0L;
+	txt_trail->blend_mode = 1;
 }
 
 void StateLevel::render_debug() const
@@ -589,9 +591,42 @@ void StateLevel::render() const
 	//render tiles
 	for (const auto& [position, tile] : tiles)
 	{
+		//experimental trail eff
+		if (!is_game_over() && txt_trail)
+		{
+			bool render_trail = true;
+			if (tile->get_info().type == TileInfo::Type::SINGLE)
+			{
+				if (dynamic_cast<SingleTile*>(tile.get())->is_state(&SingleTileCleared))
+				{
+					render_trail = false;
+				}
+			}
+			/*else if (tile->get_info().type == TileInfo::Type::LONG)
+			{
+				if (dynamic_cast<LongTile*>(tile.get())->is_state(&LongTileFullyCleared))
+				{
+					render_trail = false;
+				}
+			}*/
+			else
+			{
+				render_trail = false;
+			}
+			if (render_trail)
+			{
+				Vec2 pos = { get_column_x_pos(tile->column), tile->y_offset / 4.0L * 2.0L - 1.0L - tile->get_height() * 2.0L };
+				Texture* texture = &txt_trail.value();
+				//texture->tint.a = 128;
+				game->renderer->render(texture, {}, texture->get_psize(), pos,
+				{ 0.25, get_miss_range() / 4.0L }, {}, { 0,1 });
+			}
+		}
 		tile->render_bg();
 		if (!game_over_scroll_to.has_value() || game_over_tile != tile.get() || (new_tp % 0.25) > 0.125)
+		{
 			tile->render_fg();
+		}
 	}
 	//render score counter
 	_burst.render();
@@ -652,12 +687,17 @@ void StateLevel::spawn_new_tiles()
 		if (spawned_tiles == _song_info.tiles.size())
 		{
 			spawned_tiles = 0;
+			i = 0;
 		}
 		Number total_pos = Number(total_length) / Number(_song_info.length_units_per_single_tile);
 		if (_position > total_pos)
 		{
+			//std::cout << "Spawning new tile at position " << total_pos << std::endl;
 			//TODO: Add checking for not inserted tiles
+			//std::cout << "tile index is " << i << std::endl;
+			//std::cout << "tile length is " << _song_info.tiles[i].length << std::endl;
 			total_length += _song_info.tiles[i].length;
+			//std::cout << "total length is " << total_length << std::endl;
 			switch (_song_info.tiles[i].type)
 			{
 			case TileInfo::Type::SINGLE:

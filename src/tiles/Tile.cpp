@@ -178,8 +178,9 @@ void Tile::update()
 			//help to aim
 			if (is_active() &&
 			(get_info().type == TileInfo::Type::DOUBLE || get_info().type == TileInfo::Type::SINGLE || get_info().type == TileInfo::Type::LONG) &&
-			(get_column(touch_pos.x) & column) &&
-			click_position - max_miss_range < std::min(get_tile_length(), 1.0L) && (click_position >= 0.0L ))
+			//(get_column(touch_pos.x) & column) &&
+			((click_position - max_miss_range < std::min(get_tile_length(), 1.0L) && (click_position >= 0.0L ))
+			|| (click_position < 0.0L && click_position > (-max_miss_range))))
 			{
 				touch_pos.y = -std::numeric_limits<Number>::infinity();
 				touch_down(finger_id, { touch_pos.x, 0.0L });	
