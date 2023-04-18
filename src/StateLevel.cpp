@@ -149,9 +149,12 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_, std::string_view t_score_
 		ComposerInfo{"Pyotr Ilyich Tchaikovsky", "Russian composer of the Romantic period", 1840, 1893},
 		ComposerInfo{"Ludwig van Beethoven", "German composer and pianist", 1770, 1827},
 		ComposerInfo{"Edvard Grieg", "Norwegian composer and pianist, he is widely considered one of the main Romantic era composers", 1843, 1907},
-		ComposerInfo{"Erik Satie", "French composer and pianist", 1866, 1925},
+		ComposerInfo{"Erik Satie", "French composer and pianist", 1866, 1925},																				//7
 		ComposerInfo{"Euphemia Allen", "British composer (under the pen name Arthur de Lulli)", 1861, 1949},
-		ComposerInfo{"Wolfgang Amadeus Mozart", "prolific and influential composer of the Classical period", 1756, 1791}
+		ComposerInfo{"Wolfgang Amadeus Mozart", "prolific and influential composer of the Classical period", 1756, 1791},
+		ComposerInfo{"Camille Saint-Saëns", "French composer, organist, conductor and pianist of the Romantic era", 1835, 1921},							//10
+		ComposerInfo{"Johannes Brahms", "German composer, pianist, and conductor of the mid-Romantic period", 1833, 1897},									//11
+		ComposerInfo{"Nikolay Nekrasov", "Russian poet, writer, critic and publisher", 1821, 1877},															//12
 	};
 	
 	std::vector<SongBasicInfo> songs{
@@ -171,7 +174,18 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_, std::string_view t_score_
 		SongBasicInfo{1917, "Sonatine bureaucratique", "the final entry in his humoristic piano music of the 1910s", "Sonatine bureaucratique", {7}, 3, 3},	//13
 		SongBasicInfo{1829, "Étude Op. 10, No. 1", "also known as the Waterfall étude", "Etude Op 10 No 1", {1}, 4, 2}, 									//14
 		SongBasicInfo{1897, "Petite ouverture à danser", "the piece was one of many Satie left unpublished", "Petite ouverture a danser", {7}, 1, 5}, 		//15
-		SongBasicInfo{1867, "Waltz, Op. 12, No. 2", "", "Waltz Op 12 No 2", {6}, 2, 4} 																		//16
+		SongBasicInfo{1867, "Waltz, Op. 12, No. 2", "", "Waltz Op 12 No 2", {6}, 2, 4}, 																	//16
+
+		SongBasicInfo{1882, "Csárdás macabre", "written in a miniature sonata form", "Csardas macabre", {0}, 4, 1, "JKen777"}, //csardas macabre			/17
+		SongBasicInfo{1888, "Gymnopédie No. 1", "", "Gymnopedie No 1", {7}, 1, 2, "JKen777"},
+		SongBasicInfo{1888, "Gymnopédie No. 2", "its publication was announced in several magazines", "Gymnopedie No 2", {7}, 1, 1, "pszemyslavv_"},
+
+		SongBasicInfo{0, "Hungarian Dance No. 5", "based on the csárdás \"Bártfai emlék\"", "Hungarian Dance No 5", {11}, 3, 1},							//20
+
+		SongBasicInfo{1861, "Korobeiniki", "Nekrasov dedicated it to Gavriil Zakharov", "Korobeiniki", {12}, 2, 1, "NathanTalksTech"},
+		SongBasicInfo{1886, "Le cygne", "originally scored for solo cello accompanied by two pianos", "Le cygne", {10}, 1, 3, "NathanTalksTech"},
+		SongBasicInfo{1881, "Nuages gris", "one of Liszt's most experimental works", "Nuages gris", {0}, 0, 0, "pszemyslavv_"},
+		SongBasicInfo{1839, "Prelude Op. 28, No. 1", "dedicated to Camille Pleyel", "Prelude Op 28 No 1", {1}, 2, 2, "JKen777"}								//24
 	};
 
 	SongDatabase database;
@@ -198,7 +212,16 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_, std::string_view t_score_
 		{14, songs.at(14)}, //Etude Op 10 No 1
 		{5, songs.at(5)},//etude in d minor
 		{12, songs.at(12)},//sonata no 16
-		{4, songs.at(4)}//etude in c major
+		{4, songs.at(4)},//etude in c major
+
+		{17, songs.at(17)},
+		{18, songs.at(18)},
+		{19, songs.at(19)},
+		{20, songs.at(20)},
+		{21, songs.at(21)},
+		{22, songs.at(22)},
+		{23, songs.at(23)},
+		{24, songs.at(24)}
 		};
 	auto ofile = open_ofile("songs.db");
 	database.to_file(ofile.value());
@@ -217,21 +240,7 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_, std::string_view t_score_
 	ofile->flush();
 	std::abort();*/
 	
-	std::string filename;
-	{
-		ExtractedRes song_list_res("songs.db", "database");
-		auto song_list_file = open_ifile(song_list_res.get_path()).value();
-		SongDatabase song_database = song_list_file;
-		//find filename
-		for (const auto& [id, info] : song_database.songs_infos)
-		{
-			if (id == song_id)
-			{
-				filename = info.filename + ".usong";
-				break;
-			}
-		}
-	}
+
 	tile_divider.blend_mode = 1;
 	txt_arrow->blend_mode = 1;
 	txt_single_tile_cleared.blend_mode = 1;
@@ -263,6 +272,26 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_, std::string_view t_score_
 
 	if (t_score_filename.empty())
 	{
+		std::string filename;
+		{
+			ExtractedRes song_list_res("songs.db", "database");
+			auto song_list_file = open_ifile(song_list_res.get_path()).value();
+			SongDatabase song_database = song_list_file;
+			//find filename
+			for (const auto& [id, info] : song_database.songs_infos)
+			{
+				if (id == song_id)
+				{
+					filename = info.filename + ".usong";
+					if (!info.maker.empty()) {
+					Font maker_font{game->renderer.get(), "roboto.ttf", 8.0L};
+					lbl_maker.emplace("by " + info.maker, 1.0L, Vec2{0.0L, 0.75L}, Vec2{}, &maker_font, game->renderer.get());
+					//lbl_maker->label_text_texture->tint = {255, 64, 64, 255};
+					}
+					break;
+				}
+			}
+		}
 		ExtractedRes song_info_res(filename, "songs");
 		auto song_info_file = open_ifile(song_info_res.get_path()).value();
 		_song_info = song_info_file;
@@ -576,9 +605,9 @@ void StateLevel::render() const
 			const uint8_t tint_r = std::clamp(arrow_offset * 2.0L * 255.0L, 0.0L, 255.0L);
 			const uint8_t tint_g = std::clamp(255.0L * 2.0L - arrow_offset * 2.0L * 255.0L, 0.0L, 255.0L);
 			//const uint8_t tint_g2 = std::clamp(255.0L * 1.0L - arrow_offset * 2.0L * 255.0L, 0.0L, 255.0L);
-			txt_arrow->tint.r = tint_r;
-			txt_arrow->tint.g = tint_g;
-			txt_arrow->tint.b = 64;
+			txt_arrow->tint.r = 0xB0;
+			txt_arrow->tint.g = 0xD0;
+			txt_arrow->tint.b = 0xFF;
 			txt_arrow->tint.a = std::clamp(size * 4.0L * 255.0L, 0.0L, 255.0L);
 			/*txt_arrow->tint.b = tint_g;
 			txt_arrow->tint.g = tint_g2;
@@ -634,7 +663,18 @@ void StateLevel::render() const
 	if (_state != State::IDLE || !score.show_tps)
 		score.render(); 
 
-
+	if (_state == State::IDLE && lbl_maker)
+	{
+		const Vec2 orig_position = lbl_maker->position;
+		lbl_maker->position += Vec2{0.00625L * 0.75L, 0.0125*game->renderer->get_aspect_ratio() * 0.75L};
+		//Number angle = (new_tp % (6.28318531L / 16.0L) ) * 16.0L;
+		//Number c = std::clamp((-std::sin(angle) + 1.0L) * 127.5L, 0.0L, 255.0L);
+		lbl_maker->label_text_texture->tint = Colors::BLACK;
+		lbl_maker->render(game->renderer.get());
+		lbl_maker->position = orig_position;
+		lbl_maker->label_text_texture->tint = {255, 63, 63, 255};
+		lbl_maker->render(game->renderer.get());
+	}
 
 	//experimental
 	const Number total_time = new_tp - tp_state_start;
@@ -734,6 +774,7 @@ void StateLevel::change_tempo(Number new_tps, const Timepoint& tp_now, Number po
 	last_tempo_change = tp_now;
 	_state = State::ACTIVE;
 	txt_arrow.reset();
+	lbl_maker.reset();
 }
 
 void StateLevel::game_over(Tile* tile)
@@ -760,7 +801,7 @@ void StateLevel::game_over(Tile* tile)
 }
 
 ScoreCounter::ScoreCounter(StateLevel* level_, uint32_t init_value)
-	:_font{ level_->game->renderer.get(), "roboto.ttf", 20.0L },
+	:_font{ level_->game->renderer.get(), "roboto.ttf", 16.5L },
 	_level{ level_ }
 {
 	set(init_value);

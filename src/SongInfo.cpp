@@ -233,7 +233,7 @@ void ComposerInfo::to_file(std::ofstream& file) const
 }
 
 SongBasicInfo::SongBasicInfo(std::ifstream& file)
-:create_year{*read_u16(file)}, name{*read_string(file)}, description{*read_string(file)}, filename{*read_string(file)}
+:create_year{*read_u16(file)}, name{*read_string(file)}, description{*read_string(file)}, maker{*read_string(file)}, filename{*read_string(file)}
 {
 	const uint8_t composers_size = read_u8(file).value();
 	for (uint8_t i = 0; i < composers_size; ++i)
@@ -249,6 +249,7 @@ void SongBasicInfo::to_file(std::ofstream& file) const
 	write_u16(file, create_year);
 	write_string(file, name);
 	write_string(file, description);
+	write_string(file, maker);
 	write_string(file, filename);
 	write_u8(file, composer_ids.size());
 	for (auto composer_id : composer_ids)

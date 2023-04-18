@@ -37,16 +37,17 @@ bool EmptyTile::should_die() const
 	return true;
 }
 
-void EmptyTile::touch_down(uint16_t finger_id, Vec2 pos)
+bool EmptyTile::touch_down(uint16_t finger_id, Vec2 pos)
 {
 	if (is_state(&EmptyTileDefault))
 	{
-		if (pos.y >= 0 && pos.y < get_tile_length())
+		if (pos.y > 0 && pos.y < get_tile_length())
 		{
 			missed_column = get_column(pos.x);
-			change_state(&EmptyTileMissed);
+			return change_state(&EmptyTileMissed);
 		}
 	}
+	return false;
 }
 
 void EmptyTile::my_update()

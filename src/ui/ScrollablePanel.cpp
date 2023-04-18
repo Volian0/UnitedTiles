@@ -79,7 +79,7 @@ bool ScrollablePanel::update(Number t_aspect_ratio)
 				Number total_velocity = 0.0L;
 				for (const auto& [tp, offset] : tp_changes)
 				{
-					total_velocity += std::pow(1.0L - std::clamp(new_tp - tp, 0.0L, 1.0L), 8.0L) * offset * 4.0L;
+					total_velocity += std::pow(1.0L - std::clamp(new_tp - tp, 0.0L, 1.0L), 4.0L) * offset * 4.0L;
 				}
 				if (total_velocity > 0.0L)
 				{

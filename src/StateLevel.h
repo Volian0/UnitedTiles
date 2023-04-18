@@ -11,6 +11,7 @@
 #include "Soundfont.h"
 #include "tiles/Tile.h"
 #include "BurstParticles.h"
+#include "ui/Label.h"
 
 #include <memory>
 #include <map>
@@ -101,6 +102,8 @@ public:
 	mutable Texture txt_white;
 	mutable std::optional<Texture> txt_arrow;
 
+	mutable std::optional<Label> lbl_maker;
+
 	mutable std::optional<Texture> txt_trail;
 
 	Color theme_tint = Colors::CYAN;
@@ -140,7 +143,7 @@ public:
 
 	constexpr Number get_miss_range() const noexcept
 	{
-		return tps * 0.1171875L;
+		return 0.1L + tps * 0.1L;
 	}
 
 	BurstParticles _burst;

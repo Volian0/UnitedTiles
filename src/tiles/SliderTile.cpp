@@ -16,7 +16,7 @@ SliderTile::SliderTile(StateLevel* level_)
 
 bool SliderTile::should_game_over() const
 {
-	return y_offset > 1.0L + 4.0L;
+	return y_offset > std::min(1.0L, get_tile_length()) + 4.0L;
 }
 
 bool SliderTile::should_die() const
@@ -47,17 +47,18 @@ void SliderTile::my_update()
 	}
 }
 
-void SliderTile::touch_down(uint16_t finger_id, Vec2 pos)
+bool SliderTile::touch_down(uint16_t finger_id, Vec2 pos)
 {
 	if (is_state(&SliderTileDefault))
 	{
-		if (pos.y >= 0 && pos.y < 1.0L && in_range(pos))
+		if (pos.y >= -_level->get_miss_range() && pos.y <= std::min(1.0L, get_tile_length()) + _level->get_miss_range() && in_range(pos))
 		{
 			finger = finger_id;
 			finger_pos = pos;
-			change_state(&SliderTileClearing);
+			return change_state(&SliderTileClearing);
 		}
 	}
+	return false;
 }
 
 void SliderTile::touch_move(uint16_t finger_id, Vec2 pos)

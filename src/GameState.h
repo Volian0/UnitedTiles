@@ -12,9 +12,14 @@ class Game;
 
 struct TouchEvent
 {
-	enum class Type : uint8_t {DOWN, MOVE, UP} type;
-	uint16_t finger_id;
+	enum class Type : uint8_t {DOWN, MOVE, UP, NONE} type;
+	std::uint16_t finger_id;
 	Vec2 position;
+
+	constexpr auto kill() noexcept -> void
+	{
+		type = Type::NONE;
+	}
 };
 
 class GameState : NonCopyable

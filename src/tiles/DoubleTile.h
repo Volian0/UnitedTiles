@@ -17,7 +17,7 @@ public:
 private:
 	[[nodiscard]] bool should_game_over() const final;
 	[[nodiscard]] bool should_die() const final;
-	void touch_down(uint16_t finger_id, Vec2 pos) final;
+	bool touch_down(uint16_t finger_id, Vec2 pos) final;
 	void on_changed_state() final;
 
 	void render_bg() const final;

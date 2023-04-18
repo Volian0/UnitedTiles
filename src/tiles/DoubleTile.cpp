@@ -23,9 +23,9 @@ bool DoubleTile::should_die() const
 	return should_game_over();
 }
 
-void DoubleTile::touch_down(uint16_t finger_id, Vec2 pos)
+bool DoubleTile::touch_down(uint16_t finger_id, Vec2 pos)
 {
-	if (pos.y >= 0 && pos.y < get_tile_length()
+	if (pos.y >= -_level->get_miss_range() && pos.y <= get_tile_length() + _level->get_miss_range()
 		&& (is_state(&DoubleTileDefault) || is_state(&DoubleTilePartiallyCleared)))
 	{
 		const auto clicked_column = get_column(pos.x);
@@ -34,20 +34,21 @@ void DoubleTile::touch_down(uint16_t finger_id, Vec2 pos)
 		missed_column = clicked_column;
 		if (missed)
 		{
-			change_state(&DoubleTileMissed);
+			return change_state(&DoubleTileMissed);
 		}
 		else if (is_state(&DoubleTileDefault))
 		{
 			left_tile_cleared = clicked_left;
 			m_cleared_positions[left_tile_cleared ? 0 : 1] = y_offset;
-			change_state(&DoubleTilePartiallyCleared);
+			return change_state(&DoubleTilePartiallyCleared);
 		}
 		else if (clicked_left ^ left_tile_cleared)
 		{
 			m_cleared_positions[left_tile_cleared ? 1 : 0] = y_offset;
-			change_state(&DoubleTileFullyCleared);
+			return change_state(&DoubleTileFullyCleared);
 		}
 	}
+	return false;
 }
 
 void DoubleTile::on_changed_state()

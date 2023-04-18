@@ -19,24 +19,25 @@ bool SingleTile::should_die() const
 	return should_game_over();
 }
 
-void SingleTile::touch_down(uint16_t finger_id, Vec2 pos)
+bool SingleTile::touch_down(uint16_t finger_id, Vec2 pos)
 {
 	if (is_state(&SingleTileDefault))
 	{
-		if (pos.y >= 0 && pos.y < get_tile_length())
+		if (pos.y >= -_level->get_miss_range() && pos.y <= get_tile_length() + _level->get_miss_range())
 		{
 			TileColumn clicked_column = get_column(pos.x);
 			if (clicked_column == column)
 			{
-				change_state(&SingleTileCleared);
+				return change_state(&SingleTileCleared);
 			}
 			else
 			{
 				missed_column = clicked_column;
-				change_state(&SingleTileMissed);
+				return change_state(&SingleTileMissed);
 			}
 		}
 	}
+	return false;
 }
 
 void SingleTile::on_changed_state()

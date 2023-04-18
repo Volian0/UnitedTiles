@@ -17,7 +17,7 @@ LongTile::LongTile(StateLevel* level_)
 
 bool LongTile::should_game_over() const
 {
-	return y_offset > 1.0L + 4.0L + _level->get_miss_range();
+	return y_offset > std::min(1.0L, get_tile_length()) + 4.0L + _level->get_miss_range();
 }
 
 bool LongTile::should_die() const
@@ -53,29 +53,30 @@ void LongTile::my_update()
 		//else tap_length = 0.0L;
 }
 
-void LongTile::touch_down(uint16_t finger_id, Vec2 pos)
+bool LongTile::touch_down(uint16_t finger_id, Vec2 pos)
 {
 	if (is_state(&LongTileDefault))
 	{
-		if (pos.y >= 0 && pos.y < get_tile_length())
+		if (pos.y >= -_level->get_miss_range() && pos.y <= get_tile_length() + _level->get_miss_range())
 		{
 			auto clicked_column = get_column(pos.x);
 			if (clicked_column == column)
 			{
-				if (pos.y < 1.0L)
+				if (pos.y <= std::min(1.0L, get_tile_length()) + _level->get_miss_range())
 				{
 					//y_finger_tapped = pos.y;
 					finger = finger_id;
-					change_state(&LongTileClearing);
+					return change_state(&LongTileClearing);
 				}
 			}
 			else
 			{
 				missed_column = clicked_column;
-				change_state(&LongTileMissed);
+				return change_state(&LongTileMissed);
 			}
 		}
 	}
+	return false;
 }
 
 void LongTile::touch_up(uint16_t finger_id, Vec2 pos)
@@ -158,7 +159,7 @@ void LongTile::render_fg() const
 	{
 		texture = &_level->txt_long_tile;
 		_level->game->renderer->render(texture, {}, texture->get_psize(), pos,
-			{ 0.25, 0.25L }, {}, { 0,1 });
+			{ 0.25, std::min(0.25L, get_height()) }, {}, { 0,1 });
 		texture = &_level->txt_long_tile_ext;
 		_level->game->renderer->render(texture, {}, texture->get_psize(), pos + Vec2{ 0, -0.5 },
 			{ 0.25, get_height() - 0.25L }, {}, { 0,1 });
@@ -190,8 +191,8 @@ void LongTile::render_fg() const
 		else
 		{
 			texture = &_level->txt_long_tile_circle;
-			_level->game->renderer->render(texture, {}, texture->get_psize(), pos + Vec2{ 0, -0.25 },
-				{ 0.125, 0.125L * _level->game->renderer->get_aspect_ratio() }, {}, { 0,0 });
+			_level->game->renderer->render(texture, {}, texture->get_psize(), pos + Vec2{ 0, -std::min(0.25L, get_height()) },
+				Vec2{ 0.125, 0.125L * _level->game->renderer->get_aspect_ratio() } * (std::min(1.0L, get_tile_length() / _level->game->renderer->get_aspect_ratio())), {}, { 0,0 });
 		}
 	}
 	if (is_state(&LongTileMissed) && (_level->new_tp % 0.25) > 0.125)

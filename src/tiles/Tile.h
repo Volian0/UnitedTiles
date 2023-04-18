@@ -81,7 +81,7 @@ public:
 
 	virtual void my_update();
 
-	virtual void touch_down(uint16_t finger_id, Vec2 pos);
+	virtual bool touch_down(uint16_t finger_id, Vec2 pos);
 	virtual void touch_move(uint16_t finger_id, Vec2 pos);
 	virtual void touch_up(uint16_t finger_id, Vec2 pos);
 
