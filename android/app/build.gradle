@@ -17,14 +17,14 @@ signingConfigs {
    }
 }
 
-	ndkVersion "22.1.7171670"
-	compileSdkVersion 33
+	//ndkVersion "22.1.7171670"
+	compileSdkVersion 34
     defaultConfig {
         applicationId "com.volian.unitedtiles"
-        minSdkVersion 23
-        targetSdkVersion 33
-        versionCode 7
-        versionName "0.2.2"
+        minSdkVersion 19
+        targetSdkVersion 34
+        versionCode 8
+        versionName "0.3.0"
         ndk {
             abiFilters 'armeabi-v7a'
         }
@@ -49,7 +49,7 @@ signingConfigs {
         }
     }
 
-    packagingOptions {
+    /*packagingOptions {
         jniLibs.useLegacyPackaging true
-    }
+    }*/
 }

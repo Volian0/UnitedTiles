@@ -8,29 +8,29 @@
 #include <iostream>
 
 void Configuration::load_from_file()
-{
+{ 
 	auto file = open_ifile(Path::user("config.cfg"));
 	if (!file)
 	{
 		return;
 	}
-	audio_sample_rate = std::clamp<uint16_t>(read_u16(*file).value_or(44100), 10000, 50000);
-	audio_stereo = read_u8(*file).value_or(1);
-	enable_particles_burst = read_u8(*file).value_or(0);
-	enable_particles_dustmotes = read_u8(*file).value_or(1);
-	enable_hit_markers = read_u8(*file).value_or(0);
-	show_fps = read_u8(*file).value_or(0);
-	show_gameplay_debug_info = read_u8(*file).value_or(0);
+	std::clamp<uint16_t>(read_u16(*file).value_or(44100), 10000, 50000);
+	read_u8(*file).value_or(1);
+	read_u8(*file).value_or(0);
+	read_u8(*file).value_or(1);
+	read_u8(*file).value_or(0);
+	read_u8(*file).value_or(0);
+	read_u8(*file).value_or(0);
 	enable_vsync = read_u8(*file).value_or(1);
 	god_mode = read_u8(*file).value_or(0);
-	fake_lag = read_u8(*file).value_or(0);
+	read_u8(*file).value_or(0);
 	preferred_soundfont = read_u16(*file).value_or(0);
-	three_section_mode = read_u8(*file).value_or(0);
-	show_tps_instead_of_score = read_u8(*file).value_or(0);
-	sustain_mode = read_u8(*file).value_or(0);
-	show_sdl_errors = read_u8(*file).value_or(1);
-	soundfont_volume = read_u8(*file).value_or(128);
-	limit_note_velocity = read_u8(*file).value_or(0);
+	read_u8(*file).value_or(0);
+	read_u8(*file).value_or(0);
+	read_u8(*file).value_or(0);
+	read_u8(*file).value_or(1);
+	soundfont_volume = read_u8(*file).value_or(128); 
+	read_u8(*file).value_or(0);
 }
 
 void Configuration::save_to_file() const

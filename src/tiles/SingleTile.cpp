@@ -23,7 +23,8 @@ bool SingleTile::touch_down(uint16_t finger_id, Vec2 pos)
 {
 	if (is_state(&SingleTileDefault))
 	{
-		if (pos.y >= -_level->get_miss_range() && pos.y <= get_tile_length() + _level->get_miss_range())
+		const auto helper = is_active() ? _level->get_miss_range() : 0.0L;
+		if (pos.y >= -helper && pos.y <= get_tile_length() + helper)
 		{
 			TileColumn clicked_column = get_column(pos.x);
 			if (clicked_column == column)

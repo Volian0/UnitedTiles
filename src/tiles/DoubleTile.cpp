@@ -25,7 +25,8 @@ bool DoubleTile::should_die() const
 
 bool DoubleTile::touch_down(uint16_t finger_id, Vec2 pos)
 {
-	if (pos.y >= -_level->get_miss_range() && pos.y <= get_tile_length() + _level->get_miss_range()
+	const auto helper = is_active() ? _level->get_miss_range() : 0.0L;
+	if (pos.y >= -helper && pos.y <= get_tile_length() + helper
 		&& (is_state(&DoubleTileDefault) || is_state(&DoubleTilePartiallyCleared)))
 	{
 		const auto clicked_column = get_column(pos.x);

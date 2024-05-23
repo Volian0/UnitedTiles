@@ -18,8 +18,14 @@ public:
 	const std::string filename;
 	const Number size;
 
+	[[nodiscard]] constexpr auto get_height() const noexcept -> Number
+	{
+		return _height;
+	}
+
 private:
 	void* _ptr;
+	Number _height;
 
 	void unload() override;
 	void reload() override;

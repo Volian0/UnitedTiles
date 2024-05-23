@@ -51,7 +51,9 @@ bool SliderTile::touch_down(uint16_t finger_id, Vec2 pos)
 {
 	if (is_state(&SliderTileDefault))
 	{
-		if (pos.y >= -_level->get_miss_range() && pos.y <= std::min(1.0L, get_tile_length()) + _level->get_miss_range() && in_range(pos))
+		const auto helper = is_active() ? _level->get_miss_range() : 0.0L;
+		//const auto actual_hitbox = std::min(1.0L, get_tile_length()) + helper;
+		if (pos.y >= -helper && pos.y <= std::min(1.0L, get_tile_length()) + helper && in_range(pos))
 		{
 			finger = finger_id;
 			finger_pos = pos;

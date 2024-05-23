@@ -57,12 +57,14 @@ bool LongTile::touch_down(uint16_t finger_id, Vec2 pos)
 {
 	if (is_state(&LongTileDefault))
 	{
-		if (pos.y >= -_level->get_miss_range() && pos.y <= get_tile_length() + _level->get_miss_range())
+		const auto helper = is_active() ? _level->get_miss_range() : 0.0L;
+		const auto actual_hitbox = std::min(1.0L, get_tile_length()) + helper;
+		if (pos.y >= -helper && pos.y <= std::max(get_tile_length(), actual_hitbox))
 		{
 			auto clicked_column = get_column(pos.x);
 			if (clicked_column == column)
 			{
-				if (pos.y <= std::min(1.0L, get_tile_length()) + _level->get_miss_range())
+				if (pos.y <= actual_hitbox)
 				{
 					//y_finger_tapped = pos.y;
 					finger = finger_id;
