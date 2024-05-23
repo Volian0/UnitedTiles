@@ -10,7 +10,7 @@ public:
 	void reset_to_default();
 
 	constexpr static uint16_t audio_sample_rate = 44100;
-	constexpr static bool audio_stereo = true; //false = mono
+	bool audio_stereo = true; //false = mono
 	constexpr static bool enable_particles_burst = false;
 	constexpr static bool enable_particles_dustmotes = true;
 	constexpr static bool enable_hit_markers = false;

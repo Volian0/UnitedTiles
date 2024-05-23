@@ -15,7 +15,7 @@ void Configuration::load_from_file()
 		return;
 	}
 	std::clamp<uint16_t>(read_u16(*file).value_or(44100), 10000, 50000);
-	read_u8(*file).value_or(1);
+	audio_stereo = read_u8(*file).value_or(1);
 	read_u8(*file).value_or(0);
 	read_u8(*file).value_or(1);
 	read_u8(*file).value_or(0);

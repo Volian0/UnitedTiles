@@ -13,11 +13,11 @@ StateSplash::StateSplash(Game* game_) : GameState(game_),
 m_logo{game->renderer.get(), "logo.png"},
 m_white{game->renderer.get(), "white.png"},
 m_font{game->renderer.get(), "roboto.ttf", 6.0L},
-m_text{game->renderer.get(), &m_font, "v0.3.0 by Volian0", Colors::GRAY},
+m_text{game->renderer.get(), &m_font, "v0.3.0 by Volian0", Colors::BLACK},
 m_dustmotes{{32, 32, 32, 255}, game->renderer.get(), "glow.png", 1.0L, 2.0L, 8, 1.0L, 1.0L, 1.0L, 2}
 {
 	//m_dustmotes.dont_spawn = true;
-	m_white.tint = {16, 16, 16, 255};
+	m_white.tint = {0xB0, 0xD0, 0xFF, 255};
 	//_font = std::make_unique<Font>(game->renderer.get(), "roboto.ttf", 10.0L);
 	//_text = std::make_unique<Texture>(game->renderer.get(), _font.get(), "Volian0 presents...", Colors::WHITE);
 }
@@ -46,7 +46,7 @@ void StateSplash::render() const
 	const Number aspect_ratio = game->renderer->get_aspect_ratio();
 
 	game->renderer->render(&m_white, {}, m_white.get_psize(), {}, {1.0L, 1.0L}, {});
-	m_dustmotes.render();
+	//m_dustmotes.render();
 	game->renderer->render(&m_text, {}, m_text.get_psize(), {0.0L, 0.75L}, m_text.get_rsize(), {});
 	game->renderer->render(&m_logo, {}, m_logo.get_psize(), {0.0L, 0.0L}, Vec2{0.5L, 0.5L * aspect_ratio}, {}, {});
 	if (!m_first_tp)
