@@ -66,6 +66,8 @@ public:
 	}
 
 	bool show_tps = false;
+	Vec2 offset{0.0L};
+	Number scale{1.0L};
 
 private:
 	bool was_silent_added = false;
@@ -138,6 +140,7 @@ public:
 	std::optional<Number> game_over_scroll_to;
 
 	ScoreCounter score;
+	ScoreCounter score_tps;
 
 	Number tps = 1.0L;
 

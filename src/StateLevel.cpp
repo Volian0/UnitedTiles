@@ -121,6 +121,7 @@ void LevelBackground::render() const
 
 StateLevel::StateLevel(Game* game_, uint16_t song_id_, std::string_view t_score_filename)
 	:GameState(game_),
+	score_tps{this},
 	score{this},
 	tile_divider{game->renderer.get(), "tile_divider.png"},
 	txt_single_tile{game->renderer.get(), "single_tile.png"},
@@ -141,6 +142,9 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_, std::string_view t_score_
 	lv_bg{this},
 	song_id{song_id_}
 {
+	score_tps.scale = 0.5L;
+	score_tps.offset.y = 0.2L;
+	score_tps.show_tps = true;
 	/*std::vector<ComposerInfo> composers{
 		ComposerInfo{"Franz Liszt", "Hungarian composer, pianist and teacher of the Romantic era", 1811, 1886},
 		ComposerInfo{"Frédéric Chopin", "Polish composer and virtuoso pianist of the Romantic period", 1810, 1849},
@@ -661,7 +665,10 @@ void StateLevel::render() const
 	_burst.render();
 
 	if (_state != State::IDLE || !score.show_tps)
+	{
+		score_tps.render();
 		score.render(); 
+	}
 
 	if (_state == State::IDLE && lbl_maker)
 	{
@@ -845,11 +852,11 @@ void ScoreCounter::render() const
 	{
 		angle = 0.0L;
 	}
-	_level->game->renderer->render(_texture.get(), { 0,0 }, _texture->get_psize(), { 0.00625,-0.84+0.0125*_level->game->renderer->get_aspect_ratio() },
-		{ _texture->get_rsize().x * 0.8L,_texture->get_rsize().y*diff }, { 0,-0.84 }, {}, angle);
+	_level->game->renderer->render(_texture.get(), { 0,0 }, _texture->get_psize(), Vec2{offset.x, offset.y * _level->game->renderer->get_aspect_ratio()} + Vec2{ 0.00625 * scale,-0.84+0.0125*_level->game->renderer->get_aspect_ratio() * scale},
+		Vec2{ _texture->get_rsize().x * 0.8L,_texture->get_rsize().y*diff } * scale, { 0,-0.84 }, {}, angle);
 	_texture->tint = {255,255,255,255};
-	_level->game->renderer->render(_texture.get(), { 0,0 }, _texture->get_psize(), { 0,-0.84 },
-		{ _texture->get_rsize().x * 0.8L,_texture->get_rsize().y*diff }, { 0.00625,-0.84+0.0125*_level->game->renderer->get_aspect_ratio() }, {}, angle);
+	_level->game->renderer->render(_texture.get(), { 0,0 }, _texture->get_psize(),  Vec2{offset.x, offset.y * _level->game->renderer->get_aspect_ratio()} +Vec2{ 0,-0.84 },
+		Vec2{ _texture->get_rsize().x * 0.8L,_texture->get_rsize().y*diff } * scale, { 0.00625,-0.84+0.0125*_level->game->renderer->get_aspect_ratio() }, {}, angle);
 }
 
 void ScoreCounter::set(uint32_t value)
