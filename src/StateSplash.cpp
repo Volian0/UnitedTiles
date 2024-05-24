@@ -13,7 +13,7 @@ StateSplash::StateSplash(Game* game_) : GameState(game_),
 m_logo{game->renderer.get(), "logo.png"},
 m_white{game->renderer.get(), "white.png"},
 m_font{game->renderer.get(), "roboto.ttf", 6.0L},
-m_text{game->renderer.get(), &m_font, "v0.3.0 by Volian0", Colors::BLACK},
+m_text{game->renderer.get(), &m_font, "v0.3.0 by Gabriel Hinca", Colors::BLACK},
 m_dustmotes{{32, 32, 32, 255}, game->renderer.get(), "glow.png", 1.0L, 2.0L, 8, 1.0L, 1.0L, 1.0L, 2}
 {
 	//m_dustmotes.dont_spawn = true;

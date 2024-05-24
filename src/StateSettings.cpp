@@ -25,14 +25,14 @@ StateSettings::StateSettings(Game* game_)
 	cb_c.blend_mode = 1;
 	scrollable_panel.origin = Vec2{ 0, -1 };
 	//append check boxes
-	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Stereo audio", game->renderer.get()), std::forward_as_tuple(game->cfg->audio_stereo));
+	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Stereo Audio", game->renderer.get()), std::forward_as_tuple(game->cfg->audio_stereo));
 	//check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Burst particles", game->renderer.get()), std::forward_as_tuple(game->cfg->enable_particles_burst));
 	//check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "DustMotes particles", game->renderer.get()), std::forward_as_tuple(game->cfg->enable_particles_dustmotes));
 	//check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Show debug hit markers", game->renderer.get()), std::forward_as_tuple(game->cfg->enable_hit_markers));
 	//check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Show FPS", game->renderer.get()), std::forward_as_tuple(game->cfg->show_fps));
 	//check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Show debug information", game->renderer.get()), std::forward_as_tuple(game->cfg->show_gameplay_debug_info));
 	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Enable V-Sync", game->renderer.get()), std::forward_as_tuple(game->cfg->enable_vsync));
-	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "God mode", game->renderer.get()), std::forward_as_tuple(game->cfg->god_mode));
+	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Auto Mode", game->renderer.get()), std::forward_as_tuple(game->cfg->god_mode));
 	//check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Fake lag", game->renderer.get()), std::forward_as_tuple(game->cfg->fake_lag));
 	//check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Smooth tempo for laps", game->renderer.get()), std::forward_as_tuple(game->cfg->three_section_mode));
 	//check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Show TPS as score", game->renderer.get()), std::forward_as_tuple(game->cfg->show_tps_instead_of_score));
