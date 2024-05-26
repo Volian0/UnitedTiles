@@ -4,6 +4,8 @@
 #include "GameState.h"
 #include "FpsCounter.h"
 #include "AudioDevice.h"
+#include "AdManager.hpp"
+#include "Timepoint.h"
 
 #include <memory>
 #include <string_view>
@@ -20,6 +22,8 @@ public:
 	void stop();
 
 	void append_cfg();
+
+	AdManager ad_manager;
 
 	template<typename T, typename... Args>
 	void change_state(Args&&... args)

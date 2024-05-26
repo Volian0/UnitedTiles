@@ -31,6 +31,8 @@ void Configuration::load_from_file()
 	read_u8(*file).value_or(1);
 	soundfont_volume = read_u8(*file).value_or(128); 
 	read_u8(*file).value_or(0);
+	show_banner_ads = read_u8(*file).value_or(1); 
+	show_interstitial_ads = read_u8(*file).value_or(1); 
 }
 
 void Configuration::save_to_file() const
@@ -54,6 +56,8 @@ void Configuration::save_to_file() const
 		write_u8(*file, show_sdl_errors);
 		write_u8(*file, soundfont_volume);
 		write_u8(*file, limit_note_velocity);
+		write_u8(*file, show_banner_ads);
+		write_u8(*file, show_interstitial_ads);
 		file->close();
 		if (!file.value())
 		{

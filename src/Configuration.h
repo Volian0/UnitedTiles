@@ -26,4 +26,6 @@ public:
 	constexpr static bool show_sdl_errors = false;
 	uint8_t soundfont_volume = 128; // x^3 / 2097152
 	constexpr static bool limit_note_velocity = false; 
+	bool show_banner_ads = true;
+	bool show_interstitial_ads = true;
 };

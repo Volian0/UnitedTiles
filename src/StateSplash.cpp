@@ -13,7 +13,9 @@ StateSplash::StateSplash(Game* game_) : GameState(game_),
 m_logo{game->renderer.get(), "logo.png"},
 m_white{game->renderer.get(), "white.png"},
 m_font{game->renderer.get(), "roboto.ttf", 6.0L},
+m_font2{game->renderer.get(), "roboto.ttf", 3.0L},
 m_text{game->renderer.get(), &m_font, "v0.3.0 by Gabriel Hinca", Colors::BLACK},
+m_text2{game->renderer.get(), &m_font2, "Additional songs by JKen777, NathanTalksTech, pszemyslavv_", Colors::GRAY},
 m_dustmotes{{32, 32, 32, 255}, game->renderer.get(), "glow.png", 1.0L, 2.0L, 8, 1.0L, 1.0L, 1.0L, 2}
 {
 	//m_dustmotes.dont_spawn = true;
@@ -48,6 +50,7 @@ void StateSplash::render() const
 	game->renderer->render(&m_white, {}, m_white.get_psize(), {}, {1.0L, 1.0L}, {});
 	//m_dustmotes.render();
 	game->renderer->render(&m_text, {}, m_text.get_psize(), {0.0L, 0.75L}, m_text.get_rsize(), {});
+	game->renderer->render(&m_text2, {}, m_text2.get_psize(), {0.0L, 0.85L}, m_text2.get_rsize(), {});
 	game->renderer->render(&m_logo, {}, m_logo.get_psize(), {0.0L, 0.0L}, Vec2{0.5L, 0.5L * aspect_ratio}, {}, {});
 	if (!m_first_tp)
 	{

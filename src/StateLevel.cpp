@@ -142,6 +142,12 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_, std::string_view t_score_
 	lv_bg{this},
 	song_id{song_id_}
 {
+	    game->ad_manager.load_big_ad();
+
+	    if (game_->cfg->show_banner_ads)
+    {
+        game_->ad_manager.show_banner();
+    }
 	score_tps.scale = 0.5L;
 	score_tps.offset.y = 0.2L;
 	score_tps.show_tps = true;
@@ -786,6 +792,10 @@ void StateLevel::change_tempo(Number new_tps, const Timepoint& tp_now, Number po
 
 void StateLevel::game_over(Tile* tile)
 {
+	if (game->cfg->show_interstitial_ads && game->ad_manager.can_show_big_ad())
+    {
+        game->ad_manager.show_big_ad();
+    }
 	score.silent_update();
 	game_over_tile = tile;
 	//change_tempo(0, new_tp, _position);

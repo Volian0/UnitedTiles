@@ -7,11 +7,14 @@ android {
 signingConfigs {
 
 	release {
-       storeFile file("$System.env.RELEASE_STORE_FILE")
+       /*storeFile file("$System.env.RELEASE_STORE_FILE")
        storePassword "$System.env.RELEASE_STORE_PASSWORD"
        keyAlias "$System.env.RELEASE_KEY_ALIAS"
-       keyPassword "$System.env.RELEASE_KEY_PASSWORD"
-       // Optional, specify signing versions used
+       keyPassword "$System.env.RELEASE_KEY_PASSWORD"*/
+       storeFile file("$System.env.MP_REL_STORE_FILE")
+       storePassword "$System.env.MP_REL_STORE_PASSWORD"
+       keyAlias "$System.env.MP_REL_KEY_ALIAS"
+       keyPassword "$System.env.MP_REL_KEY_PASSWORD" 
        v1SigningEnabled true
        v2SigningEnabled true
    }
@@ -25,8 +28,8 @@ signingConfigs {
         applicationId "com.volian.unitedtiles"
         minSdkVersion 23
         targetSdkVersion 34
-        versionCode 8
-        versionName "0.3.0"
+        versionCode 9
+        versionName "0.3.1"
         ndk {
             abiFilters 'armeabi-v7a'
         }
@@ -55,3 +58,8 @@ signingConfigs {
         jniLibs.useLegacyPackaging true
     }*/
 }
+
+ dependencies {
+    implementation "com.google.android.gms:play-services-games-v2:+"
+    implementation 'com.google.android.gms:play-services-ads:23.0.0'
+  }
