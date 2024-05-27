@@ -165,6 +165,10 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_, std::string_view t_score_
 		ComposerInfo{"Camille Saint-Saëns", "French composer, organist, conductor and pianist of the Romantic era", 1835, 1921},							//10
 		ComposerInfo{"Johannes Brahms", "German composer, pianist, and conductor of the mid-Romantic period", 1833, 1897},									//11
 		ComposerInfo{"Nikolay Nekrasov", "Russian poet, writer, critic and publisher", 1821, 1877},															//12
+		ComposerInfo{"Carl Bohm", "German pianist and composer", 1844, 1920},//13
+		ComposerInfo{"Robert Schumann", "German composer, pianist and music critic", 1810, 1856},//14
+		ComposerInfo{"Amédée Méreaux", "French composer, pianist, piano teacher, musicologist and music critic", 1802, 1874},//15
+		ComposerInfo{"Johann Sebastian Bach", "German composer and musician of the late Baroque period", 1685, 1750},//16
 	};
 	
 	std::vector<SongBasicInfo> songs{
@@ -195,7 +199,21 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_, std::string_view t_score_
 		SongBasicInfo{1861, "Korobeiniki", "Nekrasov dedicated it to Gavriil Zakharov", "Korobeiniki", {12}, 2, 1, "NathanTalksTech"},
 		SongBasicInfo{1886, "Le cygne", "originally scored for solo cello accompanied by two pianos", "Le cygne", {10}, 1, 3, "NathanTalksTech"},
 		SongBasicInfo{1881, "Nuages gris", "one of Liszt's most experimental works", "Nuages gris", {0}, 0, 0, "pszemyslavv_"},
-		SongBasicInfo{1839, "Prelude Op. 28, No. 1", "dedicated to Camille Pleyel", "Prelude Op 28 No 1", {1}, 2, 2, "JKen777"}								//24
+		SongBasicInfo{1839, "Prelude Op. 28, No. 1", "dedicated to Camille Pleyel", "Prelude Op 28 No 1", {1}, 2, 2, "JKen777"},								//24
+
+		SongBasicInfo{0, "The Fountain", "", "The Fountain", {13}, 0, 0, "NathanTalksTech"}	,							//25
+		SongBasicInfo{0, "Prélude Opus 28, No. 7 in A Major", "", "Prelude Opus 28 No 7 in A Major", {1}, 0, 0},								//26
+		SongBasicInfo{0, "Carnaval Op. 9, No. 12", "", "Carnaval Op 9 No 12", {14}, 0, 0}			,					//27
+
+		SongBasicInfo{0, "Grande Etude Op. 63, No. 24", "", "Etude Op 63 No 24 Bravura", {15}, 0, 0, "JKen777"},								//28
+		SongBasicInfo{0, "Prelude in C minor Op. 28, No. 20", "", "Prelude Op 28 No 20", {1}, 0, 0, "JKen777"}	,							//29
+		SongBasicInfo{0, "Invention No. 1 in C Major, BWV 772", "", "Invention No 1 in C Major BWV 772", {16}, 0, 0, "JKen777"},								//30
+		SongBasicInfo{0, "Invention No. 2 in C Minor, BWV 773", "", "Invention 2 in C Minor BWV 773", {16}, 0, 0, "JKen777"}	,							//31
+		SongBasicInfo{0, "Invention No. 3 in D Major, BWV 774", "", "Invention 3 in D Major BWV 774", {16}, 0, 0, "JKen777"}	,							//32
+		SongBasicInfo{0, "Wiegenlied Op. 49, No. 4", "", "Wiegenlied Op 49 No 4", {11}, 0, 0, "JKen777"}	,							//33
+		SongBasicInfo{0, "Invention No. 4 in D Minor, BWV 775", "", "Invention 4 in D minor BWV 775", {16}, 0, 0, "JKen777"},								//34
+		SongBasicInfo{0, "Grande Etude Op. 63, No. 60", "", "Grande Etude Op 63 No 60", {15}, 0, 0, "JKen777"}								//35
+
 	};
 
 	SongDatabase database;
@@ -231,7 +249,19 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_, std::string_view t_score_
 		{21, songs.at(21)},
 		{22, songs.at(22)},
 		{23, songs.at(23)},
-		{24, songs.at(24)}
+		{24, songs.at(24)},
+
+		{25, songs.at(25)},
+		{26, songs.at(26)},
+		{27, songs.at(27)},
+		{28, songs.at(28)},
+		{29, songs.at(29)},
+		{30, songs.at(30)},
+		{31, songs.at(31)},
+		{32, songs.at(32)},
+		{34, songs.at(34)},
+		{33, songs.at(33)},
+		{35, songs.at(35)},
 		};
 	auto ofile = open_ofile("songs.db");
 	database.to_file(ofile.value());
@@ -792,10 +822,6 @@ void StateLevel::change_tempo(Number new_tps, const Timepoint& tp_now, Number po
 
 void StateLevel::game_over(Tile* tile)
 {
-	if (game->cfg->show_interstitial_ads && game->ad_manager.can_show_big_ad())
-    {
-        game->ad_manager.show_big_ad();
-    }
 	score.silent_update();
 	game_over_tile = tile;
 	//change_tempo(0, new_tp, _position);
@@ -815,6 +841,10 @@ void StateLevel::game_over(Tile* tile)
 		user_database.load_from_files();
 		user_database.update_score(song_id, lap_id, score.get_score(), perfect_score);
 	}
+	if (game->cfg->show_interstitial_ads && game->ad_manager.can_show_big_ad())
+    {
+        game->ad_manager.show_big_ad();
+    }
 }
 
 ScoreCounter::ScoreCounter(StateLevel* level_, uint32_t init_value)
