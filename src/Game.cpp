@@ -165,6 +165,7 @@ void Game::run()
 			}
 			else
 			{
+				//SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "United Tiles - SDL Error", "bg", nullptr);
 				std::this_thread::sleep_for(std::chrono::milliseconds(10));
 				continue;
 			}

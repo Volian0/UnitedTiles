@@ -242,6 +242,7 @@ SongBasicInfo::SongBasicInfo(std::ifstream& file)
 	}
 	unlockable_type = read_u8(file).value();
 	unlockable_amount = read_u16(file).value();
+	leaderboard_id = read_string(file).value();
 }
 
 void SongBasicInfo::to_file(std::ofstream& file) const
@@ -258,6 +259,7 @@ void SongBasicInfo::to_file(std::ofstream& file) const
 	}
 	write_u8(file, unlockable_type);
 	write_u16(file, unlockable_amount);
+	write_string(file, leaderboard_id);
 }
 
 SongScore::SongScore(std::ifstream& file)

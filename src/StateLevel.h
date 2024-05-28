@@ -199,5 +199,7 @@ private:
 
 	std::shared_ptr<Soundfont> soundfont;
 
+	std::string scoreboard_id;
+
 	void game_over(Tile*);
 };

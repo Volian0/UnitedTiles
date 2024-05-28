@@ -216,6 +216,8 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_, std::string_view t_score_
 
 	};
 
+	songs.at(4).leaderboard_id = "CgkIze-zr88ZEAIQAQ"; 
+
 	SongDatabase database;
 
 	for (uint16_t i = 0; i < composers.size(); ++i)
@@ -322,6 +324,10 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_, std::string_view t_score_
 			{
 				if (id == song_id)
 				{
+					if (!info.leaderboard_id.empty())
+					{
+						scoreboard_id = info.leaderboard_id;
+					}
 					filename = info.filename + ".usong";
 					if (!info.maker.empty()) {
 					Font maker_font{game->renderer.get(), "roboto.ttf", 8.0L};
@@ -503,6 +509,10 @@ void StateLevel::update()
 
 	if (game_over_reset.has_value() && new_tp - game_over_reset.value() > 2.0L)
 	{
+		if (game->cfg->show_interstitial_ads && game->ad_manager.can_show_big_ad())
+		{
+			game->ad_manager.show_big_ad();
+		}
 		return game->change_state<StateSongMenu>();
 	}
 
@@ -826,13 +836,14 @@ void StateLevel::game_over(Tile* tile)
 	game_over_tile = tile;
 	//change_tempo(0, new_tp, _position);
 	previous_position = _position;
-	_state = State::GAME_OVER;
+	_state = State::GAME_OVER; 
 	soundfont->play_all_events();
 	soundfont->add_event(new_tp, NoteEvent(NoteEvent::Type::ALL_OFF));
 	const std::uint16_t game_over_velocity = game->cfg->limit_note_velocity ? 72 : 127;
 	soundfont->add_event(new_tp, NoteEvent(NoteEvent::Type::ON, 48, game_over_velocity));
 	soundfont->add_event(new_tp, NoteEvent(NoteEvent::Type::ON, 52, game_over_velocity));
 	soundfont->add_event(new_tp, NoteEvent(NoteEvent::Type::ON, 55, game_over_velocity));
+	soundfont->add_event(new_tp + 2.0L, NoteEvent(NoteEvent::Type::ALL_OFF));
 	game_over_reset = new_tp;
 
 	if (game->cfg->god_mode == false && save_score)
@@ -840,11 +851,11 @@ void StateLevel::game_over(Tile* tile)
 		SongUserDatabase user_database;
 		user_database.load_from_files();
 		user_database.update_score(song_id, lap_id, score.get_score(), perfect_score);
+		if (!scoreboard_id.empty())
+		{
+			submit_score(scoreboard_id, score.get_score()); 
+		}
 	}
-	if (game->cfg->show_interstitial_ads && game->ad_manager.can_show_big_ad())
-    {
-        game->ad_manager.show_big_ad();
-    }
 }
 
 ScoreCounter::ScoreCounter(StateLevel* level_, uint32_t init_value)

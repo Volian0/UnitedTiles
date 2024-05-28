@@ -31,6 +31,8 @@ struct SongPanel
     //bool locked = false;
     mutable std::optional<Label> req_amount_label;
     //DevButton details_button;
+    std::optional<DevButton> leaderboard_button; 
+    std::string leaderboard_id;
 
     void change_position(Number y_pos);
     void render(class StateSongMenu& state_song_menu) const;
@@ -58,6 +60,8 @@ private:
     mutable std::array<Texture, 4> medal_textures;
     mutable Texture glass_icon;
     mutable Texture settings_gear;
+        mutable Texture txt_icons;
+
     std::deque<uint16_t> allowed_song_ids;
     std::vector<SongPanel> song_panels;
     Texture _dev_button_texture;

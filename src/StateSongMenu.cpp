@@ -3,6 +3,7 @@
 #include "Game.h"
 #include "File.h"
 #include "Path.h"
+#include "AdManager.hpp"
 #include "StateLevel.h"
 #include "ui/Label.h"
 #include "RNG.h"
@@ -22,6 +23,8 @@ StateSongMenu::StateSongMenu(Game* game_)
     txt_white{game->renderer.get(), "white.png"},
     font32{game->renderer.get(), "roboto.ttf", 6.25L * 0.75L},
     font24{game->renderer.get(), "roboto.ttf", 4.6875L * 0.75L},
+        txt_icons{game->renderer.get(), "misc_icons.png"},
+
     //font16{game->renderer.get(), "roboto.ttf", 3.125L * 0.75L},
     medal_textures{Texture{game->renderer.get(), "medal_bronze.png"}, Texture{game->renderer.get(), "medal_silver.png"},Texture{game->renderer.get(), "medal_gold.png"},Texture{game->renderer.get(), "cup.png"}},
     input_song{last_search, get_x_size(432), {get_x_pos(274), 0.0L}, &font24, this, &txt_white},
@@ -29,6 +32,9 @@ StateSongMenu::StateSongMenu(Game* game_)
     glass_icon{game->renderer.get(), "glass.png"},
     settings_button{Vec2{get_x_pos(482.0L), 0.0L}, get_x_size(40.0L), 0, " ", &_dev_button_texture, &font24, this, 0.0625L * 0.625L}
 {
+        txt_icons.blend_mode = 1;
+    txt_icons.tint = {16, 16, 16, 255};
+
     settings_gear.blend_mode = 1;
     glass_icon.blend_mode = 1;
     glass_icon.tint = {96, 96, 96, 255};
@@ -59,10 +65,16 @@ StateSongMenu::StateSongMenu(Game* game_)
             {},
             0,
             song_id,
-            {{get_x_pos(414), 0}, get_x_size(144), 0, (last_song && *last_song == song_id) ? "Replay" : "Play", &_dev_button_texture, &font32, this, 0.0625L * 0.75L},
+            !song_info.leaderboard_id.empty() ? DevButton{{get_x_pos(414 + (144/2 - 64/2)), 0}, get_x_size(64), 0, "", &_dev_button_texture, &font32, this, 0.0625L * 0.75L} : DevButton{{get_x_pos(414), 0}, get_x_size(144), 0, (last_song && *last_song == song_id) ? "Replay" : "Play", &_dev_button_texture, &font32, this, 0.0625L * 0.75L},
             song_info.unlockable_type,
             song_info.unlockable_amount 
         });
+        if (!song_info.leaderboard_id.empty())
+        {
+            song_panel.leaderboard_button.emplace(Vec2{get_x_pos(414 - (144/2 - 64/2)), 0}, get_x_size(64), 0, "", &_dev_button_texture, &font32, this, 0.0625L * 0.75L);
+            song_panel.leaderboard_button->spanel = &spanel;
+            song_panel.leaderboard_id = song_info.leaderboard_id;
+        }
         song_panel.play_button.spanel = &spanel;
         if (song_scores.count(song_id))
         {
@@ -279,6 +291,8 @@ void StateSongMenu::update()
 
         //set play button
             song_panel.play_button.position.y = get_y_pos(play_y_pos + current_y_pixel_position, aspect_ratio, scroll_offset);
+            if (song_panel.leaderboard_button)
+            song_panel.leaderboard_button->position.y = song_panel.play_button.position.y;
 
         /*if (scrolled || spanel.is_scrolled())
             song_panel.play_button.clear_held();*/
@@ -286,12 +300,20 @@ void StateSongMenu::update()
         if (song_panel.req_amount_label)
             continue;
         if (spanel.is_scrolled() || scrolled)
-            song_panel.play_button.clear_held();
+            {song_panel.play_button.clear_held();
+            if (song_panel.leaderboard_button)
+            {
+                song_panel.leaderboard_button->clear_held();
+            }}
         if (song_panel.play_button.update())
 	    {
             last_song = song_panel.song_id;
 		    return game->change_state<StateLevel>(uint16_t(song_panel.song_id));
 	    }
+        else if (song_panel.leaderboard_button && song_panel.leaderboard_button->update())
+        {
+            show_leaderboard(song_panel.leaderboard_id);
+        }
     }
 
     //finally, check button events
@@ -445,7 +467,17 @@ void StateSongMenu::render() const
             song_panel.req_amount_label->render(game->renderer.get());
         }
         else
-            song_panel.play_button.render();
+        {
+             song_panel.play_button.render();
+             if (song_panel.leaderboard_button){
+                    const Vec2 icon_size{get_x_size(32),get_y_size(32,aspect_ratio)};
+              song_panel.leaderboard_button->render();
+              game->renderer->render(&txt_icons, {64, 64}, {64, 64},
+            song_panel.play_button.position, icon_size, {});
+            game->renderer->render(&txt_icons, {64*3, 64}, {64, 64},
+            song_panel.leaderboard_button->position, icon_size, {});
+              }
+        }
         for (uint8_t i = 0; i < 4; ++i)
         {
             const Color prev_color = medal_textures[i].tint;

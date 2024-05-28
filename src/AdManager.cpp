@@ -10,6 +10,39 @@
 
 extern "C"
 {
+    JNIEXPORT void JNICALL Java_com_volian_unitedtiles_UnitedTilesActivity_showLeaderboard(JNIEnv* env,
+                                                                                                   jobject obj, std::string_view str)
+    {
+        jclass clazz = env->FindClass("com/volian/unitedtiles/UnitedTilesActivity");
+        if (clazz == nullptr)
+            throw std::runtime_error("class not found");
+        ; // Class not found
+
+        jmethodID methodId = env->GetMethodID(clazz, "showLeaderboard", "(Ljava/lang/String;)V");
+        if (methodId == nullptr)
+            throw std::runtime_error("method not found"); // Method not found
+
+        jstring jstr = env->NewStringUTF(str.data());
+        env->CallVoidMethod(obj, methodId, jstr);
+    }
+
+    JNIEXPORT void JNICALL Java_com_volian_unitedtiles_UnitedTilesActivity_submitScore(JNIEnv* env,
+                                                                                                   jobject obj, std::string_view str, long score)
+    {
+        jclass clazz = env->FindClass("com/volian/unitedtiles/UnitedTilesActivity");
+        if (clazz == nullptr)
+            throw std::runtime_error("class not found");
+        ; // Class not found
+
+        jmethodID methodId = env->GetMethodID(clazz, "submitScore", "(Ljava/lang/String;J)V");
+        if (methodId == nullptr)
+            throw std::runtime_error("method not found"); // Method not found
+
+        jstring jstr = env->NewStringUTF(str.data());
+        jlong jscore = score;
+        env->CallVoidMethod(obj, methodId, jstr, jscore);
+    }
+
     JNIEXPORT void JNICALL Java_com_volian_unitedtiles_UnitedTilesActivity_testShowAd(JNIEnv* env,
                                                                                                    jobject obj)
     {
@@ -73,9 +106,30 @@ void call_java_function(std::string_view t_function)
             (JNIEnv*)SDL_AndroidGetJNIEnv(), (jobject)SDL_AndroidGetActivity());
     }
 }
+
+void submit_score(std::string_view t_leaderboard_id, long t_score)
+{
+          Java_com_volian_unitedtiles_UnitedTilesActivity_submitScore((JNIEnv*)SDL_AndroidGetJNIEnv(),
+                                                                                (jobject)SDL_AndroidGetActivity(), t_leaderboard_id, t_score);
+                                                                                
+}
+void show_leaderboard(std::string_view t_leaderboard_id)
+{
+        Java_com_volian_unitedtiles_UnitedTilesActivity_showLeaderboard((JNIEnv*)SDL_AndroidGetJNIEnv(),
+                                                                                (jobject)SDL_AndroidGetActivity(), t_leaderboard_id);
+}
+
 #else
 void call_java_function(std::string_view t_function)
 {
+}
+void submit_score(std::string_view t_leaderboard_id, long t_score)
+{
+
+}
+void show_leaderboard(std::string_view t_leaderboard_id)
+{
+    
 }
 #endif
 

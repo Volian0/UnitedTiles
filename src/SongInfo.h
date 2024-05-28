@@ -8,6 +8,7 @@
 #include <map>
 #include <fstream>
 #include <array>
+#include <optional>
 #include <set>
 
 struct NoteEvent
@@ -94,8 +95,10 @@ struct SongBasicInfo
 	std::vector<uint16_t> composer_ids;
 	uint8_t unlockable_type = 0; //0: free, 1: bronze, 2: silver, 3: gold, 4: diamond
 	uint16_t unlockable_amount = 0;
+	std::string leaderboard_id;
 	SongBasicInfo() = default;
-	[[deprecated]] SongBasicInfo(uint16_t a1, std::string a2, std::string a3, std::string a4, std::vector<uint16_t> a5, uint8_t a6 = 0, uint16_t a7 = 0, const std::string& t_maker = {})
+	[[deprecated]] SongBasicInfo(uint16_t a1, std::string a2, std::string a3, std::string a4, std::vector<uint16_t> a5, uint8_t a6 = 0, uint16_t a7 = 0, const std::string& t_maker = {},
+	const std::string& leaderboard_id_ = {})
 	{
 		create_year = a1;
 		name = a2;
@@ -105,6 +108,7 @@ struct SongBasicInfo
 		composer_ids = a5;
 		unlockable_type = a6;
 		unlockable_amount = a7;
+		leaderboard_id = leaderboard_id_;
 	}
 	SongBasicInfo(std::ifstream& file);
 	void to_file(std::ofstream& file) const;

@@ -55,17 +55,25 @@ import com.google.android.gms.ads.rewarded.RewardItem;
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
 import com.google.android.gms.ads.OnUserEarnedRewardListener;
 
+import com.google.android.gms.games.PlayGamesSdk;
+import com.google.android.gms.games.GamesSignInClient;
+import com.google.android.gms.games.PlayGames;
+import com.google.android.gms.tasks.OnSuccessListener;
+import android.content.Intent;
+
 public class UnitedTilesActivity extends SDLActivity {
     public AdView adViewB = null;
     public AdSize adSizeB = null;
     public boolean resizeOnce = false;
     public boolean showBigOnce = false;
     public boolean adLoaded = false;
+    public boolean canUseSDK = false;
+    public int resumedOnce = 0;
     //private static MinesweeperPillarActivity activity;
 
     public InterstitialAd mInterstitialAd;
 
-
+    private static final int RC_LEADERBOARD_UI = 9004;
 
     public void resizeWindowAd() {
         if (!resizeOnce) {
@@ -212,11 +220,73 @@ public class UnitedTilesActivity extends SDLActivity {
         });
     }
 
+    public void submitScore(String leaderboardId, long score)
+    {
+        if (!canUseSDK)
+        {
+            return;
+        }
+        Activity activity = this;
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // Your UI update logic goes here
+                PlayGames.getLeaderboardsClient(activity)
+    .submitScore(leaderboardId, score);
+            }
+        });
+    }
+
+public void showLeaderboard(String leaderboardId)
+    {
+        if (!canUseSDK)
+        {
+            return;
+        }
+        Activity activity = this;
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // Your UI update logic goes here
+                PlayGames.getLeaderboardsClient(activity)
+      .getLeaderboardIntent(leaderboardId)
+      .addOnSuccessListener(new OnSuccessListener<Intent>() {
+        @Override
+        public void onSuccess(Intent intent) {
+          startActivityForResult(intent, RC_LEADERBOARD_UI);
+        }
+      });
+
+            }
+        });
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
+        adViewB = null;
+        adSizeB = null;
+        resizeOnce = false;
+        showBigOnce = false;
+        adLoaded = false;
+        resumedOnce = 0;
+        canUseSDK = false;
         super.onCreate(savedInstanceState);
         MobileAds.initialize(this, new OnInitializationCompleteListener() {
             @Override
             public void onInitializationComplete(InitializationStatus initializationStatus) {}
         });
+        PlayGamesSdk.initialize(this);
+        GamesSignInClient gamesSignInClient = PlayGames.getGamesSignInClient(this);
+
+        gamesSignInClient.isAuthenticated().addOnCompleteListener(isAuthenticatedTask -> {
+        boolean isAuthenticated =
+            (isAuthenticatedTask.isSuccessful() &&
+            isAuthenticatedTask.getResult().isAuthenticated());
+
+        if (isAuthenticated) {
+           canUseSDK = true;
+        }
+        });
+
     }
 }

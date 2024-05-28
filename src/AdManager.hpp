@@ -2,6 +2,10 @@
 
 #include <atomic>
 #include <chrono>
+#include <string_view>
+
+void submit_score(std::string_view t_leaderboard_id, long t_score);
+void show_leaderboard(std::string_view t_leaderboard_id);
 
 class AdManager final
 {
