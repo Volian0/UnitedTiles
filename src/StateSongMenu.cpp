@@ -462,7 +462,7 @@ void StateSongMenu::render() const
         {
             auto& medal_texture = medal_textures.at(song_panel.req_type - 1);
             game->renderer->render(&medal_texture, {}, medal_texture.get_psize(),
-            {song_panel.play_button.position.x - get_x_size(4) * 2.0L, song_panel.play_button.position.y}, locked_medal_size, {}, {1, 0});
+            {get_x_pos(414) - get_x_size(4) * 2.0L, song_panel.play_button.position.y}, locked_medal_size, {}, {1, 0});
             song_panel.req_amount_label->position.y = song_panel.play_button.position.y;
             song_panel.req_amount_label->render(game->renderer.get());
         }
