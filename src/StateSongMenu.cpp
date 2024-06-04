@@ -58,9 +58,16 @@ StateSongMenu::StateSongMenu(Game* game_)
     std::array<uint16_t, 4> medal_n{0,0,0,0};
     for (const auto& [song_id, song_info] : song_database.songs_infos)
     {
+        std::string composers_string;
+        for (const auto& composer_id : song_info.composer_ids)
+        {
+            composers_string += std::string(composer_names.at(composer_id)) + ", ";
+        }
+        composers_string.pop_back();
+        composers_string.pop_back();
         auto& song_panel = song_panels.emplace_back(SongPanel{
             Label{song_info.name, get_x_size(380), Vec2{get_x_pos(106), 0}, Vec2{-1,0}, &font32, game->renderer.get()},
-            Label{composer_names.at(song_info.composer_ids.at(0)).data(), get_x_size(220), Vec2{get_x_pos(106), 0}, Vec2{-1,0}, &font24, game->renderer.get()},
+            Label{composers_string, get_x_size(220), Vec2{get_x_pos(106), 0}, Vec2{-1,0}, &font24, game->renderer.get()},
             {},
             {},
             0,

@@ -716,7 +716,7 @@ void StateLevel::render() const
 		score.render(); 
 	}
 
-	if (_state == State::IDLE && lbl_maker)
+	if (_state == State::IDLE && lbl_maker && false)
 	{
 		const Vec2 orig_position = lbl_maker->position;
 		lbl_maker->position += Vec2{0.00625L * 0.75L, 0.0125*game->renderer->get_aspect_ratio() * 0.75L};

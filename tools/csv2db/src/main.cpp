@@ -135,7 +135,7 @@ try
 
     std::set<std::string> songs_in_db;
     std::cout << "doing song db" << std::endl;
-
+    std::vector<std::uint16_t> ids;
     {
         io::CSVReader<5, io::trim_chars<' ', '\t'>, io::double_quote_escape<',', '"'>> csv("United Tiles Songs - Song Database.csv");
             csv.read_header(io::ignore_extra_column, "Song Name", "Filename", "Unlockable Type", "Unlockable Amount", "Leaderboard ID");
@@ -153,6 +153,7 @@ try
                 throw std::runtime_error("Duplicated database song " + song_name);
             }
             songs_in_db.emplace(song_name);
+            ids.emplace_back(songs_name_map.at(song_name));
             auto& song = songs.at(songs_name_map.at(song_name));
             const auto get_unlockable = [&](std::string_view t_string){
                 if (t_string.empty())
@@ -209,9 +210,9 @@ try
     {
         song_database.composers_infos.emplace_back(p);
     }
-    for (const auto& p : songs)
+    for (const auto& id : ids)
     {
-        song_database.songs_infos.emplace_back(p);
+        song_database.songs_infos.emplace_back(id, songs.at(id));
     }
     {
     std::ofstream file("songs.db", std::ios::binary | std::ios::trunc);
