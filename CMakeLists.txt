@@ -49,3 +49,13 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
         ${SDL2_LIBRARIES} ${SDL2IMAGE_LIBRARIES} ${SDL2TTF_LIBRARIES})
+
+        project(csv2db)
+        add_executable(csv2db tools/csv2db/src/main.cpp)
+        
+        target_include_directories(${PROJECT_NAME} PRIVATE
+                include ${SDL2_INCLUDE_DIRS} ${SDL2IMAGE_INCLUDE_DIRS} ${SDL2TTF_INCLUDE_DIRS})
+        
+        target_link_libraries(${PROJECT_NAME} PRIVATE
+        ${UT_LIBRARIES})
+        
