@@ -41,7 +41,7 @@ auto split_string(std::string_view t_string, std::string_view t_delimiter, bool 
 	return strings;
 }
 
-int main()
+int main(int args_size, char** args)
 try
 {
     std::map<std::uint16_t, ComposerInfo> composers;
