@@ -6,6 +6,7 @@ Label::Label(const std::string& label_text, Number max_width_, Vec2 position_, V
 	max_width{max_width_},
 	position{position_}
 {
+	label_text_texture->tint = {0, 0, 0, 255};
 }
 
 void Label::render(Renderer* renderer) const

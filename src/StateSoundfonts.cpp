@@ -194,7 +194,7 @@ void StateSoundfonts::update()
 void StateSoundfonts::render() const
 {
     const auto aspect_ratio = game->renderer->get_aspect_ratio();
-    txt_white.tint = {16, 16, 16, 255};
+    txt_white.tint = {0xB0, 0xD0, 0xFF, 255};
     game->renderer->render(&txt_white, {}, txt_white.get_psize(),
     {}, {1.0L, 1.0L}, {});
 
@@ -215,7 +215,7 @@ void StateSoundfonts::render() const
     {
         volume_string = "Volume: " + volume_string.substr(0, 5);
     }
-    Texture volume_text{game->renderer.get(), &font32, volume_string, Colors::WHITE};
+    Texture volume_text{game->renderer.get(), &font32, volume_string, Colors::BLACK};
     game->renderer->render(&volume_text, {}, volume_text.get_psize(),
         {0.0L, get_y_pos(84, aspect_ratio)}, volume_text.get_rsize(), {});
 
@@ -256,6 +256,8 @@ void StateSoundfonts::render() const
             tint_square = {0x14, 0x28, 0x14, 0xFF};
             //tint_square += tint_square;
         }
+        tint_square = tint_square + tint_square;
+        tint_square.a = 0xff;
         tint_progress = tint_square + tint_square;
         tint_progress.a = 0xFF;
 
@@ -273,7 +275,7 @@ void StateSoundfonts::render() const
 
         //}
 
-        txt_white.tint = {48, 48, 48, 255};
+        txt_white.tint = {255, 255, 255, 255};
         game->renderer->render(&txt_white, {}, txt_white.get_psize(),
         square_position, light_square_size, {}, {-1.0L, 0.0L});
 

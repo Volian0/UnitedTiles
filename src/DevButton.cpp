@@ -18,7 +18,7 @@ DevButton::DevButton(Vec2 position_, Number width_, uint32_t id_, const std::str
 {
 	set_text(text);
 	_text_texture->tint = Color{40, 40, 40, 255};
-	_texture->tint = Colors::WHITE;
+	_texture->tint = Color{0xD7, 0xE7, 0xFE, 255};
 }
 
 bool DevButton::update()
@@ -70,7 +70,7 @@ void DevButton::render() const
 	_state->game->renderer->render(_text_texture.get(), { 0,0 }, _text_texture->get_psize(), position, _text_texture->get_rsize(), { 0,0 });
 
 	_text_texture->tint = Color{40, 40, 40, 255};
-	_texture->tint = Colors::WHITE;
+	_texture->tint = Color{0xD7, 0xE7, 0xFE, 255};
 }
 
 void DevButton::set_text(const std::string& text)

@@ -10,7 +10,7 @@
 
 StateSettings::StateSettings(Game* game_)
 	:GameState(game_),
-	_font{ game_->renderer.get(), "roboto.ttf", 8.0L },
+	_font{ game_->renderer.get(), "roboto.ttf", 6.0L },
 	_bg{ game->renderer.get(), "white.png" },
 	_dev_button_texture{ game->renderer.get(), "dev_button.png" },
 	_b_discard{ {-0.5, 0}, 0.4L, 0, "Discard", &_dev_button_texture, &_font, this},
@@ -19,7 +19,7 @@ StateSettings::StateSettings(Game* game_)
 	cb_u{ game->renderer.get(), "ui/checkbox0.png"},
 	cb_c{ game->renderer.get(), "ui/checkbox1.png"}
 {
-	_bg.tint = {24, 24, 24, 255}; 
+	_bg.tint = {0xB0, 0xD0, 0xFF, 255}; 
 	_dev_button_texture.blend_mode = 1;
 	cb_u.blend_mode = 1;
 	cb_c.blend_mode = 1;

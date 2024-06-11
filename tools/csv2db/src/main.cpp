@@ -145,6 +145,7 @@ try
         {
             if (!songs_name_map.contains(song_name))
             {
+                std::cout << "Skipping DB song \"" + song_name + "\", because it's not found" << std::endl;
                 //SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Info", ("Skipping database song \"" + song_name + "\", because it doesn't exist.").data(), nullptr);
                 continue;
             }
@@ -206,6 +207,7 @@ try
     }
 
     SongDatabase song_database;
+    std::cout << "Amount of songs in DB:" << ids.size() << std::endl;
     for (const auto& p : composers)
     {
         song_database.composers_infos.emplace_back(p);

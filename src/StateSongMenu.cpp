@@ -37,8 +37,9 @@ StateSongMenu::StateSongMenu(Game* game_)
 
     settings_gear.blend_mode = 1;
     glass_icon.blend_mode = 1;
-    glass_icon.tint = {96, 96, 96, 255};
+    glass_icon.tint = {0, 0, 0, 255};
 	_dev_button_texture.blend_mode = 1;
+    //_dev_button_texture.tint = {0xE0, 0XE0, 0XE0, 255};
     for (auto& txt : medal_textures)
     {
         txt.blend_mode = 1;
@@ -114,6 +115,7 @@ StateSongMenu::StateSongMenu(Game* game_)
             song_panel.year->label_text_texture->tint = {96, 96, 96, 255};
         }*/
         song_panel.composer_name.label_text_texture->tint = {128, 128, 128, 255};
+        song_panel.song_name.label_text_texture->tint = {0, 0, 0, 255};
     }
     for (auto& panel : song_panels)
     {
@@ -331,12 +333,13 @@ void StateSongMenu::update()
 void StateSongMenu::render() const
 {
     const auto aspect_ratio = game->renderer->get_aspect_ratio();
-    txt_white.tint = {16, 16, 16, 255};
+    txt_white.tint = {0xB0, 0xD0, 0xFF, 255};
     game->renderer->render(&txt_white, {}, txt_white.get_psize(),
     {}, {1.0L, 1.0L}, {});
 
     
-    txt_white.tint = {32, 32, 32, 255};
+    //txt_white.tint = {32, 32, 32, 255};
+    txt_white.tint = {0xD7, 0xE7, 0xFE, 255};
     const std::array<Vec2, 4> top_medals_positions { //and rect positions too
         Vec2{get_x_pos(30),get_y_pos(30,aspect_ratio)},
         Vec2{get_x_pos(143),get_y_pos(30,aspect_ratio)},
@@ -368,8 +371,8 @@ void StateSongMenu::render() const
     {
         const Timepoint tp{};
         constexpr Number pi = 3.14159265358979323846L;
-        const uint8_t pixel_color = 40.0L + 8.0L * std::sin(tp % pi * 8.0L);
-        txt_white.tint = {pixel_color, pixel_color, pixel_color, 255};
+        const uint8_t pixel_color = 246.0L + 8.0L * std::sin(tp % pi * 8.0L);
+        txt_white.tint = {pixel_color, pixel_color, 0xFF, 255};
     }
 
     game->renderer->render(&txt_white, {}, txt_white.get_psize(),
@@ -377,7 +380,7 @@ void StateSongMenu::render() const
 
     if (spanel.is_scrolled())
     {
-        txt_white.tint = {48, 48, 48, 255};
+        txt_white.tint = {0xF0, 0xF0, 0xF0, 255};
         const auto progress = spanel.get_progress();
         game->renderer->render(&txt_white, {}, txt_white.get_psize(),
         {get_x_pos(10.0L + (1.0L - progress) * 468.0L),get_y_pos(84,aspect_ratio)}, {get_x_size(24), get_y_size(48,aspect_ratio)}, {}, {-1.0L,0.0L});
@@ -442,7 +445,7 @@ void StateSongMenu::render() const
 
         const Vec2& big_medal_position{zero_point.x + get_x_pos(78) + 1.0L,zero_point.y + get_y_pos(60,aspect_ratio, 1.0L)};
 
-        txt_white.tint = {32, 32, 32, 255};
+        txt_white.tint = {0xD7, 0xE7, 0xFE, 255};
         game->renderer->render(&txt_white, {}, txt_white.get_psize(),
         square_position, dark_square_size, {}, {1.0L, 0.0L});
 
@@ -458,7 +461,7 @@ void StateSongMenu::render() const
             }
         }
         
-        txt_white.tint = {48, 48, 48, 255};
+        txt_white.tint = {0xFF, 0xFF, 0xFF, 255};
         game->renderer->render(&txt_white, {}, txt_white.get_psize(),
         square_position, light_square_size, {}, {-1.0L, 0.0L});
         song_panel.composer_name.render(game->renderer.get());
@@ -490,7 +493,7 @@ void StateSongMenu::render() const
             const Color prev_color = medal_textures[i].tint;
             if (song_panel.medal_level < i + 1)
             {
-                medal_textures[i].tint = {0, 0, 0, song_panel.req_amount_label ? 0 : 64};
+                medal_textures[i].tint = {0, 0, 0, song_panel.req_amount_label ? 0 : 32};
             }
             game->renderer->render(&medal_textures[i], {},
             medal_textures[i].get_psize(), medals_positions[i],
