@@ -69,6 +69,8 @@ private:
     ScrollablePanel spanel;
     DevButton settings_button;
 
+    inline static std::optional<unsigned> static_amount_of_diamonds = std::nullopt;
+
     static std::string last_search; 
     static Number last_position;
     static std::optional<std::uint16_t> last_song;

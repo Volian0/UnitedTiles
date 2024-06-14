@@ -86,6 +86,20 @@ extern "C"
 
         env->CallVoidMethod(obj, methodId);
     }
+
+    JNIEXPORT void JNICALL Java_com_volian_unitedtiles_UnitedTilesActivity_testShowRating(JNIEnv* env,
+                                                                                                   jobject obj)
+    {
+        jclass clazz = env->FindClass("com/volian/unitedtiles/UnitedTilesActivity");
+        if (clazz == nullptr)
+            throw std::runtime_error("class not found"); // Class not found
+
+        jmethodID methodId = env->GetMethodID(clazz, "testShowRating", "()V");
+        if (methodId == nullptr)
+            throw std::runtime_error("method not found"); // Method not found
+
+        env->CallVoidMethod(obj, methodId);
+    }
 }
 
 void call_java_function(std::string_view t_function)
@@ -119,6 +133,12 @@ void show_leaderboard(std::string_view t_leaderboard_id)
                                                                                 (jobject)SDL_AndroidGetActivity(), t_leaderboard_id);
 }
 
+void show_rating()
+{
+     Java_com_volian_unitedtiles_UnitedTilesActivity_testShowRating((JNIEnv*)SDL_AndroidGetJNIEnv(),
+                                                                                (jobject)SDL_AndroidGetActivity());
+}
+
 #else
 void call_java_function(std::string_view t_function)
 {
@@ -130,6 +150,10 @@ void submit_score(std::string_view t_leaderboard_id, long t_score)
 void show_leaderboard(std::string_view t_leaderboard_id)
 {
     
+}
+void show_rating() 
+{
+
 }
 #endif
 

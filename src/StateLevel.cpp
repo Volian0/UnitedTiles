@@ -509,7 +509,7 @@ void StateLevel::update()
 
 	if (game_over_reset.has_value() && new_tp - game_over_reset.value() > 2.0L)
 	{
-		if (game->cfg->show_interstitial_ads && game->ad_manager.can_show_big_ad())
+		if (game->cfg->show_interstitial_ads && game->ad_manager.can_show_big_ad() && !perfect_score)
 		{
 			game->ad_manager.show_big_ad();
 		}

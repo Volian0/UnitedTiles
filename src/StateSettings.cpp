@@ -1,5 +1,6 @@
 #include "StateSettings.h"
 
+#include "AdManager.hpp"
 #include "Font.h"
 #include "Game.h"
 #include "Renderer.h"
@@ -16,6 +17,7 @@ StateSettings::StateSettings(Game* game_)
 	_b_discard{ {-0.5, 0}, 0.4L, 0, "Discard", &_dev_button_texture, &_font, this},
 	_b_apply{ {0.5, 0}, 0.4L, 0, "Apply", &_dev_button_texture, &_font, this },
 	_b_soundfonts{ {0.0, 0}, 0.8L, 0, "Extra Soundfonts", &_dev_button_texture, &_font, this },
+	_b_rate_app{{0.0, 0}, 0.8L, 0, "Rate the game", &_dev_button_texture, &_font, this},
 	cb_u{ game->renderer.get(), "ui/checkbox0.png"},
 	cb_c{ game->renderer.get(), "ui/checkbox1.png"}
 {
@@ -49,6 +51,7 @@ StateSettings::StateSettings(Game* game_)
 		checkbox.first.spanel = &scrollable_panel;
 	}
 	_b_soundfonts.spanel = &scrollable_panel;
+	_b_rate_app.spanel = &scrollable_panel;
 	scrollable_panel._state = this;
 	scrollable_panel.max_offset = 0.0L;
 }
@@ -84,8 +87,12 @@ void StateSettings::update()
 		check_boxes[i].first.update(this);
 	}
 	_b_soundfonts.position.y = -1.0L + button_height + Number(check_boxes.size() + 1) * 0.2L * game->renderer->get_aspect_ratio() + scrollable_panel.get_offset();
+	_b_rate_app.position.y = _b_soundfonts.position.y + 0.125L * 2.0F * game->renderer->get_aspect_ratio();
 	if (scrollable_panel.is_scrolled() || scrolled)
-		_b_soundfonts.clear_held();
+		{
+_b_soundfonts.clear_held();
+_b_rate_app.clear_held();			
+		}
 	if (_b_soundfonts.update())
 	{
 		return game->change_state<StateSoundfonts>();

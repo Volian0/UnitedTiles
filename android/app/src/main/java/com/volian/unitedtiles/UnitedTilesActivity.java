@@ -60,6 +60,10 @@ import com.google.android.gms.games.GamesSignInClient;
 import com.google.android.gms.games.PlayGames;
 import com.google.android.gms.tasks.OnSuccessListener;
 import android.content.Intent;
+import com.google.android.play.core.review.ReviewManager;
+import com.google.android.play.core.review.ReviewManagerFactory;
+import com.google.android.play.core.review.ReviewInfo;
+import com.google.android.play.core.tasks.*;
 
 public class UnitedTilesActivity extends SDLActivity {
     public AdView adViewB = null;
@@ -207,6 +211,39 @@ public class UnitedTilesActivity extends SDLActivity {
                 // Your UI update logic goes here
                 showBigAd();
             }
+        });
+    }
+
+    public void testShowRating() {
+        Activity activity = this;
+        this.runOnUiThread(new Runnable() {
+                    
+
+            @Override
+            public void run() {
+                
+                ReviewManager manager = ReviewManagerFactory.create(activity);
+                Task<ReviewInfo> request = manager.requestReviewFlow();
+                request.addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // We can get the ReviewInfo object
+                        ReviewInfo reviewInfo = task.getResult();
+
+                        Task<Void> flow = manager.launchReviewFlow(activity, reviewInfo);
+                        flow.addOnCompleteListener(task2 -> {
+                            // The flow has finished. The API does not indicate whether the user
+                            // reviewed or not, or even whether the review dialog was shown. Thus, no
+                            // matter the result, we continue our app flow.
+                        });
+
+
+                    } else {
+                        // There was some problem, log or handle the error code.
+                    }
+                });
+
+                                
+                            }
         });
     }
 

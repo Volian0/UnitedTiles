@@ -28,8 +28,8 @@ signingConfigs {
         applicationId "com.volian.unitedtiles"
         minSdkVersion 23
         targetSdkVersion 34
-        versionCode 12
-        versionName "0.4.0"
+        versionCode 13
+        versionName "0.4.1" 
         ndk {
             abiFilters 'armeabi-v7a'
         }
@@ -62,4 +62,6 @@ signingConfigs {
  dependencies {
     implementation "com.google.android.gms:play-services-games-v2:+"
     implementation 'com.google.android.gms:play-services-ads:23.1.0'
+    //implementation 'com.google.android.play:review:2.0.1'
+    implementation 'com.google.android.play:core:1.10.3'
   }
