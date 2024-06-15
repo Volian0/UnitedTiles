@@ -7,6 +7,8 @@
 #include "StateSongMenu.h"
 #include "StateSoundfonts.h"
 
+#include <SDL.h>
+
 #include <algorithm>
 
 StateSettings::StateSettings(Game* game_)
@@ -19,7 +21,9 @@ StateSettings::StateSettings(Game* game_)
 	_b_soundfonts{ {0.0, 0}, 0.8L, 0, "Extra Soundfonts", &_dev_button_texture, &_font, this },
 	_b_rate_app{{0.0, 0}, 0.8L, 0, "Rate the game", &_dev_button_texture, &_font, this},
 	cb_u{ game->renderer.get(), "ui/checkbox0.png"},
-	cb_c{ game->renderer.get(), "ui/checkbox1.png"}
+	cb_c{ game->renderer.get(), "ui/checkbox1.png"},
+	ad_hint{"Ads are our only revenue, so consider enabling them to support the game!", 0.9L,
+	Vec2{},Vec2{},&_font,game->renderer.get()}
 {
 	_bg.tint = {0xB0, 0xD0, 0xFF, 255}; 
 	_dev_button_texture.blend_mode = 1;
@@ -54,6 +58,7 @@ StateSettings::StateSettings(Game* game_)
 	_b_rate_app.spanel = &scrollable_panel;
 	scrollable_panel._state = this;
 	scrollable_panel.max_offset = 0.0L;
+	ad_hint.label_text_texture->tint = Colors::BLACK;
 }
 
 void StateSettings::update()
@@ -88,6 +93,7 @@ void StateSettings::update()
 	}
 	_b_soundfonts.position.y = -1.0L + button_height + Number(check_boxes.size() + 1) * 0.2L * game->renderer->get_aspect_ratio() + scrollable_panel.get_offset();
 	_b_rate_app.position.y = _b_soundfonts.position.y + 0.125L * 2.0F * game->renderer->get_aspect_ratio();
+	ad_hint.position.y = _b_soundfonts.position.y + 0.225L * game->renderer->get_aspect_ratio();
 	if (scrollable_panel.is_scrolled() || scrolled)
 		{
 _b_soundfonts.clear_held();
@@ -97,6 +103,7 @@ _b_rate_app.clear_held();
 	{
 		return game->change_state<StateSoundfonts>();
 	}
+	ad_hint.label_text_texture->tint.g = std::abs(std::sin(Number(SDL_GetTicks64()) * 0.005L)) * 100.0F;
 }
 
 void StateSettings::render() const
@@ -110,5 +117,10 @@ void StateSettings::render() const
 		checkbox.first.render(game->renderer.get());
 	}
 	_b_soundfonts.render();
+	if (!game->cfg->show_banner_ads || !game->cfg->show_interstitial_ads
+	|| !check_boxes[3].first._checked || !check_boxes[4].first._checked)
+	{
+		ad_hint.render(game->renderer.get()); 
+	}
 	scrollable_panel.stop_rendering();
 }

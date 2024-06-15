@@ -6,6 +6,7 @@
 #include "DevButton.h"
 
 #include "ui/CheckBox.h"
+#include "ui/Label.h"
 #include "ui/ScrollablePanel.h"
 
 #include <memory>
@@ -28,6 +29,7 @@ private:
 	DevButton _b_rate_app;
 
 	Texture cb_u, cb_c;
+	Label ad_hint;
 
 	ScrollablePanel scrollable_panel;
 
