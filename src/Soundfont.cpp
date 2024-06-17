@@ -9,6 +9,7 @@
 #include <iostream>
 
 Soundfont::Soundfont(const std::string& filename, uint16_t sample_rate, bool stereo)
+:m_stereo{stereo}
 {
 	std::scoped_lock lock(_mutex); //unsafe?
 	if (filename.empty())
@@ -81,9 +82,35 @@ void Soundfont::reset()
 
 void Soundfont::render(uint32_t frames, void* buffer)
 {
-	play_events();
-	std::scoped_lock lock(_mutex);
-	tsf_render_short(reinterpret_cast<tsf*>(_ptr), reinterpret_cast<short*>(buffer), frames, 0);
+	Timepoint tp;
+	Timepoint tp_end{tp + static_cast<long double>(frames)/44100.0L};
+	std::scoped_lock lock(_mutex_events);
+	
+	auto lower_bound = _events.lower_bound(tp_end);
+	int frames_rendered{0};
+	auto update_delta = [&](int delta_frames){
+		if (delta_frames > frames_rendered)
+		{
+			const auto frames_to_render = delta_frames - frames_rendered;
+			//std::cout << "rendering frames: " << frames_to_render << std::endl;
+			tsf_render_short(reinterpret_cast<tsf*>(_ptr), reinterpret_cast<short*>(buffer)+frames_rendered*(m_stereo ? 2 : 1), frames_to_render, 0);
+			frames_rendered = delta_frames;
+		}
+	};
+	{ 
+		for (auto it = _events.begin(); it != lower_bound; ++it)
+		{
+			auto delta = it->first - tp;
+			//std::cout << "rendering event with delta frames " << delta << std::endl;
+			//std::cout << "done playing event" << std::endl;
+			int delta_frames = delta * 44100.0L;
+			//std::cout << "rendering event with delta frames " << delta_frames << std::endl;
+			update_delta(delta_frames);
+			play_event(it->second);
+		}
+		update_delta(frames);
+	}
+	_events.erase(_events.begin(), lower_bound);
 }
 
 void Soundfont::add_event(const Timepoint& timepoint, const NoteEvent& event)

@@ -142,6 +142,10 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_, std::string_view t_score_
 	lv_bg{this},
 	song_id{song_id_}
 {
+	if (game->cfg->god_mode)
+	{
+		score.is_auto = true;
+	}
 	    game->ad_manager.load_big_ad();
 
 	    if (game_->cfg->show_banner_ads)
@@ -884,6 +888,10 @@ void ScoreCounter::render() const
 		_texture = std::make_unique<Texture>(_level->game->renderer.get(), &_font, my_tps, Color{ 255, 63, 63, 255 });
 		//return;
 	}
+	else if (is_auto)
+	{
+		_texture = std::make_unique<Texture>(_level->game->renderer.get(), &_font, "AUTO", Color{ 63, 255, 63, 255 });
+	}
 
 	Number diff = std::clamp(0.1L - (_level->new_tp - _tp_update), 0.0L, 0.1L);
 	diff = diff * diff * 10.0L;
@@ -899,9 +907,13 @@ void ScoreCounter::render() const
 	{
 		angle *= 0.5L;
 	}
-	if (v >= 10000000)
+	if (v >= 10000000 || is_auto)
 	{
 		angle = 0.0L;
+	}
+	if (is_auto)
+	{
+		diff = 0.8L;
 	}
 	_level->game->renderer->render(_texture.get(), { 0,0 }, _texture->get_psize(), Vec2{offset.x, offset.y * _level->game->renderer->get_aspect_ratio()} + Vec2{ 0.00625 * scale,-0.84+0.0125*_level->game->renderer->get_aspect_ratio() * scale},
 		Vec2{ _texture->get_rsize().x * 0.8L,_texture->get_rsize().y*diff } * scale, { 0,-0.84 }, {}, angle);

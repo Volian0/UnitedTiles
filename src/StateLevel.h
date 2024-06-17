@@ -68,6 +68,7 @@ public:
 	bool show_tps = false;
 	Vec2 offset{0.0L};
 	Number scale{1.0L};
+	bool is_auto = false;
 
 private:
 	bool was_silent_added = false;

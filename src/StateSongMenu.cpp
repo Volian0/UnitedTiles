@@ -142,12 +142,12 @@ StateSongMenu::StateSongMenu(Game* game_)
     spanel._state = this;
     spanel.position.x = 0.0L;
 
-    if (static_amount_of_diamonds == 2 && medal_n[3] == 3)
+    if (static_amount_of_diamonds == 2 && medal_n[1] == 3)
     {
         //show rating
         show_rating(); 
     }
-    static_amount_of_diamonds = medal_n[3]; 
+    static_amount_of_diamonds = medal_n[1]; 
 
     need_to_restore = true;
     tp_state_start = {};

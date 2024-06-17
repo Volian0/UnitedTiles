@@ -22,7 +22,7 @@ StateSettings::StateSettings(Game* game_)
 	_b_rate_app{{0.0, 0}, 0.8L, 0, "Rate the game", &_dev_button_texture, &_font, this},
 	cb_u{ game->renderer.get(), "ui/checkbox0.png"},
 	cb_c{ game->renderer.get(), "ui/checkbox1.png"},
-	ad_hint{"Ads are our only revenue, so consider enabling them to support the game!", 0.9L,
+	ad_hint{"Consider enabling ads to support the game!", 0.9L,
 	Vec2{},Vec2{},&_font,game->renderer.get()}
 {
 	_bg.tint = {0xB0, 0xD0, 0xFF, 255}; 

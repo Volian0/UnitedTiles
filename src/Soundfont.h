@@ -42,4 +42,5 @@ private:
 	std::multimap<Timepoint, NoteEvent> _events;
 	void* _ptr;
 	std::unordered_set<uint8_t> _notes_on;
+	bool m_stereo;
 };
