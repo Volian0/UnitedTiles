@@ -91,6 +91,7 @@ void Soundfont::render(uint32_t frames, void* buffer)
 	auto update_delta = [&](int delta_frames){
 		if (delta_frames > frames_rendered)
 		{
+			std::scoped_lock lock(_mutex);
 			const auto frames_to_render = delta_frames - frames_rendered;
 			//std::cout << "rendering frames: " << frames_to_render << std::endl;
 			tsf_render_short(reinterpret_cast<tsf*>(_ptr), reinterpret_cast<short*>(buffer)+frames_rendered*(m_stereo ? 2 : 1), frames_to_render, 0);
