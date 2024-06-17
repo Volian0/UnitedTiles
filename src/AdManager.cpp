@@ -58,6 +58,21 @@ extern "C"
         env->CallVoidMethod(obj, methodId);
     }
 
+    JNIEXPORT void JNICALL Java_com_volian_unitedtiles_UnitedTilesActivity_testShare(JNIEnv* env,
+                                                                                                   jobject obj)
+    {
+        jclass clazz = env->FindClass("com/volian/unitedtiles/UnitedTilesActivity");
+        if (clazz == nullptr)
+            throw std::runtime_error("class not found");
+        ; // Class not found
+
+        jmethodID methodId = env->GetMethodID(clazz, "testShare", "()V");
+        if (methodId == nullptr)
+            throw std::runtime_error("method not found"); // Method not found
+
+        env->CallVoidMethod(obj, methodId);
+    }
+
     JNIEXPORT void JNICALL Java_com_volian_unitedtiles_UnitedTilesActivity_testShowBanner(JNIEnv* env,
                                                                                                    jobject obj)
     {
@@ -138,6 +153,11 @@ void show_rating()
      Java_com_volian_unitedtiles_UnitedTilesActivity_testShowRating((JNIEnv*)SDL_AndroidGetJNIEnv(),
                                                                                 (jobject)SDL_AndroidGetActivity());
 }
+void share_game() 
+{
+     Java_com_volian_unitedtiles_UnitedTilesActivity_testShare((JNIEnv*)SDL_AndroidGetJNIEnv(),
+                                                                                (jobject)SDL_AndroidGetActivity());
+}
 
 #else
 void call_java_function(std::string_view t_function)
@@ -152,6 +172,10 @@ void show_leaderboard(std::string_view t_leaderboard_id)
     
 }
 void show_rating() 
+{
+
+}
+void share_game() 
 {
 
 }

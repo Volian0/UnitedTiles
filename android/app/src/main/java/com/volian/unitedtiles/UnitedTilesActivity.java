@@ -63,7 +63,7 @@ import android.content.Intent;
 import com.google.android.play.core.review.ReviewManager;
 import com.google.android.play.core.review.ReviewManagerFactory;
 import com.google.android.play.core.review.ReviewInfo;
-import com.google.android.play.core.tasks.*;
+import com.google.android.gms.tasks.*;
 
 public class UnitedTilesActivity extends SDLActivity {
     public AdView adViewB = null;
@@ -210,6 +210,25 @@ public class UnitedTilesActivity extends SDLActivity {
             public void run() {
                 // Your UI update logic goes here
                 showBigAd();
+            }
+        });
+    }
+
+    public void testShare() {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // Your UI update logic goes here
+                
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=com.volian.unitedtiles");
+                sendIntent.setType("text/plain");
+
+                Intent shareIntent = Intent.createChooser(sendIntent, null);
+                startActivity(shareIntent);
+
+
             }
         });
     }

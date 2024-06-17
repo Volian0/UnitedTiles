@@ -69,6 +69,10 @@ private:
     ScrollablePanel spanel;
     DevButton settings_button;
 
+    Label share1;
+    Label share2;
+    DevButton share_button;
+
     inline static std::optional<unsigned> static_amount_of_diamonds = std::nullopt;
 
     static std::string last_search; 

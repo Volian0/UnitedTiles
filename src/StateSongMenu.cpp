@@ -30,7 +30,10 @@ StateSongMenu::StateSongMenu(Game* game_)
     input_song{last_search, get_x_size(432), {get_x_pos(274), 0.0L}, &font24, this, &txt_white},
     settings_gear{game->renderer.get(), "gear.png"},
     glass_icon{game->renderer.get(), "glass.png"},
-    settings_button{Vec2{get_x_pos(482.0L), 0.0L}, get_x_size(40.0L), 0, " ", &_dev_button_texture, &font24, this, 0.0625L * 0.625L}
+    settings_button{Vec2{get_x_pos(482.0L), 0.0L}, get_x_size(40.0L), 0, " ", &_dev_button_texture, &font24, this, 0.0625L * 0.625L},
+    share1{"Share the game with friends", 1.0L, Vec2{get_x_pos(106-72), 0}, {-1.0L, 0.0L}, &font32, game->renderer.get()},
+    share2{"and compete in the leaderboards!", 1.0L, Vec2{get_x_pos(106-72), 0}, {-1.0L, 0.0L}, &font24, game->renderer.get()},
+    share_button{{get_x_pos(414), 0}, get_x_size(144), 0, "Share", &_dev_button_texture, &font32, this, 0.0625L * 0.75L}
 {
         txt_icons.blend_mode = 1;
     txt_icons.tint = {16, 16, 16, 255};
@@ -57,6 +60,7 @@ StateSongMenu::StateSongMenu(Game* game_)
         composer_names.emplace(composer_id, composer_info.name);
     }
     std::array<uint16_t, 4> medal_n{0,0,0,0};
+    share_button.spanel = &spanel;
     for (const auto& [song_id, song_info] : song_database.songs_infos)
     {
         std::string composers_string;
@@ -264,6 +268,20 @@ void StateSongMenu::update()
     uint16_t current_song_index = 0;
     const Number scroll_offset = spanel.get_offset();
     last_position = scroll_offset;
+
+        constexpr uint32_t composer_y_pos = 52;
+        constexpr uint32_t songname_y_pos = 24;
+        constexpr uint32_t score_y_pos = 88;
+        constexpr uint32_t play_y_pos = 88;
+        constexpr uint32_t lap_y_pos = 60;
+
+    if (all_songs || allowed_song_ids.size() == song_panels.size())
+    {
+        share1.position.y = get_y_pos(songname_y_pos + current_y_pixel_position, aspect_ratio, scroll_offset);
+        share2.position.y = get_y_pos(composer_y_pos + current_y_pixel_position, aspect_ratio, scroll_offset);
+        share_button.position.y = get_y_pos(play_y_pos + current_y_pixel_position, aspect_ratio, scroll_offset);
+        current_y_pixel_position += 130;
+    }
     for (auto& song_panel : song_panels)
     {
         if (!all_songs)
@@ -287,11 +305,7 @@ void StateSongMenu::update()
         //set medal
 
         //constexpr uint32_t year_y_pos = 58;
-        constexpr uint32_t composer_y_pos = 52;
-        constexpr uint32_t songname_y_pos = 24;
-        constexpr uint32_t score_y_pos = 88;
-        constexpr uint32_t play_y_pos = 88;
-        constexpr uint32_t lap_y_pos = 60;
+
 
         //set lap
         if (song_panel.lap)
@@ -319,6 +333,7 @@ void StateSongMenu::update()
             continue;
         if (spanel.is_scrolled() || scrolled)
             {song_panel.play_button.clear_held();
+            share_button.clear_held();
             if (song_panel.leaderboard_button)
             {
                 song_panel.leaderboard_button->clear_held();
@@ -335,6 +350,11 @@ void StateSongMenu::update()
     }
 
     //finally, check button events
+
+    if (share_button.update())
+    {
+        share_game();
+    }
 
     need_to_restore = false;
 }
@@ -416,6 +436,25 @@ void StateSongMenu::render() const
     //const Vec2 zero_point{get_x_pos(), get_y_pos()};
     //std::cout << offset_dark.x << ", " << offset_dark.y << std::endl;
     //std::abort();
+
+        if (all_songs || allowed_song_ids.size() == song_panels.size())
+    {
+        constexpr uint32_t songname_y_pos = 24;
+
+        const Vec2 zero_point{-1.0L, 
+        share1.position.y - get_y_pos(24, aspect_ratio, 1.0L)};
+
+        const Vec2 square_position{zero_point.x + get_x_pos(10) + 1.0L,zero_point.y + get_y_pos(60,aspect_ratio, 1.0L)};
+
+        txt_white.tint = {0xFF, 0xFF, 0xFF, 255};
+        game->renderer->render(&txt_white, {}, txt_white.get_psize(),
+        square_position, Vec2{get_x_size(492), get_y_size(120,aspect_ratio)}, {}, {-1.0L, 0.0L});
+
+        share1.render(game->renderer.get());
+        share2.render(game->renderer.get());
+        share_button.render();
+    }
+
     for (auto& song_panel : song_panels)
     {
         if (!all_songs)

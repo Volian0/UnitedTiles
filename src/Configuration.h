@@ -28,4 +28,6 @@ public:
 	constexpr static bool limit_note_velocity = false; 
 	bool show_banner_ads = true;
 	bool show_interstitial_ads = true;
+	//constexpr static bool show_banner_ads = false;
+	//constexpr static bool show_interstitial_ads = false;
 };

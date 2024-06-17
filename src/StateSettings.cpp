@@ -7,7 +7,7 @@
 #include "StateSongMenu.h"
 #include "StateSoundfonts.h"
 
-#include <SDL.h>
+#include <SDL/SDL.h>
 
 #include <algorithm>
 
@@ -39,8 +39,14 @@ StateSettings::StateSettings(Game* game_)
 	//check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Show debug information", game->renderer.get()), std::forward_as_tuple(game->cfg->show_gameplay_debug_info));
 	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Enable V-Sync", game->renderer.get()), std::forward_as_tuple(game->cfg->enable_vsync));
 	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Auto Mode", game->renderer.get()), std::forward_as_tuple(game->cfg->god_mode));
+
+
+	//ONLY TEMPORARY, UNCOMMENT FOR PRODUCTION
 	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Support the game by banner ads", game->renderer.get()), std::forward_as_tuple(game->cfg->show_banner_ads));
 	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Support the game by game over ads", game->renderer.get()), std::forward_as_tuple(game->cfg->show_interstitial_ads));
+
+
+
 	//check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Fake lag", game->renderer.get()), std::forward_as_tuple(game->cfg->fake_lag));
 	//check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Smooth tempo for laps", game->renderer.get()), std::forward_as_tuple(game->cfg->three_section_mode));
 	//check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Show TPS as score", game->renderer.get()), std::forward_as_tuple(game->cfg->show_tps_instead_of_score));
@@ -103,7 +109,7 @@ _b_rate_app.clear_held();
 	{
 		return game->change_state<StateSoundfonts>();
 	}
-	ad_hint.label_text_texture->tint.g = std::abs(std::sin(Number(SDL_GetTicks64()) * 0.005L)) * 100.0F;
+	ad_hint.label_text_texture->tint.g = std::abs(std::sin(Number(SDL_GetTicks()) * 0.005L)) * 100.0F;
 }
 
 void StateSettings::render() const
@@ -117,10 +123,13 @@ void StateSettings::render() const
 		checkbox.first.render(game->renderer.get());
 	}
 	_b_soundfonts.render();
+
+		//ONLY TEMPORARY, UNCOMMENT FOR PRODUCTION
 	if (!game->cfg->show_banner_ads || !game->cfg->show_interstitial_ads
 	|| !check_boxes[3].first._checked || !check_boxes[4].first._checked)
 	{
 		ad_hint.render(game->renderer.get()); 
 	}
+
 	scrollable_panel.stop_rendering();
 }

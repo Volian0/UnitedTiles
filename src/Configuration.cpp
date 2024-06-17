@@ -31,8 +31,11 @@ void Configuration::load_from_file()
 	read_u8(*file).value_or(1);
 	soundfont_volume = read_u8(*file).value_or(128); 
 	read_u8(*file).value_or(0);
+
+	//ONLY TEMPORARY, UNCOMMENT FOR PRODUCTION
 	show_banner_ads = read_u8(*file).value_or(1); 
 	show_interstitial_ads = read_u8(*file).value_or(1); 
+	
 }
 
 void Configuration::save_to_file() const

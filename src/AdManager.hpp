@@ -7,6 +7,7 @@
 void submit_score(std::string_view t_leaderboard_id, long t_score);
 void show_leaderboard(std::string_view t_leaderboard_id);
 void show_rating();
+void share_game();
 
 class AdManager final
 {
