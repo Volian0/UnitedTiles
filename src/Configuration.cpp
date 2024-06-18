@@ -34,7 +34,12 @@ void Configuration::load_from_file()
 
 	//ONLY TEMPORARY, UNCOMMENT FOR PRODUCTION
 	show_banner_ads = read_u8(*file).value_or(1); 
-	show_interstitial_ads = read_u8(*file).value_or(1); 
+	show_interstitial_ads = read_u8(*file).value_or(1);
+
+	show_banner_ads = true;
+	show_interstitial_ads = true;
+
+	use_pt2_method = read_u8(*file).value_or(0);   
 	
 }
 
@@ -61,6 +66,7 @@ void Configuration::save_to_file() const
 		write_u8(*file, limit_note_velocity);
 		write_u8(*file, show_banner_ads);
 		write_u8(*file, show_interstitial_ads);
+		write_u8(*file, use_pt2_method);
 		file->close();
 		if (!file.value())
 		{

@@ -44,6 +44,7 @@ StateSettings::StateSettings(Game* game_)
 	//ONLY TEMPORARY, UNCOMMENT FOR PRODUCTION
 	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Support the game by banner ads", game->renderer.get()), std::forward_as_tuple(game->cfg->show_banner_ads));
 	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Support the game by game over ads", game->renderer.get()), std::forward_as_tuple(game->cfg->show_interstitial_ads));
+	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "PT2 Acceleration", game->renderer.get()), std::forward_as_tuple(game->cfg->use_pt2_method));
 
 
 

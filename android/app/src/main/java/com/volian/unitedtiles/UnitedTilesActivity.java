@@ -98,7 +98,7 @@ public class UnitedTilesActivity extends SDLActivity {
 
         AdRequest adRequest = new AdRequest.Builder().build();
 
-        InterstitialAd.load(this, "ca-app-pub-3940256099942544/1033173712", adRequest,
+        InterstitialAd.load(this, "ca-app-pub-9020041895455560/8092335055", adRequest,
             new InterstitialAdLoadCallback() {
                 @Override
                 public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
@@ -160,7 +160,7 @@ public class UnitedTilesActivity extends SDLActivity {
 
     public void showAd() {
         adViewB = new AdView(this);
-        adViewB.setAdUnitId("ca-app-pub-3940256099942544/9214589741");
+        adViewB.setAdUnitId("ca-app-pub-9020041895455560/1718498398");
         adViewB.setAdSize(AdSize.BANNER);
 
         AdRequest adRequest = new AdRequest.Builder().build();

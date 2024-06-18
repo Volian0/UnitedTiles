@@ -17,18 +17,23 @@ public:
 	Soundfont(const std::string& filename, uint16_t sample_rate, bool stereo);
 	~Soundfont();
 
+	private:
+
 	void cc(uint8_t control, uint8_t value);
 	void note_on(uint8_t key, uint8_t velocity);
 	void note_off(uint8_t key);
 	void all_notes_off();
+
+	public:
 	void reset();
+
 
 	void render(uint32_t frames, void* buffer);
 
 	void add_event(const Timepoint& timepoint, const NoteEvent& event);
 	void play_event(const NoteEvent& event);
 	void play_all_events();
-	void play_events(const Timepoint& bound = {});
+	//void play_events(const Timepoint& bound = {});
 
 	void set_volume(Number volume);
 

@@ -245,7 +245,11 @@ void StateSongMenu::update()
 
     //calculate max offset for scrollable panel
     const bool all_songs = allowed_song_ids.empty();
-    const uint16_t song_n = all_songs ? song_panels.size() : allowed_song_ids.size();
+     uint16_t song_n = all_songs ? song_panels.size() : allowed_song_ids.size();
+     if (all_songs || allowed_song_ids.size() == song_panels.size())
+     {
+        song_n += 1;
+     }
     const Number all_size_y = get_y_size(130.0L * song_n/* - 10.0L*/, aspect_ratio);
     const Number topbar_size = get_y_size(118.0L, aspect_ratio);
     //const Number footbar_size = get_y_size(64.0L + 4.0L, aspect_ratio);

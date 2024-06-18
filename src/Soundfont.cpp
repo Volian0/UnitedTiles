@@ -39,7 +39,7 @@ void Soundfont::cc(uint8_t control, uint8_t value)
 
 void Soundfont::note_on(uint8_t key, uint8_t velocity)
 {
-	std::scoped_lock lock(_mutex);
+	//std::scoped_lock lock(_mutex);
 	if (_notes_on.count(key))
 	{
 		if (always_sustain)
@@ -59,7 +59,7 @@ void Soundfont::note_off(uint8_t key)
 {
 	if (always_sustain)
 		return;
-	std::scoped_lock lock(_mutex);
+	//std::scoped_lock lock(_mutex);
 	tsf_note_off(reinterpret_cast<tsf*>(_ptr), 0, key);
 	_notes_on.erase(key);
 }
@@ -68,7 +68,7 @@ void Soundfont::all_notes_off()
 {
 	if (always_sustain)
 		return;
-	std::scoped_lock lock(_mutex);
+	//std::scoped_lock lock(_mutex);
 	tsf_note_off_all(reinterpret_cast<tsf*>(_ptr));
 	_notes_on.clear();
 }
@@ -91,14 +91,14 @@ void Soundfont::render(uint32_t frames, void* buffer)
 	auto update_delta = [&](int delta_frames){
 		if (delta_frames > frames_rendered)
 		{
-			std::scoped_lock lock(_mutex);
 			const auto frames_to_render = delta_frames - frames_rendered;
 			//std::cout << "rendering frames: " << frames_to_render << std::endl;
 			tsf_render_short(reinterpret_cast<tsf*>(_ptr), reinterpret_cast<short*>(buffer)+frames_rendered*(m_stereo ? 2 : 1), frames_to_render, 0);
 			frames_rendered = delta_frames;
 		}
 	};
-	{ 
+		std::scoped_lock lock2(_mutex);
+
 		for (auto it = _events.begin(); it != lower_bound; ++it)
 		{
 			auto delta = it->first - tp;
@@ -110,7 +110,6 @@ void Soundfont::render(uint32_t frames, void* buffer)
 			play_event(it->second);
 		}
 		update_delta(frames);
-	}
 	_events.erase(_events.begin(), lower_bound);
 }
 
@@ -146,7 +145,8 @@ void Soundfont::play_event(const NoteEvent& event)
 
 void Soundfont::play_all_events()
 {
-	std::scoped_lock lock(_mutex_events);
+	std::scoped_lock lock2(_mutex_events);
+	std::scoped_lock lock(_mutex);
 	for (const auto& [timepoint, event] : _events)
 	{
 		play_event(event);
@@ -154,7 +154,7 @@ void Soundfont::play_all_events()
 	_events.clear();
 }
 
-void Soundfont::play_events(const Timepoint& bound)
+/*void Soundfont::play_events(const Timepoint& bound)
 {
 	std::scoped_lock lock(_mutex_events);
 	auto lower_bound = _events.lower_bound(bound);
@@ -163,7 +163,7 @@ void Soundfont::play_events(const Timepoint& bound)
 		play_event(it->second);
 	}
 	_events.erase(_events.begin(), lower_bound);
-}
+}*/
 
 uint8_t Soundfont::get_notes_on_size()
 {

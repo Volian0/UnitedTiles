@@ -377,7 +377,25 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_, std::string_view t_score_
 	//_song_info.acceleration_method = SongInfo::AccelerationMethod::CLASSIC;
 	//_song_info.acceleration_info.classic_tempo_changes = {std::make_pair<uint32_t, Number>(10, 2.0L), {20, 7.0L}};
 
-	if (game->cfg->three_section_mode) // 3 section mode
+	if (game->cfg->use_pt2_method) // 3 section mode
+	{
+		if (_song_info.acceleration_method == SongInfo::AccelerationMethod::LINEAR)
+		{
+			auto& tc = _song_info.acceleration_info.tempo_changes;
+			if (tc.empty() && _song_info.tiles.size() >= 3)
+			{
+				_song_info.acceleration_method = SongInfo::AccelerationMethod::CLASSIC;
+				const std::array<uint32_t, 2> indexes{
+					_song_info.tiles.size() / uint64_t{3},
+					uint64_t(_song_info.tiles.size()) * uint64_t{2} / uint64_t{3}
+				};
+				const Number mini_param = std::cbrt(_song_info.acceleration_info.parameter);
+				_song_info.acceleration_info.classic_tempo_changes[0]=std::pair<uint32_t, Number>(indexes[0], _song_info.starting_tempo * mini_param);
+				_song_info.acceleration_info.classic_tempo_changes[1]=std::pair<uint32_t, Number>(indexes[1], _song_info.starting_tempo * mini_param * mini_param);
+			}
+		}
+	}
+	else if (/*game->cfg->three_section_mode*/ true) // 3 section mode
 	{
 		if (_song_info.acceleration_method == SongInfo::AccelerationMethod::LINEAR)
 		{
@@ -850,7 +868,7 @@ void StateLevel::game_over(Tile* tile)
 	soundfont->add_event(new_tp + 2.0L, NoteEvent(NoteEvent::Type::ALL_OFF));
 	game_over_reset = new_tp;
 
-	if (game->cfg->god_mode == false && save_score)
+	if (game->cfg->god_mode == false && save_score && game->cfg->use_pt2_method == false)
 	{
 		SongUserDatabase user_database;
 		user_database.load_from_files();
@@ -885,7 +903,7 @@ void ScoreCounter::render() const
 			_tp_update = _level->new_tp;
 		}
 		old_tps = my_tps;
-		_texture = std::make_unique<Texture>(_level->game->renderer.get(), &_font, my_tps, Color{ 255, 63, 63, 255 });
+		_texture = std::make_unique<Texture>(_level->game->renderer.get(), &_font, my_tps, _level->game->cfg->use_pt2_method ? Color{ 63, 63, 255, 255 } : Color{ 255, 63, 63, 255 });
 		//return;
 	}
 	else if (is_auto)
