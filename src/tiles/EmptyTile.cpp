@@ -27,6 +27,14 @@ EmptyTile::EmptyTile(StateLevel* level_)
 	}
 }
 
+void EmptyTile::revive()
+{
+	if (is_state(&EmptyTileMissed))
+	{
+		force_change_state(&EmptyTileDefault);
+	}
+}
+
 bool EmptyTile::should_game_over() const
 {
 	return false;

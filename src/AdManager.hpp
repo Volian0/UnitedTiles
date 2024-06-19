@@ -19,8 +19,8 @@ public:
 
     void reward();*/
 
-    static constexpr auto COOLDOWN_BIG_AD{std::chrono::minutes{2}};
-    static constexpr auto COOLDOWN_REWARDED_AD{std::chrono::seconds{30}};
+    static constexpr auto COOLDOWN_BIG_AD{std::chrono::seconds(150)};
+    static constexpr auto COOLDOWN_REWARDED_AD{std::chrono::seconds{150}};
     static constexpr auto COOLDOWN_LOAD_AD{std::chrono::seconds{11}};
 
     void show_banner();

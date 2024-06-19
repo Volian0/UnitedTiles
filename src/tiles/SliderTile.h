@@ -15,6 +15,8 @@ public:
 	std::pair<TileColumn, std::optional<TileColumn>> get_end_column() const;
 
 private:
+	void revive() override;
+
 	[[nodiscard]] bool should_game_over() const final;
 	[[nodiscard]] bool should_die() const final;
 	void my_update() final;
@@ -31,11 +33,11 @@ private:
 	Number held_tile_duration = 0;
 
 	[[nodiscard]] uint8_t get_column_index() const;
-	const uint8_t _column_index;
+	const uint8_t _column_index{};
 
 	void render_fragment(class Texture* texture, Number length, Vec2 pos, bool facing_right) const;
 
-	FingerID finger;
+	FingerID finger{};
 	std::optional<Number> previous_offset;
-	Vec2 finger_pos;
+	Vec2 finger_pos{};
 };

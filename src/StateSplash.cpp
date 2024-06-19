@@ -14,7 +14,7 @@ m_logo{game->renderer.get(), "logo.png"},
 m_white{game->renderer.get(), "white.png"},
 m_font{game->renderer.get(), "roboto.ttf", 6.0L},
 m_font2{game->renderer.get(), "roboto.ttf", 3.0L},
-m_text{game->renderer.get(), &m_font, "v0.4.4 by Gabriel Hinca", Colors::BLACK},
+m_text{game->renderer.get(), &m_font, "v0.4.7 by Gabriel Hinca", Colors::BLACK},
 m_text2{game->renderer.get(), &m_font2, "Additional songs by JKen777, NathanTalksTech, pszemyslavv_", Colors::GRAY},
 m_dustmotes{{32, 32, 32, 255}, game->renderer.get(), "glow.png", 1.0L, 2.0L, 8, 1.0L, 1.0L, 1.0L, 2}
 {

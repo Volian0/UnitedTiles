@@ -295,6 +295,10 @@ void Tile::handle_first_interaction()
 			}
 		}
 	}
+	if (_level->_state == StateLevel::State::IDLE)
+	{
+		_level->change_tempo(_level->tps, _level->new_tp, _level->_position);
+	}
 }
 
 void Tile::handle_clear()

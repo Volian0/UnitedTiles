@@ -14,6 +14,8 @@ public:
 	std::shared_ptr<Tile> previous_tile;
 
 private:
+	void revive() override;
+
 	[[nodiscard]] bool should_game_over() const final;
 	[[nodiscard]] bool should_die() const final;
 	bool touch_down(uint16_t finger_id, Vec2 pos) final;

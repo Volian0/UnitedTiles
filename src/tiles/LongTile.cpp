@@ -53,6 +53,18 @@ void LongTile::my_update()
 		//else tap_length = 0.0L;
 }
 
+void LongTile::revive()
+{
+	if (is_state(&LongTileClearing))
+	{
+		force_change_state(&LongTileNotFullyCleared);
+	}
+	else if (is_state(&LongTileMissed))
+	{
+		force_change_state(&LongTileDefault);
+	}
+}
+
 bool LongTile::touch_down(uint16_t finger_id, Vec2 pos)
 {
 	if (is_state(&LongTileDefault))

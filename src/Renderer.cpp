@@ -14,7 +14,7 @@ Renderer::Renderer(bool vsync_)
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
 #ifdef __ANDROID__
-	_window = SDL_CreateWindow("United Tiles", 0, 0, 0, 0, SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_BORDERLESS | SDL_WINDOW_OPENGL);
+	_window = SDL_CreateWindow("United Tiles", 0, 0, 0, 0, SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_BORDERLESS | SDL_WINDOW_OPENGL | SDL_WINDOW_MAXIMIZED);
 #else
 	_window = SDL_CreateWindow("United Tiles", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 608, 1080, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 #endif

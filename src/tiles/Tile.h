@@ -88,9 +88,11 @@ public:
 	[[nodiscard]] virtual bool should_game_over() const = 0;
 	[[nodiscard]] virtual bool should_die() const = 0;
 
-	TileColumn missed_column;
+	TileColumn missed_column{};
 
-	Number y_offset;
+	Number y_offset{};
+
+	virtual void revive() {};
 
 protected:
 	[[nodiscard]] bool force_first_interaction() const;
@@ -114,6 +116,11 @@ public:
 
 	inline virtual void on_changed_state()
 	{
+	}
+
+	inline void force_change_state(const TileStateInfo* state)
+	{
+		_state = state;
 	}
 
 	inline bool change_state(const TileStateInfo* state)

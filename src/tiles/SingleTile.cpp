@@ -19,6 +19,14 @@ bool SingleTile::should_die() const
 	return should_game_over();
 }
 
+void SingleTile::revive()
+{
+	if (is_state(&SingleTileMissed))
+	{
+		force_change_state(&SingleTileDefault);
+	}
+}
+
 bool SingleTile::touch_down(uint16_t finger_id, Vec2 pos)
 {
 	if (is_state(&SingleTileDefault))

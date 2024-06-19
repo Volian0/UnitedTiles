@@ -15,6 +15,8 @@ public:
 	DoubleTile(class StateLevel* level_);
 
 private:
+	void revive() override;
+
 	[[nodiscard]] bool should_game_over() const final;
 	[[nodiscard]] bool should_die() const final;
 	bool touch_down(uint16_t finger_id, Vec2 pos) final;
@@ -27,7 +29,7 @@ private:
 
 	std::optional<Timepoint> tp_tapped;
 	std::optional<Timepoint> tp_second;
-	bool left_tile_cleared;
+	bool left_tile_cleared{false};
 
-	std::array<Number, 2> m_cleared_positions;
+	std::array<Number, 2> m_cleared_positions{0.0L, 0.0L};
 };

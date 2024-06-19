@@ -16,6 +16,8 @@ public:
 	static Number y_finger_tapped;
 
 private:
+	void revive() override;
+
 	[[nodiscard]] bool should_game_over() const final;
 	[[nodiscard]] bool should_die() const final;
 	void my_update() final;
@@ -30,8 +32,8 @@ private:
 
 	std::vector<std::pair<Number, Number>> taps;
 
-	FingerID finger;
-	Number y_tapped;
+	FingerID finger{};
+	Number y_tapped{};
 
-	Number m_cleared_position;
+	Number m_cleared_position{};
 };

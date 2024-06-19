@@ -145,6 +145,8 @@ public:
 
 	Number tps = 1.0L;
 
+	bool can_be_revived = true;
+
 	constexpr Number get_miss_range() const noexcept
 	{
 		return 0.1L + tps * 0.1L;

@@ -377,7 +377,15 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
         mSurface = new SDLSurface(getApplication());
 
         mLayout = new RelativeLayout(this);
-        mLayout.addView(mSurface);
+
+RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.FILL_PARENT,
+            RelativeLayout.LayoutParams.FILL_PARENT);
+
+            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+
+
+        mLayout.addView(mSurface, params);
 
         // Get our current screen orientation and pass it down.
         mCurrentOrientation = SDLActivity.getCurrentOrientation();

@@ -65,6 +65,11 @@ import com.google.android.play.core.review.ReviewManagerFactory;
 import com.google.android.play.core.review.ReviewInfo;
 import com.google.android.gms.tasks.*;
 
+import android.provider.Settings.System;
+import android.provider.Settings;
+
+import android.view.Window;
+
 public class UnitedTilesActivity extends SDLActivity {
     public AdView adViewB = null;
     public AdSize adSizeB = null;
@@ -73,6 +78,7 @@ public class UnitedTilesActivity extends SDLActivity {
     public boolean adLoaded = false;
     public boolean canUseSDK = false;
     public int resumedOnce = 0;
+    public boolean test_device = false;
     //private static MinesweeperPillarActivity activity;
 
     public InterstitialAd mInterstitialAd;
@@ -90,6 +96,10 @@ public class UnitedTilesActivity extends SDLActivity {
     }
 
     public void loadBigAd() {
+        if (test_device)
+        {
+            return;
+        }
         if (adLoaded) {
             return;
         }
@@ -98,7 +108,8 @@ public class UnitedTilesActivity extends SDLActivity {
 
         AdRequest adRequest = new AdRequest.Builder().build();
 
-        InterstitialAd.load(this, "ca-app-pub-9020041895455560/8092335055", adRequest,
+        //InterstitialAd.load(this, "ca-app-pub-9020041895455560/8092335055", adRequest,
+        InterstitialAd.load(this, "ca-app-pub-3940256099942544/1033173712", adRequest,
             new InterstitialAdLoadCallback() {
                 @Override
                 public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
@@ -152,15 +163,33 @@ public class UnitedTilesActivity extends SDLActivity {
     }
 
     public void showBigAd() {
+                if (test_device)
+        {
+            return;
+        }
         adLoaded = false;
         if (mInterstitialAd != null) {
             mInterstitialAd.show(this);
         }
     }
 
+    private boolean isTestDevice() {
+
+
+
+  String testLabSetting = Settings.System.getString(getContentResolver(), "firebase.test.lab");
+  return "true".equals(testLabSetting);
+}
+
+
     public void showAd() {
+                if (test_device)
+        {
+            return;
+        }
         adViewB = new AdView(this);
-        adViewB.setAdUnitId("ca-app-pub-9020041895455560/1718498398");
+        //adViewB.setAdUnitId("ca-app-pub-9020041895455560/1718498398");
+        adViewB.setAdUnitId("ca-app-pub-3940256099942544/9214589741");
         adViewB.setAdSize(AdSize.BANNER);
 
         AdRequest adRequest = new AdRequest.Builder().build();
@@ -169,7 +198,7 @@ public class UnitedTilesActivity extends SDLActivity {
             RelativeLayout.LayoutParams.WRAP_CONTENT,
             RelativeLayout.LayoutParams.WRAP_CONTENT);
 
-        params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
 
         params.addRule(RelativeLayout.CENTER_HORIZONTAL);
 
@@ -326,7 +355,13 @@ public void showLeaderboard(String leaderboardId)
         adLoaded = false;
         resumedOnce = 0;
         canUseSDK = false;
+        test_device = isTestDevice();
+        //test_device = true;
+        //getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
+
+
+        //getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         MobileAds.initialize(this, new OnInitializationCompleteListener() {
             @Override
             public void onInitializationComplete(InitializationStatus initializationStatus) {}

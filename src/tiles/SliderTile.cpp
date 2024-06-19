@@ -47,6 +47,21 @@ void SliderTile::my_update()
 	}
 }
 
+void SliderTile::revive()
+{
+	if (is_state(&SliderTileClearing) || is_state(&SliderTileMissed))
+	{
+		_level->cleared_tiles++;
+		force_change_state(&SliderTileCleared);
+	}
+	/*else if (is_state(&SliderTileMissed))
+	{
+		force_change_state(&SliderTileDefault);
+		held_tile_duration = 0.0F;
+		previous_offset.reset();
+	}*/
+}
+
 bool SliderTile::touch_down(uint16_t finger_id, Vec2 pos)
 {
 	if (is_state(&SliderTileDefault))

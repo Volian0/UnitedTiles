@@ -531,11 +531,44 @@ void StateLevel::update()
 
 	if (game_over_reset.has_value() && new_tp - game_over_reset.value() > 2.0L)
 	{
-		if (game->cfg->show_interstitial_ads && game->ad_manager.can_show_big_ad() && !perfect_score)
+		if (_song_info.acceleration_method != SongInfo::AccelerationMethod::ACCELERATION && can_be_revived /*&& game->ad_manager.can_show_rewarded_ad()*/)
 		{
-			game->ad_manager.show_big_ad();
+			soundfont->play_all_events();
+			perfect_score = false;
+			game_over_tile = nullptr;
+			game_over_scroll_to.reset();
+			can_be_revived = false;
+			game_over_reset.reset();
+			_state = State::IDLE;
+			for (auto& tile : tiles)
+			{
+				tile.second->revive();
+			}
+			for (auto& tile : tiles)
+			{
+				if (tile.second->is_active())
+				{
+					_position = tile.first + 3.0L;
+					break;
+				}
+				else
+				{
+					_position = tile.first + 3.0L + tile.second->get_tile_length();
+				}
+			}
+			for (auto& [position, tile] : tiles)
+			{ 
+				tile->y_offset = _position - position;
+			}
 		}
-		return game->change_state<StateSongMenu>();
+		else
+		{
+			if (game->cfg->show_interstitial_ads && game->ad_manager.can_show_big_ad() && !perfect_score)
+			{
+				game->ad_manager.show_big_ad();
+			}
+			return game->change_state<StateSongMenu>();
+		}
 	}
 
 	if (game_over_scroll_to.has_value() && _state == State::GAME_OVER)
@@ -848,7 +881,7 @@ void StateLevel::change_tempo(Number new_tps, const Timepoint& tp_now, Number po
 	tps = new_tps;
 	last_tempo_change = tp_now;
 	_state = State::ACTIVE;
-	txt_arrow.reset();
+	//txt_arrow.reset();
 	lbl_maker.reset();
 }
 

@@ -23,6 +23,15 @@ bool DoubleTile::should_die() const
 	return should_game_over();
 }
 
+void DoubleTile::revive()
+{
+	if (is_state(&DoubleTileMissed) || is_state(&DoubleTilePartiallyCleared))
+	{
+		force_change_state(&DoubleTileFullyCleared);
+		_level->cleared_tiles++;
+	}
+}
+
 bool DoubleTile::touch_down(uint16_t finger_id, Vec2 pos)
 {
 	const auto helper = is_active() ? _level->get_miss_range() : 0.0L;

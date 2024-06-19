@@ -14,6 +14,8 @@ public:
 	static void render_clearing(Number offset, class Texture* texture, Vec2 pos, Number tile_height, class Renderer* renderer);
 
 private:
+	void revive() override;
+
 	[[nodiscard]] bool should_game_over() const final;
 	[[nodiscard]] bool should_die() const final;
 	bool touch_down(uint16_t finger_id, Vec2 pos) final;
@@ -21,5 +23,5 @@ private:
 
 	void render_fg() const final;
 
-	Number m_cleared_position;
+	Number m_cleared_position{};
 };
