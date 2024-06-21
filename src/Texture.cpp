@@ -17,6 +17,12 @@ Texture::Texture(Renderer* renderer, const std::string& filename)
 	blend_mode = SDL_BLENDMODE_NONE;
 }
 
+void Texture::set_to_nearest()
+{
+	SDL_SetTextureScaleMode(reinterpret_cast<SDL_Texture*>(_ptr), SDL_ScaleModeNearest);
+	m_nearest = true;
+}
+
 Texture::Texture(Renderer* renderer, const Font* font, const std::string& text, Color color)
 	:RendererReloadable(renderer),
 	type{ Type::FONT },
@@ -56,6 +62,10 @@ void Texture::reload()
 		SDL_FreeSurface(surface);
 	}
 	update_size();
+	if (m_nearest)
+	{
+		set_to_nearest();
+	}
 }
 
 glm::u32vec2 Texture::get_psize() const

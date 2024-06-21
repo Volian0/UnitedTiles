@@ -49,6 +49,6 @@ private:
     std::chrono::steady_clock::time_point m_last_rewarded_ad_loaded{m_last_big_ad_showed};
 
     void* m_ptr;
-    bool taryfa_ulgowa = true;
+    bool taryfa_ulgowa = false;
     bool banner_showed = false;
 };

@@ -55,6 +55,8 @@ StateSoundfonts::StateSoundfonts(Game* game_)
         create_array<SoundfontPanel, extra_soundfonts.size()>(this)
     }
 {
+    //settings_gear.set_to_nearest();
+    txt_icons.set_to_nearest();
     settings_gear.blend_mode = 1;
     txt_icons.blend_mode = 1;
     _dev_button_texture.blend_mode = 1;

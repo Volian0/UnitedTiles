@@ -1,1 +1,11 @@
 include ':app'
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositories {
+        google()
+        mavenCentral()
+        // Add your custom repository here
+        maven { url 'https://android-sdk.is.com/' }
+    }
+}

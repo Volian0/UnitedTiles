@@ -27,8 +27,19 @@ void DoubleTile::revive()
 {
 	if (is_state(&DoubleTileMissed) || is_state(&DoubleTilePartiallyCleared))
 	{
-		force_change_state(&DoubleTileFullyCleared);
-		_level->cleared_tiles++;
+		if (tp_tapped)
+		{
+			force_change_state(&DoubleTileFullyCleared);
+			_level->cleared_tiles++;
+		}
+		else
+		{
+			force_change_state(&DoubleTileDefault);
+			tp_tapped.reset();
+			tp_second.reset();
+			left_tile_cleared = false;
+			m_cleared_positions = std::array<Number, 2>{0.0L, 0.0L};
+		}
 	}
 }
 

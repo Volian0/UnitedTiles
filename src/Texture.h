@@ -19,6 +19,8 @@ public:
 	Texture(Renderer* renderer, const Font* font, const std::string& text, Color color);
 	~Texture();
 
+	void set_to_nearest();
+
 	enum class Type : uint8_t {
 		FILE, FONT
 	} const type;
@@ -40,6 +42,7 @@ public:
 	[[nodiscard]] Vec2 get_rsize() const;
 
 private:
+	bool m_nearest{false}; 
 	void* _ptr;
 	glm::u32vec2 _psize;
 	Vec2 _rsize;

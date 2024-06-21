@@ -70,6 +70,16 @@ import android.provider.Settings;
 
 import android.view.Window;
 
+import com.vungle.ads.VunglePrivacySettings;
+import com.vungle.ads.VunglePrivacySettings; 
+import com.ironsource.mediationsdk.IronSource;
+import com.google.android.gms.ads.RequestConfiguration;
+import com.google.android.gms.ads.RequestConfiguration.Builder;
+import java.util.List;
+
+import com.google.android.gms.ads.ResponseInfo;
+import com.google.android.gms.ads.AdapterResponseInfo;
+
 public class UnitedTilesActivity extends SDLActivity {
     public AdView adViewB = null;
     public AdSize adSizeB = null;
@@ -108,13 +118,15 @@ public class UnitedTilesActivity extends SDLActivity {
 
         AdRequest adRequest = new AdRequest.Builder().build();
 
-        //InterstitialAd.load(this, "ca-app-pub-9020041895455560/8092335055", adRequest,
-        InterstitialAd.load(this, "ca-app-pub-3940256099942544/1033173712", adRequest,
+        InterstitialAd.load(this, "ca-app-pub-9020041895455560/8092335055", adRequest,
+        //InterstitialAd.load(this, "ca-app-pub-3940256099942544/1033173712", adRequest,
             new InterstitialAdLoadCallback() {
                 @Override
                 public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
                     // The mInterstitialAd reference will be null until
                     // an ad is loaded.
+                                                Log.d("L3 IronSource", "Ad is now loaded.");
+
                     mInterstitialAd = interstitialAd;
 
                     mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
@@ -133,6 +145,7 @@ public class UnitedTilesActivity extends SDLActivity {
                         @Override
                         public void onAdFailedToShowFullScreenContent(AdError adError) {
                             // Called when ad fails to show.
+                                        Log.d("L3 IronSource", "Ad failed to show");
                             mInterstitialAd = null;
                         }
 
@@ -143,6 +156,8 @@ public class UnitedTilesActivity extends SDLActivity {
 
                         @Override
                         public void onAdShowedFullScreenContent() {
+                            Log.d("L3 IronSource", "Ad shown");
+
                             // Called when ad is shown.
                         }
                     });
@@ -158,6 +173,8 @@ public class UnitedTilesActivity extends SDLActivity {
                 public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                     // Handle the error
                     mInterstitialAd = null;
+                                                Log.d("L3 IronSource", "Ad is not loaded");
+
                 }
             });
     }
@@ -188,11 +205,11 @@ public class UnitedTilesActivity extends SDLActivity {
             return;
         }
         adViewB = new AdView(this);
-        //adViewB.setAdUnitId("ca-app-pub-9020041895455560/1718498398");
-        adViewB.setAdUnitId("ca-app-pub-3940256099942544/9214589741");
+        adViewB.setAdUnitId("ca-app-pub-9020041895455560/1718498398");
+        //adViewB.setAdUnitId("ca-app-pub-3940256099942544/9214589741");
         adViewB.setAdSize(AdSize.BANNER);
 
-        AdRequest adRequest = new AdRequest.Builder().build();
+        AdRequest adRequest = new AdRequest.Builder().build(); 
 
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
             RelativeLayout.LayoutParams.WRAP_CONTENT,
@@ -219,6 +236,19 @@ public class UnitedTilesActivity extends SDLActivity {
 
                 resizeWindowAd();
             }
+
+
+            @Override
+            public void onAdFailedToLoad(LoadAdError loadAdError) {
+            ResponseInfo responseInfo = loadAdError.getResponseInfo();
+            List<AdapterResponseInfo> adapterResponses = responseInfo.getAdapterResponses();
+            Log.d("L1", responseInfo.toString());
+            for (AdapterResponseInfo info : adapterResponses) {
+                Log.d("L2", responseInfo.toString());
+            }
+            }
+
+
         });
 
     }
@@ -346,8 +376,44 @@ public void showLeaderboard(String leaderboardId)
         });
     }
 
+
+
+@Override
+public void onResume() {
+    super.onResume();
+    IronSource.onResume(this);
+}
+
+@Override
+public void onPause() {
+    super.onPause();
+    IronSource.onPause(this);
+}
+
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
+            //RequestConfiguration.Builder builder = new RequestConfiguration.Builder();
+            //List<String> testDeviceIds = Arrays.asList("6C3B420CA4230D8D76C463A2B27DF1E7");
+            //builder.setTestDeviceIds(testDeviceIds);
+            //builder.build();
+
+
+      VunglePrivacySettings.setGDPRStatus(true, "v1.0.0");
+
+
+VunglePrivacySettings.setCCPAStatus(true);
+
+
+
+IronSource.setConsent(true);
+
+
+IronSource.setMetaData("do_not_sell", "true");
+
+
         adViewB = null;
         adSizeB = null;
         resizeOnce = false;
@@ -364,7 +430,11 @@ public void showLeaderboard(String leaderboardId)
         //getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         MobileAds.initialize(this, new OnInitializationCompleteListener() {
             @Override
-            public void onInitializationComplete(InitializationStatus initializationStatus) {}
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+
+
+
+            }
         });
         PlayGamesSdk.initialize(this);
         GamesSignInClient gamesSignInClient = PlayGames.getGamesSignInClient(this);
