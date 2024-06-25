@@ -26,7 +26,7 @@ void Configuration::load_from_file()
 	read_u8(*file).value_or(0);
 	preferred_soundfont = read_u16(*file).value_or(0);
 	read_u8(*file).value_or(0);
-	read_u8(*file).value_or(0);
+	read_u8(*file).value_or(0); 
 	read_u8(*file).value_or(0);
 	read_u8(*file).value_or(1);
 	soundfont_volume = read_u8(*file).value_or(128); 
@@ -39,7 +39,7 @@ void Configuration::load_from_file()
 	show_banner_ads = true;
 	show_interstitial_ads = true;
 
-	use_pt2_method = read_u8(*file).value_or(0);   
+	read_u8(*file).value_or(0);   
 	
 }
 

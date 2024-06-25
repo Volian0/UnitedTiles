@@ -383,7 +383,7 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_, std::string_view t_score_
 	//_song_info.acceleration_method = SongInfo::AccelerationMethod::CLASSIC;
 	//_song_info.acceleration_info.classic_tempo_changes = {std::make_pair<uint32_t, Number>(10, 2.0L), {20, 7.0L}};
 
-	if (game->cfg->use_pt2_method) // 3 section mode
+	if (true || game->cfg->use_pt2_method) // 3 section mode
 	{
 		if (_song_info.acceleration_method == SongInfo::AccelerationMethod::LINEAR)
 		{
@@ -843,7 +843,10 @@ void StateLevel::render() const
 
 	if (_state != State::IDLE || !score.show_tps)
 	{
-		score_tps.render();
+		if (_song_info.acceleration_method != SongInfo::AccelerationMethod::ACCELERATION)
+		{
+			score_tps.render();
+		}
 		score.render(); 
 	}
 
