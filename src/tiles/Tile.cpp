@@ -237,7 +237,7 @@ void Tile::handle_first_interaction()
 				_level->perfect_score = true;
 			}
 		}
-		if (acceleration_method != SongInfo::AccelerationMethod::CLASSIC)
+		if (true)
 		{
 			if (_level->lap_id == 2)
 			{
@@ -273,7 +273,7 @@ void Tile::handle_first_interaction()
 				if (_level->lap_id == 1)
 					{
 						_level->change_tempo(change.second, _level->new_tp, _level->_position);
-						_level->lv_bg.change_state(_level->lv_bg.get_state() + 1);
+						//_level->lv_bg.change_state(_level->lv_bg.get_state() + 1);
 					}
 				else
 					_level->change_tempo(Number(new_bpm_pt2(_level->tps * 60.0L, 1.0F, 1.0F, _level->lap_id >= 4)) / 60.0L, _level->new_tp, _level->_position);

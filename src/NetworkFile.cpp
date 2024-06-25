@@ -108,7 +108,7 @@ std::size_t NetworkFile::write_callback(char* t_ptr, std::size_t t_size, std::si
     const auto total_size = t_size * t_nmemb;
     if (reinterpret_cast<std::ofstream*>(t_userdata)->write(t_ptr, t_size * t_nmemb))
     {
-        if (reinterpret_cast<std::ofstream*>(t_userdata)->tellp() > 50000000)
+        if (reinterpret_cast<std::ofstream*>(t_userdata)->tellp() > 100000000)
         {
             return CURLE_WRITE_ERROR;        
         }

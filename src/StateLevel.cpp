@@ -136,17 +136,23 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_, std::string_view t_score_
 	slider_tile{game->renderer.get(), "slider.png"},
 	txt_white{game->renderer.get(), "white.png"},
 	slider_tile_clearing{game->renderer.get(), "slider_clearing.png"},
-	_debug_font{game->renderer.get(), "roboto.ttf", 4},
+	_debug_font{game->renderer.get(), "roboto.ttf", 6},
 	_burst{game_->renderer.get(), "white.png"},
 	//txt_trail{std::in_place, game_->renderer.get(), "trail.png"},
 	lv_bg{this},
-	song_id{song_id_}
+	song_id{song_id_}, 
+	_dev_button_texture{ game->renderer.get(), "dev_button.png" },
+	revive_yes{Vec2{}, 0.5L, 0, "Revive",  &_dev_button_texture, &_debug_font, this},
+	revive_no{Vec2{}, 0.5L, 0, "Exit",  &_dev_button_texture, &_debug_font, this}
 {
+	_dev_button_texture.blend_mode = 1;
+	//std::cout << "wow" << std::endl;
 	if (game->cfg->god_mode)
 	{
 		score.is_auto = true;
 	}
 	    game->ad_manager.load_big_ad();
+	    game->ad_manager.load_rewarded_ad();
 
 	    if (game_->cfg->show_banner_ads)
     {
@@ -533,7 +539,57 @@ void StateLevel::update()
 	{
 		if (_song_info.acceleration_method != SongInfo::AccelerationMethod::ACCELERATION && can_be_revived /*&& game->ad_manager.can_show_rewarded_ad()*/)
 		{
-			soundfont->play_all_events();
+			//game_over_reset.reset();
+			if (!revive_tp.has_value())
+			{
+				revive_tp = new_tp;
+				if (!game->ad_manager.can_show_rewarded_ad())
+				{
+					*revive_tp -= 100.0L;
+				} 
+			}
+			/*soundfont->play_all_events();
+			perfect_score = false;
+			game_over_tile = nullptr;
+			game_over_scroll_to.reset();
+			can_be_revived = false;
+			game_over_reset.reset();
+			_state = State::IDLE;
+			for (auto& tile : tiles)
+			{
+				tile.second->revive();
+			}
+			for (auto& tile : tiles)
+			{
+				if (tile.second->is_active())
+				{
+					_position = tile.first + 3.0L;
+					break;
+				}
+				else
+				{
+					_position = tile.first + 3.0L + tile.second->get_tile_length();
+				}
+			}
+			for (auto& [position, tile] : tiles)
+			{ 
+				tile->y_offset = _position - position;
+			}*/
+		}
+		else
+		{
+			if (game->cfg->show_interstitial_ads && game->ad_manager.can_show_big_ad() && !perfect_score)
+			{
+				game->ad_manager.show_big_ad();
+			}
+			return game->change_state<StateSongMenu>();
+		}
+	}
+
+	//handle revive
+	const auto revive=[&]()
+	{
+		soundfont->play_all_events();
 			perfect_score = false;
 			game_over_tile = nullptr;
 			game_over_scroll_to.reset();
@@ -560,13 +616,33 @@ void StateLevel::update()
 			{ 
 				tile->y_offset = _position - position;
 			}
-		}
-		else
+			revive_tp.reset();
+	};
+
+	//handle revive
+	if (revive_tp.has_value())
+	{
+		revive_yes.position.y = -0.15L * game->renderer->get_aspect_ratio();
+		revive_no.position.y = 0.15L * game->renderer->get_aspect_ratio();
+		const auto revive_seconds = get_revive_seconds();
+
+		if (game->ad_manager.is_rewarded())
 		{
-			if (game->cfg->show_interstitial_ads && game->ad_manager.can_show_big_ad() && !perfect_score)
+			return revive();
+		}
+		else if (revive_yes.update())
+		{
+			if (revive_seconds) //SHOW AD
 			{
-				game->ad_manager.show_big_ad();
+				game->ad_manager.show_rewarded_ad();
 			}
+			else //just revive
+			{
+				return revive();
+			}
+		}
+		else if (revive_no.update())
+		{
 			return game->change_state<StateSongMenu>();
 		}
 	}
@@ -792,6 +868,26 @@ void StateLevel::render() const
 	//experimental
 
 	if (game->cfg->show_gameplay_debug_info) render_debug();
+
+	if (revive_tp.has_value())
+	{
+		txt_white.tint = Colors::WHITE;
+		game->renderer->render(&txt_white, {}, txt_white.get_psize(), {}, {1.0L, 0.5L *game->renderer->get_aspect_ratio()}, {}); 
+
+		const auto revive_seconds = get_revive_seconds();
+
+		Texture txt_top(game->renderer.get(), &_debug_font, revive_seconds ? "Revive for ad?" : "Revive for free?", Colors::BLACK);
+		game->renderer->render(&txt_top, {}, txt_top.get_psize(), Vec2{0.0L, -0.4L * game->renderer->get_aspect_ratio()}, txt_top.get_rsize(), {});
+
+		if (revive_seconds)
+		{
+			Texture txt_bottom(game->renderer.get(), &_debug_font, "...or you can wait "+std::to_string(*revive_seconds)+" seconds to revive without ad!", Colors::GRAY);
+			game->renderer->render(&txt_bottom, {}, txt_bottom.get_psize(), Vec2{0.0L, 0.4L * game->renderer->get_aspect_ratio()}, txt_bottom.get_rsize() * 0.7L, {});
+
+		}
+		revive_yes.render();
+		revive_no.render();
+	}
 }
 
 Number StateLevel::get_tile_pos(const Tile* tile_)

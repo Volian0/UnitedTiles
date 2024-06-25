@@ -89,6 +89,109 @@ public class UnitedTilesActivity extends SDLActivity {
     public boolean canUseSDK = false;
     public int resumedOnce = 0;
     public boolean test_device = false;
+
+  public boolean adRewardLoaded = false;
+    private RewardedAd rewardedAd;
+
+
+  public void testLoadRewardedAd()
+  {
+        this.runOnUiThread(new Runnable() {
+    @Override
+    public void run() {
+        // Your UI update logic goes here
+    loadRewardedAd();
+    }
+});
+  }
+
+  public void testShowRewardedAd()
+  {
+        this.runOnUiThread(new Runnable() {
+    @Override
+    public void run() {
+        // Your UI update logic goes here
+    showRewardedAd();
+    }
+});
+  }
+
+public void loadRewardedAd()
+  {
+    if (adRewardLoaded)
+    {
+      return;
+    }
+    AdRequest adRequest = new AdRequest.Builder().build();
+    RewardedAd.load(this, "ca-app-pub-9020041895455560/5589638257",
+      adRequest, new RewardedAdLoadCallback() {
+        @Override
+        public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+          // Handle the error. 
+          rewardedAd = null;
+        }
+
+        @Override
+        public void onAdLoaded(@NonNull RewardedAd ad) {
+          rewardedAd = ad;
+          adRewardLoaded = true;
+          //showRewardedAd();
+          rewardedAd.setFullScreenContentCallback(new FullScreenContentCallback() {
+  @Override
+  public void onAdClicked() {
+    // Called when a click is recorded for an ad.
+  }
+
+   @Override
+  public void onAdDismissedFullScreenContent() {
+    // Called when ad is dismissed.
+    // Set the ad reference to null so you don't show the ad a second time.
+    rewardedAd = null;
+  }
+
+  @Override
+  public void onAdFailedToShowFullScreenContent(AdError adError) {
+    // Called when ad fails to show.
+    rewardedAd = null;
+  }
+
+  @Override
+  public void onAdImpression() {
+    // Called when an impression is recorded for an ad.
+  }
+
+  @Override
+  public void onAdShowedFullScreenContent() {
+    // Called when ad is shown.
+  }
+});
+
+        }
+    });
+
+
+
+  } 
+
+  public void showRewardedAd()
+  {
+    adRewardLoaded = false;
+    if (rewardedAd != null) {
+  rewardedAd.show(this, new OnUserEarnedRewardListener() {
+    @Override
+    public void onUserEarnedReward(@NonNull RewardItem rewardItem) {
+      // Handle the reward.
+      handleReward(); 
+    }
+  });
+} else {
+}
+
+  }
+
+  public static native void handleReward();
+
+
     //private static MinesweeperPillarActivity activity;
 
     public InterstitialAd mInterstitialAd;
@@ -418,6 +521,8 @@ IronSource.setMetaData("do_not_sell", "true");
         adSizeB = null;
         resizeOnce = false;
         showBigOnce = false;
+          adRewardLoaded = false;
+    rewardedAd = null;
         adLoaded = false;
         resumedOnce = 0;
         canUseSDK = false;

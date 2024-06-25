@@ -88,6 +88,8 @@ class StateLevel : public GameState
 public:
 	StateLevel(Game* game_, uint16_t song_id_, std::string_view t_song_filename = {});
 
+
+
 	const uint16_t song_id;
 
 	mutable Texture txt_single_tile;
@@ -127,6 +129,25 @@ public:
 	Tile* game_over_tile = nullptr;
 
 	mutable Font _debug_font;
+
+	mutable Texture _dev_button_texture;
+	std::optional<Timepoint> revive_tp;
+	DevButton revive_yes;
+	DevButton revive_no;
+
+	[[nodiscard]] constexpr std::optional<unsigned> get_revive_seconds() const noexcept
+	{
+		if (!revive_tp)
+		{
+			return std::nullopt;
+		}
+		unsigned seconds = new_tp - *revive_tp;
+		if (seconds >= 60)
+		{
+			return std::nullopt;
+		}
+		return 60 - seconds;
+	}
 
 	void render_debug() const;
 

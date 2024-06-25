@@ -57,6 +57,42 @@ extern "C"
 
         env->CallVoidMethod(obj, methodId);
     }
+    JNIEXPORT void JNICALL Java_com_volian_unitedtiles_UnitedTilesActivity_testLoadRewardedAd(JNIEnv* env,
+                                                                                                   jobject obj)
+    {
+        jclass clazz = env->FindClass("com/volian/unitedtiles/UnitedTilesActivity");
+        if (clazz == nullptr)
+            throw std::runtime_error("class not found");
+        ; // Class not found
+
+        jmethodID methodId = env->GetMethodID(clazz, "testLoadRewardedAd", "()V");
+        if (methodId == nullptr)
+            throw std::runtime_error("method not found"); // Method not found
+
+        env->CallVoidMethod(obj, methodId);
+    }
+
+        JNIEXPORT void JNICALL Java_com_volian_unitedtiles_UnitedTilesActivity_testShowRewardedAd(JNIEnv* env,
+                                                                                                   jobject obj)
+    {
+        jclass clazz = env->FindClass("com/volian/unitedtiles/UnitedTilesActivity");
+        if (clazz == nullptr)
+            throw std::runtime_error("class not found");
+        ; // Class not found
+
+        jmethodID methodId = env->GetMethodID(clazz, "testShowRewardedAd", "()V");
+        if (methodId == nullptr)
+            throw std::runtime_error("method not found"); // Method not found
+
+        env->CallVoidMethod(obj, methodId);
+    }
+
+        JNIEXPORT void JNICALL Java_com_volian_unitedtiles_UnitedTilesActivity_handleReward(JNIEnv* env,
+                                                                                                  jobject /* this */)
+    {
+        AdManager::m_reward = true;
+    }
+
 
     JNIEXPORT void JNICALL Java_com_volian_unitedtiles_UnitedTilesActivity_testShare(JNIEnv* env,
                                                                                                    jobject obj)
@@ -133,6 +169,16 @@ void call_java_function(std::string_view t_function)
     {
         Java_com_volian_unitedtiles_UnitedTilesActivity_testShowBanner(
             (JNIEnv*)SDL_AndroidGetJNIEnv(), (jobject)SDL_AndroidGetActivity());
+    }
+    else if (t_function == "load_rewarded_ad")
+    {
+        Java_com_volian_unitedtiles_UnitedTilesActivity_testLoadRewardedAd((JNIEnv*)SDL_AndroidGetJNIEnv(),
+                                                                                   (jobject)SDL_AndroidGetActivity());
+    }
+    else if (t_function == "show_rewarded_ad")
+    {
+        Java_com_volian_unitedtiles_UnitedTilesActivity_testShowRewardedAd((JNIEnv*)SDL_AndroidGetJNIEnv(),
+                                                                                   (jobject)SDL_AndroidGetActivity());
     }
 }
 
@@ -280,7 +326,8 @@ bool AdManager::show_rewarded_ad()
 [[nodiscard]] bool AdManager::can_show_big_ad()
 {
 #ifdef __ANDROID__
-    return std::chrono::steady_clock::now() - m_last_big_ad_showed >= COOLDOWN_BIG_AD && can_load_big_ad();
+    return m_is_big_ad_loaded && std::chrono::steady_clock::now() - m_last_big_ad_showed >= COOLDOWN_BIG_AD && 
+    std::chrono::steady_clock::now() - m_last_big_ad_loaded >= std::chrono::seconds(61);
 #else
     return false;
 #endif
@@ -288,8 +335,8 @@ bool AdManager::show_rewarded_ad()
 [[nodiscard]] bool AdManager::can_show_rewarded_ad()
 {
 #ifdef __ANDROID__
-    return std::chrono::steady_clock::now() - m_last_rewarded_ad_showed >= COOLDOWN_REWARDED_AD &&
-           can_load_rewarded_ad();
+    return m_is_rewarded_ad_loaded && std::chrono::steady_clock::now() - m_last_rewarded_ad_showed >= COOLDOWN_REWARDED_AD &&
+           std::chrono::steady_clock::now() - m_last_rewarded_ad_loaded >= std::chrono::seconds(61);
 #else
     return false;
 #endif
