@@ -3,6 +3,8 @@
 #include "NonCopyable.h"
 #include "Soundfont.h"
 
+#include <SDL_mixer.h>
+
 #include <memory>
 #include <mutex>
 
@@ -16,13 +18,13 @@ public:
 	[[nodiscard]] std::shared_ptr<Soundfont> load_soundfont(const std::string& filename);
 	void unload_soundfont();
 
-	static void data_callback(struct ma_device* device, void* output, const void* input, uint32_t frames);
+	static void data_callback(void* t_user_ptr, std::uint8_t* t_stream, int t_length);
 
 	const uint16_t sample_rate;
 	const bool stereo;
 
 private:
-	void* _ptr;
+	//void* _ptr;
 	std::shared_ptr<Soundfont> _soundfont;
 	mutable std::mutex _soundfont_mutex;
 };

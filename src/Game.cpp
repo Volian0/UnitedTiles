@@ -234,6 +234,7 @@ void Game::append_cfg()
 {
 	renderer->vsync = cfg->enable_vsync;
 	renderer->reload();
+	audio.reset();
 	audio = std::make_unique<AudioDevice>(cfg->audio_sample_rate, cfg->audio_stereo);
 	DustMotes::enabled = cfg->enable_particles_dustmotes;
 	BurstParticles::enabled = cfg->enable_particles_burst;
