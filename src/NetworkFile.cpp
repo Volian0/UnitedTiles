@@ -4,7 +4,7 @@
 
 #include <curl/curl.h>
 #include <picosha2/picosha2.h>
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 #include <array>
 #include <utility>

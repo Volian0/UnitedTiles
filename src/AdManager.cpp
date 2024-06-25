@@ -2,7 +2,7 @@
 
 #ifdef __ANDROID__
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 #include <jni.h>
 
 #include <stdexcept>

@@ -3,8 +3,8 @@
 #include "Renderer.h"
 #include "Path.h"
 
-#include <SDL/SDL_image.h>
-#include <SDL/SDL_ttf.h>
+#include <SDL_image.h>
+#include <SDL_ttf.h>
 
 Texture::Texture(Renderer* renderer, const std::string& filename)
 	:RendererReloadable(renderer),

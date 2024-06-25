@@ -1,6 +1,6 @@
 #include "Path.h"
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 #include <filesystem>
 

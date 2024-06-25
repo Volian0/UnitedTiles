@@ -145,6 +145,7 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_, std::string_view t_score_
 	revive_yes{Vec2{}, 0.5L, 0, "Revive",  &_dev_button_texture, &_debug_font, this},
 	revive_no{Vec2{}, 0.5L, 0, "Exit",  &_dev_button_texture, &_debug_font, this}
 {
+	    game->stop_music();
 	_dev_button_texture.blend_mode = 1;
 	//std::cout << "wow" << std::endl;
 	if (game->cfg->god_mode)
@@ -542,6 +543,7 @@ void StateLevel::update()
 			//game_over_reset.reset();
 			if (!revive_tp.has_value())
 			{
+				game->play_music();
 				revive_tp = new_tp;
 				if (!game->ad_manager.can_show_rewarded_ad())
 				{
@@ -580,6 +582,7 @@ void StateLevel::update()
 		{
 			if (game->cfg->show_interstitial_ads && game->ad_manager.can_show_big_ad() && !perfect_score)
 			{
+				game->stop_music();
 				game->ad_manager.show_big_ad();
 			}
 			return game->change_state<StateSongMenu>();
@@ -596,6 +599,7 @@ void StateLevel::update()
 			can_be_revived = false;
 			game_over_reset.reset();
 			_state = State::IDLE;
+			game->stop_music();
 			for (auto& tile : tiles)
 			{
 				tile.second->revive();
@@ -634,6 +638,7 @@ void StateLevel::update()
 		{
 			if (revive_seconds) //SHOW AD
 			{
+				game->stop_music();
 				game->ad_manager.show_rewarded_ad();
 			}
 			else //just revive

@@ -29,6 +29,7 @@ public:
 	bool show_banner_ads = true;
 	bool show_interstitial_ads = true;
 	static constexpr bool use_pt2_method = false;
+	bool menu_music = true;
 	//constexpr static bool show_banner_ads = false;
 	//constexpr static bool show_interstitial_ads = false;
 };

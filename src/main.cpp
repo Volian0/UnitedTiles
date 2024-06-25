@@ -1,6 +1,6 @@
 #include "Game.h"
 
-#include <SDL/SDL.h> //This is required here, so don't remove it
+#include <SDL.h> //This is required here, so don't remove it
 
 int main(int argc, char* argv[])
 {

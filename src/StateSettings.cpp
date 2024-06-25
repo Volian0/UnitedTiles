@@ -7,7 +7,7 @@
 #include "StateSongMenu.h"
 #include "StateSoundfonts.h"
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 #include <algorithm>
 
@@ -25,6 +25,7 @@ StateSettings::StateSettings(Game* game_)
 	ad_hint{"Consider enabling ads to support the game!", 0.9L,
 	Vec2{},Vec2{},&_font,game->renderer.get()}
 {
+	    //game->stop_music();
 	_bg.tint = {0xB0, 0xD0, 0xFF, 255}; 
 	_dev_button_texture.blend_mode = 1;
 	cb_u.blend_mode = 1;
@@ -44,6 +45,7 @@ StateSettings::StateSettings(Game* game_)
 	//ONLY TEMPORARY, UNCOMMENT FOR PRODUCTION
 	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Support the game by banner ads", game->renderer.get()), std::forward_as_tuple(game->cfg->show_banner_ads));
 	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Support the game by game over ads", game->renderer.get()), std::forward_as_tuple(game->cfg->show_interstitial_ads));
+	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Main Menu Music", game->renderer.get()), std::forward_as_tuple(game->cfg->menu_music));
 	//check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "PT2 Acceleration", game->renderer.get()), std::forward_as_tuple(game->cfg->use_pt2_method));
 
 

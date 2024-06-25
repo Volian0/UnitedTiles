@@ -3,7 +3,7 @@
 #include "Renderer.h"
 #include "Path.h"
 
-#include <SDL/SDL_ttf.h>
+#include <SDL_ttf.h>
 
 Font::Font(Renderer* renderer, const std::string& filename_, Number size_)
 	:RendererReloadable(renderer),

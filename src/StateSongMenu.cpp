@@ -35,6 +35,7 @@ StateSongMenu::StateSongMenu(Game* game_)
     share2{"and compete in the leaderboards!", 1.0L, Vec2{get_x_pos(106-72), 0}, {-1.0L, 0.0L}, &font24, game->renderer.get()},
     share_button{{get_x_pos(414), 0}, get_x_size(144), 0, "Share", &_dev_button_texture, &font32, this, 0.0625L * 0.75L}
 {
+    game->play_music();
     //settings_gear.set_to_nearest();
     txt_icons.set_to_nearest();
         txt_icons.blend_mode = 1;

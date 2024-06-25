@@ -1,7 +1,7 @@
 #include "TextInput.h"
 #include "../Game.h"
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 #include <iostream>
 

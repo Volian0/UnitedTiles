@@ -11,9 +11,9 @@
 #include "RNG.h"
 #include "NetworkFile.h"
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
-#include <SDL/SDL_ttf.h>
+#include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_ttf.h>
 #include <curl/curl.h>
 
 #include <algorithm>
@@ -34,6 +34,9 @@ Game::Game(std::string_view t_song_filename)
 
 	renderer = std::make_unique<Renderer>(cfg->enable_vsync);
 	audio = std::make_unique<AudioDevice>(cfg->audio_sample_rate, cfg->audio_stereo);
+
+		main_menu_music = std::make_unique<Music>(Path::res("menu.ogg", "sounds"));
+
 
 	DustMotes::enabled = cfg->enable_particles_dustmotes;
 	BurstParticles::enabled = cfg->enable_particles_burst;
@@ -78,6 +81,7 @@ Game::~Game()
 	//make sure to destruct the old state
 	stop();
 
+	main_menu_music.reset();
 	audio.reset();
 	renderer.reset();
 	cfg->save_to_file();
@@ -230,12 +234,39 @@ void Game::stop()
 	_state.reset();
 }
 
+void Game::play_music()
+{
+	if (!cfg->menu_music)
+	{
+		return;
+	}
+	if (m_music_playing)
+	{
+		return;
+	}
+	m_music_playing = true;
+	main_menu_music->fade_in(1.0F);
+}
+void Game::stop_music()
+{
+	if (!m_music_playing)
+	{
+		return;
+	}
+	main_menu_music->fade_out(0.5F);
+	m_music_playing = false;
+}
+
 void Game::append_cfg()
 {
 	renderer->vsync = cfg->enable_vsync;
 	renderer->reload();
+	main_menu_music->fade_out(0.0F);
+	main_menu_music.reset();
 	audio.reset();
 	audio = std::make_unique<AudioDevice>(cfg->audio_sample_rate, cfg->audio_stereo);
+	main_menu_music = std::make_unique<Music>(Path::res("menu.ogg", "sounds"));
+	m_music_playing = false;
 	DustMotes::enabled = cfg->enable_particles_dustmotes;
 	BurstParticles::enabled = cfg->enable_particles_burst;
 	cfg->save_to_file();

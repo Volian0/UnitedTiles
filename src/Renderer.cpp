@@ -2,7 +2,7 @@
 
 #include "Texture.h"
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 #include <atomic>
 #include <iostream>

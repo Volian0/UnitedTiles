@@ -6,6 +6,7 @@
 #include "AudioDevice.h"
 #include "AdManager.hpp"
 #include "Timepoint.h"
+#include "Music.hpp"
 
 #include <memory>
 #include <string_view>
@@ -42,8 +43,13 @@ public:
 
 	std::unique_ptr<Renderer> renderer;
 	std::unique_ptr<AudioDevice> audio;
+	std::unique_ptr<Music> main_menu_music;
+
+	void play_music();
+	void stop_music();
 
 private:
+	bool m_music_playing = false;
 	void init_libraries();
 	void deinit_libraries();
 	
