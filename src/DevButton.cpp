@@ -30,6 +30,7 @@ bool DevButton::update()
 		{
 			if (!is_held() && in_range(touch_event.position))
 			{
+				_state->game->sfx_tick->play(0);
 				_held_finger_id.emplace(touch_event.finger_id);
 			}
 		}
@@ -40,6 +41,7 @@ bool DevButton::update()
 				_held_finger_id.reset();
 				if (in_range(touch_event.position))
 				{
+					_state->game->sfx_press->play(0);
 					_pressed = true;
 				}
 			}

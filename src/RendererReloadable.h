@@ -12,6 +12,7 @@ public:
 
 	virtual void unload() = 0;
 	virtual void reload() = 0;
+	virtual void update_size(){};
 
 protected:
 	Renderer* _renderer;

@@ -36,6 +36,8 @@ Game::Game(std::string_view t_song_filename)
 	audio = std::make_unique<AudioDevice>(cfg->audio_sample_rate, cfg->audio_stereo);
 
 		main_menu_music = std::make_unique<Music>(Path::res("menu.ogg", "sounds"));
+			sfx_press = std::make_unique<Sound>(Path::res("press.wav", "sounds"));
+	sfx_tick = std::make_unique<Sound>(Path::res("tick.wav", "sounds"));
 
 
 	DustMotes::enabled = cfg->enable_particles_dustmotes;
@@ -91,6 +93,9 @@ Game::~Game()
 
 std::atomic_bool mutex_network_usage = false;
 
+extern std::atomic_bool active_audio;
+
+
 void Game::run()
 {
 	_state_changed = false;
@@ -115,9 +120,11 @@ void Game::run()
 				_in_foreground = false;
 				_in_background = true;
 				std::cout << "Entering background..." << std::endl;
+				active_audio = false;
 			}
 			else if (event.type == SDL_APP_DIDENTERFOREGROUND)
 			{
+				active_audio = true;
 				_in_foreground = true;
 			}
 			else if (event.type == SDL_QUIT) {
@@ -222,7 +229,7 @@ void Game::run()
 		//check for SDL errors
 		std::string sdlerror(SDL_GetError());
 		if (!sdlerror.empty()) {
-			if (cfg->show_sdl_errors)
+			if (true || cfg->show_sdl_errors)
 				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "United Tiles - SDL Error", sdlerror.c_str(), nullptr);
 			SDL_ClearError(); }
 	}
@@ -266,6 +273,8 @@ void Game::append_cfg()
 	audio.reset();
 	audio = std::make_unique<AudioDevice>(cfg->audio_sample_rate, cfg->audio_stereo);
 	main_menu_music = std::make_unique<Music>(Path::res("menu.ogg", "sounds"));
+	sfx_press = std::make_unique<Sound>(Path::res("press.wav", "sounds"));
+	sfx_tick = std::make_unique<Sound>(Path::res("tick.wav", "sounds"));
 	m_music_playing = false;
 	DustMotes::enabled = cfg->enable_particles_dustmotes;
 	BurstParticles::enabled = cfg->enable_particles_burst;

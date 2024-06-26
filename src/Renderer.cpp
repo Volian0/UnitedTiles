@@ -41,16 +41,16 @@ void Renderer::display()
 void Renderer::reload()
 {
 	std::cout << "Reloading renderer" << std::endl;
+	//for (RendererReloadable* reloadable : _reloadables)
+	//{
+	//	reloadable->unload();
+	//}
+	//SDL_DestroyRenderer(reinterpret_cast<SDL_Renderer*>(_ptr));
+	//_ptr = SDL_CreateRenderer(reinterpret_cast<SDL_Window*>(_window), -1, vsync ? SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC : SDL_RENDERER_ACCELERATED);
+	update_size(); 
 	for (RendererReloadable* reloadable : _reloadables)
 	{
-		reloadable->unload();
-	}
-	SDL_DestroyRenderer(reinterpret_cast<SDL_Renderer*>(_ptr));
-	_ptr = SDL_CreateRenderer(reinterpret_cast<SDL_Window*>(_window), -1, vsync ? SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC : SDL_RENDERER_ACCELERATED);
-	update_size();
-	for (RendererReloadable* reloadable : _reloadables)
-	{
-		reloadable->reload();
+		reloadable->update_size();
 	}
 
 	if (_clip_size != Vec2{})
@@ -91,9 +91,13 @@ extern std::atomic_bool active_audio;
 
 bool Renderer::active() const
 {
+	#ifdef __ANDROID__
+	return true;
+	#else
 	bool active = !(SDL_GetWindowFlags(reinterpret_cast<SDL_Window*>(_window)) & SDL_WINDOW_MINIMIZED);
 	active_audio = active;
 	return active;
+	#endif
 }
 
 void Renderer::set_clip_rect(Vec2 pos, Vec2 size, Vec2 origin)

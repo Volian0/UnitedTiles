@@ -8,7 +8,7 @@
 Font::Font(Renderer* renderer, const std::string& filename_, Number size_)
 	:RendererReloadable(renderer),
 	filename{ filename_ }, size{ size_ },
-	_ptr{ TTF_OpenFont(Path::res(filename, "fonts").c_str(), size * Number(_renderer->get_size().x) * 0.01L) },
+	_ptr{ TTF_OpenFont(Path::res(filename, "fonts").c_str(), size * 7.0F /** Number(_renderer->get_size().x) * 0.01L)*/) },
 	_height{Number(TTF_FontLineSkip(reinterpret_cast<TTF_Font*>(_ptr))) / Number(_renderer->get_size().y)}
 {
 }
@@ -25,6 +25,7 @@ void Font::unload()
 
 void Font::reload()
 {
+	std::abort();
 	_ptr = TTF_OpenFont(Path::res(filename, "fonts").c_str(), size * Number(_renderer->get_size().x) * 0.01L);
 	_height = Number(TTF_FontLineSkip(reinterpret_cast<TTF_Font*>(_ptr))) / Number(_renderer->get_size().y);
 }

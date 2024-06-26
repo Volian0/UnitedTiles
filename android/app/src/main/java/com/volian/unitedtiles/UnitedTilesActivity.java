@@ -497,6 +497,7 @@ public void onPause() {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
             //RequestConfiguration.Builder builder = new RequestConfiguration.Builder();
             //List<String> testDeviceIds = Arrays.asList("6C3B420CA4230D8D76C463A2B27DF1E7");
@@ -504,18 +505,19 @@ public void onPause() {
             //builder.build();
 
 
-      VunglePrivacySettings.setGDPRStatus(true, "v1.0.0");
+      VunglePrivacySettings.setGDPRStatus(false, "v1.0.0");
 
 
-VunglePrivacySettings.setCCPAStatus(true);
+VunglePrivacySettings.setCCPAStatus(false);
 
 
 
-IronSource.setConsent(true);
-
-
+IronSource.setConsent(false);
 IronSource.setMetaData("do_not_sell", "true");
 
+IronSource.setMetaData("is_deviceid_optout","true");
+IronSource.setMetaData("is_child_directed","true");
+IronSource.setMetaData("Google_Family_Self_Certified_SDKS","true");
 
         adViewB = null;
         adSizeB = null;
@@ -529,7 +531,6 @@ IronSource.setMetaData("do_not_sell", "true");
         test_device = isTestDevice();
         //test_device = true;
         //getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        super.onCreate(savedInstanceState);
 
 
         //getWindow().requestFeature(Window.FEATURE_NO_TITLE);

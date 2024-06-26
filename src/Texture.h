@@ -43,10 +43,10 @@ public:
 
 private:
 	bool m_nearest{false}; 
-	void* _ptr;
+	void* _ptr=nullptr;
 	glm::u32vec2 _psize;
 	Vec2 _rsize;
-	void update_size();
+	void update_size() override;
 	void unload() override;
 	void reload() override;
 };

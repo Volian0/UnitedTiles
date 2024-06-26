@@ -29,6 +29,7 @@ private:
 	Font m_font2;
 	mutable Texture m_text;
 	mutable Texture m_text2;
+	mutable Texture m_text3;
 	mutable std::optional<Timepoint> m_first_tp;
 	
 	DustMotes m_dustmotes;

@@ -6,12 +6,25 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 
+#include <chrono>
+#include <iostream>
+#include <thread>
+
 Texture::Texture(Renderer* renderer, const std::string& filename)
 	:RendererReloadable(renderer),
 	type{ Type::FILE },
 	info{ FileInfo{ filename } }
 {
-	_ptr = IMG_LoadTexture(reinterpret_cast<SDL_Renderer*>(_renderer->_ptr), Path::res(filename, "textures").c_str());
+	while (true)
+	{
+		_ptr = IMG_LoadTexture(reinterpret_cast<SDL_Renderer*>(_renderer->_ptr), Path::res(filename, "textures").c_str());
+		if (_ptr == nullptr)
+		{
+			std::cout << filename << std::endl;
+			std::this_thread::sleep_for(std::chrono::milliseconds(250));
+		}
+		else break;
+	}
 	SDL_SetTextureScaleMode(reinterpret_cast<SDL_Texture*>(_ptr), SDL_ScaleModeBest);
 	update_size();
 	blend_mode = SDL_BLENDMODE_NONE;
@@ -23,13 +36,33 @@ void Texture::set_to_nearest()
 	m_nearest = true;
 }
 
-Texture::Texture(Renderer* renderer, const Font* font, const std::string& text, Color color)
+Texture::Texture(Renderer* renderer, const Font* font, const std::string& text2, Color color)
 	:RendererReloadable(renderer),
 	type{ Type::FONT },
-	info{ FontInfo{ font->filename, font->size, text, color } }
+	info{ FontInfo{ font->filename, font->size, text2.empty() ? " " : text2, color } }
 {
-	SDL_Surface* surface = TTF_RenderUTF8_Blended(reinterpret_cast<TTF_Font*>(font->_ptr), text.c_str(), { color.r,color.g,color.b,color.a });
-	_ptr = SDL_CreateTextureFromSurface(reinterpret_cast<SDL_Renderer*>(_renderer->_ptr), surface);
+	std::string text = text2.empty() ? " " : text2;
+	SDL_Surface* surface = nullptr;
+	while (true)
+	{
+		surface = TTF_RenderUTF8_Blended(reinterpret_cast<TTF_Font*>(font->_ptr), text.c_str(), { color.r,color.g,color.b,color.a });
+		if (surface == nullptr)
+		{
+			std::cout << text << std::endl;
+			std::this_thread::sleep_for(std::chrono::milliseconds(250));
+		}
+		else break;
+	}
+while (true)
+	{
+		_ptr = SDL_CreateTextureFromSurface(reinterpret_cast<SDL_Renderer*>(_renderer->_ptr), surface);
+		if (_ptr == nullptr)
+		{
+						std::cout << text << std::endl;
+			std::this_thread::sleep_for(std::chrono::milliseconds(250));
+		}
+		else break;
+	}
 	SDL_FreeSurface(surface);
 	update_size();
 	blend_mode = SDL_BLENDMODE_BLEND;
@@ -80,8 +113,14 @@ Vec2 Texture::get_rsize() const
 
 void Texture::update_size()
 {
+	std::cout << "updating size" << std::endl;
 	int w, h;
 	SDL_QueryTexture(reinterpret_cast<SDL_Texture*>(_ptr), nullptr, nullptr, &w, &h);
 	_psize = { w, h };
-	_rsize = Vec2(_psize) / Vec2(_renderer->get_size());
+	if (std::holds_alternative<FontInfo>(info))
+	{
+		_rsize = Vec2(_psize) * 0.0015L;
+		_rsize.y *= _renderer->get_aspect_ratio();
+	}
+	else _rsize = Vec2(_psize) / Vec2(_renderer->get_size());
 }
