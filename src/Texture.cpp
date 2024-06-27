@@ -113,7 +113,7 @@ Vec2 Texture::get_rsize() const
 
 void Texture::update_size()
 {
-	std::cout << "updating size" << std::endl;
+	//std::cout << "updating size" << std::endl;
 	int w, h;
 	SDL_QueryTexture(reinterpret_cast<SDL_Texture*>(_ptr), nullptr, nullptr, &w, &h);
 	_psize = { w, h };

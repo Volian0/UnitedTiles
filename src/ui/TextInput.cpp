@@ -71,6 +71,7 @@ bool TextInput::update()
             }
             if (!has_focus() && in_range(touch_event.position))
             {
+                m_state->game->sfx_tick->play(0);
                 if (m_current_focused_text_input == nullptr)
                 {
                     SDL_StartTextInput();

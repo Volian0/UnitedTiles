@@ -1009,10 +1009,15 @@ void StateLevel::game_over(Tile* tile)
 	{
 		SongUserDatabase user_database;
 		user_database.load_from_files();
-		user_database.update_score(song_id, lap_id, score.get_score(), perfect_score);
+		auto score2 = score.get_score();
+		if (_song_info.acceleration_method == SongInfo::AccelerationMethod::ACCELERATION)
+		{
+			score2 = static_cast<decltype(score2)>(tps * 100.0F);
+		}
+		user_database.update_score(song_id, lap_id, score2, perfect_score);
 		if (!scoreboard_id.empty())
 		{
-			submit_score(scoreboard_id, score.get_score()); 
+			submit_score(scoreboard_id, score2); 
 		}
 	}
 }
@@ -1044,6 +1049,10 @@ void ScoreCounter::render() const
 		//return;
 	}
 	else if (is_auto)
+	{
+		_texture = std::make_unique<Texture>(_level->game->renderer.get(), &_font, "AUTO", Color{ 63, 255, 63, 255 });
+	}
+	if (is_auto && _level->_song_info.acceleration_method == SongInfo::AccelerationMethod::ACCELERATION)
 	{
 		_texture = std::make_unique<Texture>(_level->game->renderer.get(), &_font, "AUTO", Color{ 63, 255, 63, 255 });
 	}

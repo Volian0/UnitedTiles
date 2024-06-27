@@ -229,7 +229,7 @@ void Game::run()
 		//check for SDL errors
 		std::string sdlerror(SDL_GetError());
 		if (!sdlerror.empty()) {
-			if (true || cfg->show_sdl_errors)
+			if (cfg->show_sdl_errors)
 				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "United Tiles - SDL Error", sdlerror.c_str(), nullptr);
 			SDL_ClearError(); }
 	}

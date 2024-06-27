@@ -21,6 +21,7 @@ bool CheckBox::update(GameState* state)
 		const auto& pos = touch_event.position;
 		if (pos.x < -0.8L && std::abs(pos.y - label.position.y) < 0.1L * state->game->renderer->get_aspect_ratio())
 		{
+			state->game->sfx_tick->play(0);
 			_checked = !_checked;
 			break;
 		}
