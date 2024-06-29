@@ -44,9 +44,10 @@ class TextInput
     Number get_height() const noexcept;
 
     Vec2 m_position;
+    std::string m_text;
+
 private:
     Texture* m_white_txt;
-    std::string m_text;
     Number m_max_width;
     
     Font* m_font;

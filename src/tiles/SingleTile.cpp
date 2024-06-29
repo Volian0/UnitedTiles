@@ -2,6 +2,7 @@
 
 #include "../StateLevel.h"
 #include "../Game.h"
+#include "../RNG.h"
 
 #include <algorithm>
 
@@ -69,7 +70,8 @@ void SingleTile::render_fg() const
 	{
 		pos.x = get_column_x_pos(missed_column);
 		texture = &_level->txt_game_over_tile;
-		_level->game->renderer->render(texture, {}, texture->get_psize(), pos,
+		_level->game->renderer->render(texture, {}, 
+		RNG::integer(1,10000) == 0 ? texture->get_psize() : glm::u32vec2{1,1}, pos,
 			{ 0.25,  get_height() }, {}, { 0,1 });
 	}
 	else if (is_state(&SingleTileCleared) && !_level->is_game_over())

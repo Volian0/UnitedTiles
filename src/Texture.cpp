@@ -15,15 +15,15 @@ Texture::Texture(Renderer* renderer, const std::string& filename)
 	type{ Type::FILE },
 	info{ FileInfo{ filename } }
 {
+
 	while (true)
 	{
 		_ptr = IMG_LoadTexture(reinterpret_cast<SDL_Renderer*>(_renderer->_ptr), Path::res(filename, "textures").c_str());
-		if (_ptr == nullptr)
+		if (_ptr != nullptr)
 		{
-			std::cout << filename << std::endl;
-			std::this_thread::sleep_for(std::chrono::milliseconds(250));
+			break;			
 		}
-		else break;
+		std::this_thread::sleep_for(std::chrono::milliseconds(250));
 	}
 	SDL_SetTextureScaleMode(reinterpret_cast<SDL_Texture*>(_ptr), SDL_ScaleModeBest);
 	update_size();
@@ -41,27 +41,26 @@ Texture::Texture(Renderer* renderer, const Font* font, const std::string& text2,
 	type{ Type::FONT },
 	info{ FontInfo{ font->filename, font->size, text2.empty() ? " " : text2, color } }
 {
+
 	std::string text = text2.empty() ? " " : text2;
 	SDL_Surface* surface = nullptr;
 	while (true)
 	{
 		surface = TTF_RenderUTF8_Blended(reinterpret_cast<TTF_Font*>(font->_ptr), text.c_str(), { color.r,color.g,color.b,color.a });
-		if (surface == nullptr)
+		if (surface != nullptr)
 		{
-			std::cout << text << std::endl;
-			std::this_thread::sleep_for(std::chrono::milliseconds(250));
+			break;
 		}
-		else break;
+		std::this_thread::sleep_for(std::chrono::milliseconds(250));
 	}
 while (true)
 	{
 		_ptr = SDL_CreateTextureFromSurface(reinterpret_cast<SDL_Renderer*>(_renderer->_ptr), surface);
-		if (_ptr == nullptr)
+		if (_ptr != nullptr)
 		{
-						std::cout << text << std::endl;
-			std::this_thread::sleep_for(std::chrono::milliseconds(250));
+			break;
 		}
-		else break;
+		std::this_thread::sleep_for(std::chrono::milliseconds(250));
 	}
 	SDL_FreeSurface(surface);
 	update_size();
@@ -71,27 +70,56 @@ while (true)
 Texture::~Texture()
 {
 	unload();
+	_ptr = nullptr;
 }
 
 void Texture::unload()
 {
 	SDL_DestroyTexture(reinterpret_cast<SDL_Texture*>(_ptr));
+	_ptr = nullptr;
 }
 
 void Texture::reload()
 {
+	_ptr = nullptr;
 	if (type == Type::FILE)
 	{
 		const FileInfo& file_info = std::get<FileInfo>(info);
+			while (true)
+	{
 		_ptr = IMG_LoadTexture(reinterpret_cast<SDL_Renderer*>(_renderer->_ptr), Path::res(file_info.filename, "textures").c_str());
+		if (_ptr != nullptr)
+		{
+			break;			
+		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(250));
+	}
 		SDL_SetTextureScaleMode(reinterpret_cast<SDL_Texture*>(_ptr), SDL_ScaleModeBest);
 	}
 	else if (type == Type::FONT)
 	{
 		const FontInfo& font_info = std::get<FontInfo>(info);
 		Font font(_renderer, font_info.filename, font_info.size);
-		SDL_Surface* surface = TTF_RenderUTF8_Blended(reinterpret_cast<TTF_Font*>(font._ptr), font_info.text.c_str(), { font_info.color.r,font_info.color.g,font_info.color.b,font_info.color.a });
+		SDL_Surface* surface = nullptr;
+
+	while (true)
+	{
+		surface = TTF_RenderUTF8_Blended(reinterpret_cast<TTF_Font*>(font._ptr), font_info.text.c_str(), { font_info.color.r,font_info.color.g,font_info.color.b,font_info.color.a });
+		if (surface != nullptr)
+		{
+			break;
+		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(250));
+	}
+while (true)
+	{
 		_ptr = SDL_CreateTextureFromSurface(reinterpret_cast<SDL_Renderer*>(_renderer->_ptr), surface);
+		if (_ptr != nullptr)
+		{
+			break;
+		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(250));
+	}
 		SDL_FreeSurface(surface);
 	}
 	update_size();

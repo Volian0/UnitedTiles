@@ -134,7 +134,7 @@ void Game::run()
 			else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED
 			|| event.type == SDL_RENDER_DEVICE_RESET || event.type == SDL_RENDER_TARGETS_RESET) {
 				if (!_in_background)
-					renderer->reload();
+					renderer->reload(cfg->reload_renderer);
 			}
 			else if (event.type == SDL_FINGERDOWN || event.type == SDL_FINGERUP || event.type == SDL_FINGERMOTION) {
 				const Vec2 position{ std::clamp(Number(event.tfinger.x) * 2.0L - 1.0L, -1.0L, 1.0L),
@@ -172,7 +172,7 @@ void Game::run()
 			{
 				std::cout << "Entering foreground..." << std::endl;
 				_in_background = false;
-				renderer->reload();
+				renderer->reload(cfg->reload_renderer);
 			}
 			else
 			{
@@ -243,6 +243,10 @@ void Game::stop()
 
 void Game::play_music()
 {
+	return;
+
+
+	
 	if (!cfg->menu_music)
 	{
 		return;
@@ -256,6 +260,10 @@ void Game::play_music()
 }
 void Game::stop_music()
 {
+	return;
+
+
+
 	if (!m_music_playing)
 	{
 		return;
@@ -267,7 +275,7 @@ void Game::stop_music()
 void Game::append_cfg()
 {
 	renderer->vsync = cfg->enable_vsync;
-	renderer->reload();
+	renderer->reload(cfg->reload_renderer);
 	main_menu_music->fade_out(0.0F);
 	main_menu_music.reset();
 	audio.reset();

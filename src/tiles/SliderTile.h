@@ -4,10 +4,10 @@
 
 inline constexpr auto SliderTileDefault = TileStateInfo{ TileAction::GAME_OVER };
 inline constexpr auto SliderTileClearing = TileStateInfo{ TileAction::NOTHING, ScoreInfo{1,true} };
-inline constexpr auto SliderTileMissed = TileStateInfo{ TileAction::NOTHING };
-inline constexpr auto SliderTileCleared = TileStateInfo{ TileAction::DELETE, ScoreInfo{1} };
+inline constexpr auto SliderTileMissed = TileStateInfo{ TileAction::DELETE,  ScoreInfo{0} };
+inline constexpr auto SliderTileCleared = TileStateInfo{ TileAction::DELETE, ScoreInfo{4} };
 
-class SliderTile : public StatableTile<&SliderTileDefault, &SliderTileMissed, &SliderTileCleared, &SliderTileClearing>
+class SliderTile : public StatableTile<&SliderTileDefault, nullptr, &SliderTileClearing, &SliderTileClearing>
 {
 public:
 	SliderTile(class StateLevel* level_);

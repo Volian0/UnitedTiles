@@ -24,7 +24,7 @@ public:
 	}
 
 private:
-	void* _ptr;
+	void* _ptr=nullptr;
 	Number _height;
 
 	void unload() override;

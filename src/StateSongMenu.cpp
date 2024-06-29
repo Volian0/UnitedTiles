@@ -35,6 +35,7 @@ StateSongMenu::StateSongMenu(Game* game_)
     share2{"and compete in the leaderboards!", 1.0L, Vec2{get_x_pos(106-72), 0}, {-1.0L, 0.0L}, &font24, game->renderer.get()},
     share_button{{get_x_pos(414), 0}, get_x_size(144), 0, "Share", &_dev_button_texture, &font32, this, 0.0625L * 0.75L}
 {
+    game->audio->unload_soundfont();
     //game->play_music();
     game->stop_music();
     //settings_gear.set_to_nearest();
@@ -102,7 +103,13 @@ StateSongMenu::StateSongMenu(Game* game_)
             {
                 song_panel.medal_level = 4;
             }
-            song_panel.score.emplace(std::to_string(score.reached_score), get_x_size(60), Vec2{get_x_pos(266), 0}, Vec2{-1,0}, &font24, game->renderer.get());
+            auto score_string = std::to_string(score.reached_score);
+            if (song_id == 162)
+            {
+                score_string.insert(score_string.size()-2, ".");
+                score_string += " T/s";
+            }
+            song_panel.score.emplace(score_string, get_x_size(60), Vec2{get_x_pos(266), 0}, Vec2{-1,0}, &font24, game->renderer.get());
             song_panel.score->label_text_texture->tint = {96, 96, 96, 255};
             for (uint8_t i = 0; i < 4; ++i)
             {
@@ -161,6 +168,13 @@ StateSongMenu::StateSongMenu(Game* game_)
 
 void StateSongMenu::update()
 {
+    if (input_song.get_text() == "secret"
+    || input_song.get_text() == "Secret" || input_song.get_text() == "SECRET")
+    {
+        last_search ="";
+        input_song.m_text = "";
+        return game->change_state<StateLevel>(std::uint16_t{65535}, std::string{"Secret.usong"}, true);
+    }
 
     const auto aspect_ratio = game->renderer->get_aspect_ratio();
 

@@ -86,7 +86,7 @@ class StateLevel : public GameState
 	friend Tile;
 
 public:
-	StateLevel(Game* game_, uint16_t song_id_, std::string_view t_song_filename = {});
+	StateLevel(Game* game_, uint16_t song_id_, std::string_view t_song_filename = {}, bool t_from_res = false);
 
 
 

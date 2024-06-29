@@ -20,7 +20,7 @@ public:
 
 	void clear();
 	void display();
-	void reload();
+	void reload(bool recreate);
 
 	void render(Texture* texture, glm::u32vec2 src_pos, glm::u32vec2 src_size,
 		Vec2 dest_pos, Vec2 dest_size,

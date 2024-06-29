@@ -213,7 +213,7 @@ void LongTile::render_fg() const
 	{
 		pos.x = get_column_x_pos(missed_column);
 		texture = &_level->txt_game_over_tile;
-		_level->game->renderer->render(texture, {}, texture->get_psize(), pos,
+		_level->game->renderer->render(texture, {}, {1,1}, pos,
 			{ 0.25, get_height() }, {}, { 0,1 });
 	}
 }

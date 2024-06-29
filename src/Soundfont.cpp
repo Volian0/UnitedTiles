@@ -97,7 +97,7 @@ void Soundfont::render(uint32_t frames, void* buffer)
 		{
 			const auto frames_to_render = delta_frames - frames_rendered;
 			//std::cout << "rendering frames: " << frames_to_render << std::endl;
-			tsf_render_short(reinterpret_cast<tsf*>(_ptr), reinterpret_cast<short*>(buffer)+frames_rendered*(m_stereo ? 2 : 1), frames_to_render, 1);
+			tsf_render_short(reinterpret_cast<tsf*>(_ptr), reinterpret_cast<short*>(buffer)+frames_rendered*(m_stereo ? 2 : 1), frames_to_render, 0);
 			frames_rendered = delta_frames;
 		}
 	};

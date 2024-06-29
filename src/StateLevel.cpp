@@ -119,7 +119,8 @@ void LevelBackground::render() const
 	_dustmotes_stars.render();
 }
 
-StateLevel::StateLevel(Game* game_, uint16_t song_id_, std::string_view t_score_filename)
+StateLevel::StateLevel(Game* game_, uint16_t song_id_, std::string_view t_score_filename,
+bool t_from_res)
 	:GameState(game_),
 	score_tps{this},
 	score{this},
@@ -355,8 +356,17 @@ StateLevel::StateLevel(Game* game_, uint16_t song_id_, std::string_view t_score_
 	}
 	else
 	{
-		auto song_info_file = open_ifile(t_score_filename.data()).value();
-		_song_info = song_info_file;
+		if (t_from_res)
+		{
+			ExtractedRes res(t_score_filename.data(), "songs");
+			auto song_info_file = open_ifile(res.get_path()).value();
+			_song_info = song_info_file;
+		}
+		else
+		{
+			auto song_info_file = open_ifile(t_score_filename.data()).value();
+			_song_info = song_info_file;
+		}
 		save_score = false;
 	}
 	tps = 0.0L;
@@ -648,6 +658,11 @@ void StateLevel::update()
 		}
 		else if (revive_no.update())
 		{
+			if (game->cfg->show_interstitial_ads && game->ad_manager.can_show_big_ad() && !perfect_score)
+			{
+				game->stop_music();
+				game->ad_manager.show_big_ad();
+			}
 			return game->change_state<StateSongMenu>();
 		}
 	}

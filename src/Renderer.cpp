@@ -6,6 +6,8 @@
 
 #include <atomic>
 #include <iostream>
+#include <chrono>
+#include <thread>
 
 Renderer::Renderer(bool vsync_)
 	:vsync{ vsync_ }
@@ -38,17 +40,37 @@ void Renderer::display()
 	SDL_RenderPresent(reinterpret_cast<SDL_Renderer*>(_ptr));
 }
 
-void Renderer::reload()
+void Renderer::reload(bool recreate)
 {
 	std::cout << "Reloading renderer" << std::endl;
-	//for (RendererReloadable* reloadable : _reloadables)
-	//{
-	//	reloadable->unload();
-	//}
-	//SDL_DestroyRenderer(reinterpret_cast<SDL_Renderer*>(_ptr));
-	//_ptr = SDL_CreateRenderer(reinterpret_cast<SDL_Window*>(_window), -1, vsync ? SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC : SDL_RENDERER_ACCELERATED);
-	update_size(); 
-	for (RendererReloadable* reloadable : _reloadables)
+	std::unordered_set<RendererReloadable*> reloadables2 = _reloadables;
+	if (recreate)
+	{
+		for (RendererReloadable* reloadable : reloadables2)
+		{
+			reloadable->unload();
+		}
+		SDL_DestroyRenderer(reinterpret_cast<SDL_Renderer*>(_ptr));
+		_ptr = nullptr;
+		while (true)
+		{
+			_ptr = SDL_CreateRenderer(reinterpret_cast<SDL_Window*>(_window), -1, vsync ? SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC : SDL_RENDERER_ACCELERATED);
+			if (_ptr != nullptr)
+			{
+				break;
+			}
+			std::this_thread::sleep_for(std::chrono::milliseconds(250));
+		}
+	}
+	update_size();
+	if (recreate)
+	{
+		for (RendererReloadable* reloadable : reloadables2)
+		{
+			reloadable->reload();
+		}
+	}
+	for (RendererReloadable* reloadable : reloadables2)
 	{
 		reloadable->update_size();
 	}

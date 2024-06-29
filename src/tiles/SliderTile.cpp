@@ -51,7 +51,7 @@ void SliderTile::revive()
 {
 	if (is_state(&SliderTileClearing) || is_state(&SliderTileMissed))
 	{
-		_level->cleared_tiles++;
+		//_level->cleared_tiles++;
 		force_change_state(&SliderTileCleared);
 	}
 	/*else if (is_state(&SliderTileMissed))
@@ -105,10 +105,10 @@ void SliderTile::on_changed_state()
 
 void SliderTile::render_fg() const
 {
-	if (is_state(&SliderTileMissed) && (_level->new_tp % 0.25) > 0.125)
+	/*if (is_state(&SliderTileMissed) && (_level->new_tp % 0.25) > 0.125)
 	{
 		return;
-	}
+	}*/
 	const auto length = get_info().length;
 	const uint32_t length_per_single_tile = _level->_song_info.length_units_per_single_tile;
 	const auto iterations = (length * 2 - 1) / length_per_single_tile + 1;
@@ -163,7 +163,8 @@ TileColumn SliderTile::next_column(const std::shared_ptr<Tile>& previous_tile) c
 
 bool SliderTile::in_range(Vec2 pos) const
 {
-	return std::abs((std::abs(std::fmod(pos.y + Number(_column_index) * 0.5L, 3.0L) - 1.5L) - 0.75L) - pos.x) <= 0.75L;
+	return std::abs((std::abs(std::fmod(pos.y + Number(_column_index) * 0.5L, 3.0L) - 1.5L) - 0.75L) - pos.x) <= 0.75L
+	|| std::abs((std::abs(std::fmod(held_tile_duration * 1.0F + Number(_column_index) * 0.5L, 3.0L) - 1.5L) - 0.75L) - pos.x) < 0.75L;
 }
 
 uint8_t SliderTile::get_column_index() const

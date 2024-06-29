@@ -72,7 +72,7 @@ void EmptyTile::render_fg() const
 	{
 		Vec2 pos = { get_column_x_pos(missed_column), y_offset / 4.0L * 2.0L - 1.0L };
 		Texture* texture = &_level->txt_game_over_tile;
-		_level->game->renderer->render(texture, {}, texture->get_psize(), pos,
+		_level->game->renderer->render(texture, {}, {1,1}, pos,
 			{ 0.25, get_height() }, {}, { 0,1 });
 	}
 }

@@ -162,6 +162,8 @@ void call_java_function(std::string_view t_function)
     }
     else if (t_function == "show_big_ad")
     {
+                //SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Info", "Calling testShowAd!", nullptr);
+
         Java_com_volian_unitedtiles_UnitedTilesActivity_testShowAd((JNIEnv*)SDL_AndroidGetJNIEnv(),
                                                                                 (jobject)SDL_AndroidGetActivity());
     }
@@ -285,12 +287,12 @@ bool AdManager::show_big_ad()
     {
         return false;
     }
-    if (taryfa_ulgowa)
+    /*if (taryfa_ulgowa)
     {
         taryfa_ulgowa = false;
         return false;
     }
-    taryfa_ulgowa = true;
+    taryfa_ulgowa = true;*/
     m_is_big_ad_loaded = false;
     call_java_function("show_big_ad");
     m_last_big_ad_showed = std::chrono::steady_clock::now();
@@ -326,8 +328,17 @@ bool AdManager::show_rewarded_ad()
 [[nodiscard]] bool AdManager::can_show_big_ad()
 {
 #ifdef __ANDROID__
-    return m_is_big_ad_loaded && std::chrono::steady_clock::now() - m_last_big_ad_showed >= COOLDOWN_BIG_AD && 
+    const auto result = m_is_big_ad_loaded && std::chrono::steady_clock::now() - m_last_big_ad_showed >= COOLDOWN_BIG_AD && 
     std::chrono::steady_clock::now() - m_last_big_ad_loaded >= std::chrono::seconds(61);
+    if (result)
+    {
+        //SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Info", "Ad can be shown", nullptr);
+    }
+    else
+    {
+       //SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Info", "Ad can NOT be shown!", nullptr);
+    }
+    return result;
 #else
     return false;
 #endif
