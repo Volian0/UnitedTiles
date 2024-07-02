@@ -184,6 +184,8 @@ std::uint32_t SongInfo::calculate_perfect_score() const
 			score += 1;
 			break;
 		case TileInfo::Type::SLIDER:
+			score += 5;
+			break;
 		case TileInfo::Type::LONG:
 		case TileInfo::Type::DOUBLE:
 			score += 2;

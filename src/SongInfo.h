@@ -29,7 +29,7 @@ struct TileInfo : NonCopyable
 	uint32_t length;
 	enum class Type : uint8_t {
 		SINGLE, LONG, DOUBLE,
-		EMPTY, SLIDER
+		EMPTY, SLIDER, COMBO
 	} type;
 	std::multimap<uint32_t, NoteEvent> note_events;
 	std::multimap<uint32_t, NoteEvent> note_events_2nd_tile;

@@ -63,7 +63,7 @@ signingConfigs {
     implementation "com.google.android.gms:play-services-games-v2:+"
     implementation 'com.google.android.gms:play-services-ads:23.1.0'
     implementation 'com.google.android.play:review:2.0.1' 
-    implementation("com.google.ads.mediation:vungle:7.3.2.0")
+    //implementation("com.google.ads.mediation:vungle:7.3.2.0")
 
     //implementation 'com.ironsource.sdk:mediationsdk:8.1.0' 
     //implementation("com.google.ads.mediation:ironsource:8.1.0.0")

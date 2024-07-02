@@ -20,6 +20,8 @@ enum TileColumn : uint8_t
 	DT_LEFT   = 0b11001100,
 	DT_RIGHT  = 0b00110011,
 
+	CB_CENTER = 0b00111100,
+
 	ST_FAR_LEFT               = 0b01000000,
 	ST_MID_LEFT_FACING_LEFT   = 0b00100000,
 	ST_MID_LEFT_FACING_RIGHT  = 0b00010000,
@@ -101,6 +103,7 @@ protected:
 	void handle_game_over();
 	void handle_state_change(const TileStateInfo* state);
 	StateLevel* _level;
+	unsigned random_jken{};
 };
 
 template

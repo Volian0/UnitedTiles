@@ -64,7 +64,8 @@ StateSongMenu::StateSongMenu(Game* game_)
     {
         composer_names.emplace(composer_id, composer_info.name);
     }
-    std::array<uint16_t, 4> medal_n{0,0,0,0};
+    //std::array<uint16_t, 4> medal_n{0,0,0,0};
+    std::array<uint16_t, 4> medal_n{100,100,100,100};
     share_button.spanel = &spanel;
     for (const auto& [song_id, song_info] : song_database.songs_infos)
     {

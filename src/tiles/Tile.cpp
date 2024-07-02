@@ -56,6 +56,10 @@ TileColumn next_column(const std::shared_ptr<Tile>& previous_tile)
 		case 3: return FAR_RIGHT; break;
 		}
 	}
+	else if (previous_tile->get_info().type == TileInfo::Type::COMBO)
+	{
+		
+	}
 	else if (previous_tile->get_info().type == TileInfo::Type::SINGLE
 		|| previous_tile->get_info().type == TileInfo::Type::LONG)
 	{

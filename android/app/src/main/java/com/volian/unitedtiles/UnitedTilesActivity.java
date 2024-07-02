@@ -70,8 +70,8 @@ import android.provider.Settings;
 
 import android.view.Window;
 
-import com.vungle.ads.VunglePrivacySettings;
-import com.vungle.ads.VunglePrivacySettings; 
+//import com.vungle.ads.VunglePrivacySettings; 
+//import com.vungle.ads.VunglePrivacySettings; 
 import com.ironsource.adqualitysdk.sdk.IronSourceAdQuality;
 //import com.ironsource.mediationsdk.IronSource;
 
@@ -586,7 +586,7 @@ public void onPause() {
       //VunglePrivacySettings.setGDPRStatus(false, "v1.0.0");
 
 
-VunglePrivacySettings.setCCPAStatus(false);
+//VunglePrivacySettings.setCCPAStatus(false);
 
 
     IronSourceAdQuality.getInstance().initialize(this, "1ede7878d");
@@ -758,6 +758,10 @@ IronSource.init(this, "1ede7878d", IronSource.AD_UNIT.REWARDED_VIDEO);
 IronSource.init(this, "1ede7878d", IronSource.AD_UNIT.INTERSTITIAL); 
 //Init Banner
 IronSource.init(this, "1ede7878d", IronSource.AD_UNIT.BANNER);
+
+
+IntegrationHelper.validateIntegration(this);
+
 
 //IntegrationHelper.validateIntegration(this);
 

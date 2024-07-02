@@ -42,6 +42,7 @@ bool SingleTile::touch_down(uint16_t finger_id, Vec2 pos)
 			}
 			else
 			{
+				random_jken = RNG::integer(1, 10000);
 				missed_column = clicked_column;
 				return change_state(&SingleTileMissed);
 			}
@@ -71,7 +72,7 @@ void SingleTile::render_fg() const
 		pos.x = get_column_x_pos(missed_column);
 		texture = &_level->txt_game_over_tile;
 		_level->game->renderer->render(texture, {}, 
-		RNG::integer(1,10000) == 0 ? texture->get_psize() : glm::u32vec2{1,1}, pos,
+		random_jken == 1 ? texture->get_psize() : glm::u32vec2{1,1}, pos,
 			{ 0.25,  get_height() }, {}, { 0,1 });
 	}
 	else if (is_state(&SingleTileCleared) && !_level->is_game_over())
