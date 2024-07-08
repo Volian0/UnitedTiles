@@ -31,6 +31,7 @@ public:
 	static constexpr bool use_pt2_method = false;
 	bool menu_music = true;
 	bool reload_renderer = true;
+	std::uint8_t starting_tps{0};
 	//constexpr static bool show_banner_ads = false;
 	//constexpr static bool show_interstitial_ads = false;
 };

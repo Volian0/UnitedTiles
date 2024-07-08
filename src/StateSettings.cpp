@@ -20,6 +20,7 @@ StateSettings::StateSettings(Game* game_)
 	_b_apply{ {0.5, 0}, 0.4L, 0, "Apply", &_dev_button_texture, &_font, this },
 	_b_soundfonts{ {0.0, 0}, 0.8L, 0, "Extra Soundfonts", &_dev_button_texture, &_font, this },
 	_b_rate_app{{0.0, 0}, 0.8L, 0, "Rate the game", &_dev_button_texture, &_font, this},
+	_b_starting_tps{{0.0, 0}, 0.8L, 0, "Starting TPS: NORMAL", &_dev_button_texture, &_font, this},
 	cb_u{ game->renderer.get(), "ui/checkbox0.png"},
 	cb_c{ game->renderer.get(), "ui/checkbox1.png"},
 	ad_hint{"Consider enabling ads to support the game!", 0.9L,
@@ -103,7 +104,8 @@ void StateSettings::update()
 	}
 	_b_soundfonts.position.y = -1.0L + button_height + Number(check_boxes.size() + 1) * 0.2L * game->renderer->get_aspect_ratio() + scrollable_panel.get_offset();
 	_b_rate_app.position.y = _b_soundfonts.position.y + 0.125L * 2.0F * game->renderer->get_aspect_ratio();
-	ad_hint.position.y = _b_soundfonts.position.y + 0.225L * game->renderer->get_aspect_ratio();
+	_b_starting_tps.position.y = _b_soundfonts.position.y + (0.25L + 0.025L) * game->renderer->get_aspect_ratio();
+	ad_hint.position.y = _b_starting_tps.position.y + 0.225L * game->renderer->get_aspect_ratio();
 	if (scrollable_panel.is_scrolled() || scrolled)
 		{
 _b_soundfonts.clear_held();
@@ -112,6 +114,29 @@ _b_rate_app.clear_held();
 	if (_b_soundfonts.update())
 	{
 		return game->change_state<StateSoundfonts>();
+	}
+	else if (_b_starting_tps.update())
+	{
+		if (game->cfg->starting_tps == 0)
+		{
+			game->cfg->starting_tps = 4;
+		}
+		else if (game->cfg->starting_tps == 12)
+		{
+			game->cfg->starting_tps = 0;
+		}
+		else
+		{
+			game->cfg->starting_tps++;
+		}
+	}
+	if (game->cfg->starting_tps == 0)
+	{
+		_b_starting_tps.set_text("Starting TPS: NORMAL");
+	}
+	else
+	{
+		_b_starting_tps.set_text("Starting TPS: "+std::to_string(game->cfg->starting_tps) + " TPS");
 	}
 	ad_hint.label_text_texture->tint.g = std::abs(std::sin(Number(SDL_GetTicks()) * 0.005L)) * 100.0F;
 }
@@ -127,6 +152,7 @@ void StateSettings::render() const
 		checkbox.first.render(game->renderer.get());
 	}
 	_b_soundfonts.render();
+	_b_starting_tps.render();
 
 		//ONLY TEMPORARY, UNCOMMENT FOR PRODUCTION
 	if (!game->cfg->show_banner_ads || !game->cfg->show_interstitial_ads

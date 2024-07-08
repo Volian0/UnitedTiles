@@ -193,5 +193,14 @@ TileColumn DoubleTile::next_column(const std::shared_ptr<Tile>& previous_tile)
 		}
 		return DT_LEFT;
 	}
+	else if (previous_tile->get_info().type == TileInfo::Type::COMBO)
+	{
+		uint8_t random_column = RNG::integer(0, 1);
+		if (random_column)
+		{
+			return DT_LEFT;
+		}
+		return DT_RIGHT;
+	}
 	else abort();
 }

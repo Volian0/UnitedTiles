@@ -28,8 +28,8 @@ signingConfigs {
         applicationId "com.volian.unitedtiles"
         minSdkVersion 23
         targetSdkVersion 34
-        versionCode 31
-        versionName "0.5.9"  
+        versionCode 30
+        versionName "0.5.8"  
         ndk {
             abiFilters 'armeabi-v7a'
         }
@@ -68,7 +68,8 @@ signingConfigs {
     //implementation 'com.ironsource.sdk:mediationsdk:8.1.0' 
     //implementation("com.google.ads.mediation:ironsource:8.1.0.0")
 
-    implementation("com.google.ads.mediation:ironsource:8.1.0.0")
+implementation 'com.ironsource.sdk:mediationsdk:8.1.0' 
+    implementation 'com.ironsource:adqualitysdk:7.20.1'
 
 implementation 'com.google.android.gms:play-services-appset:16.0.0'
 implementation 'com.google.android.gms:play-services-ads-identifier:17.0.0'

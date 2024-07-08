@@ -149,6 +149,8 @@ public:
 		return 60 - seconds;
 	}
 
+	std::optional<TileColumn> dt_column;
+
 	void render_debug() const;
 
 	uint64_t cleared_tiles = 0;
@@ -189,12 +191,12 @@ public:
 	{
 		return _state == State::GAME_OVER;
 	}
+	bool save_score = true;
 
 private:
 	virtual void update();
 	virtual void render() const;
 
-	bool save_score = true;
 
 	void restart_level();
 

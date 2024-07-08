@@ -46,7 +46,7 @@ TileInfo::TileInfo(std::ifstream& file)
 {
 	length = read_u32(file).value();
 	type = static_cast<Type>(read_u8(file).value());
-	if (type == Type::SINGLE || type == Type::LONG || type == Type::SLIDER || type == Type::DOUBLE)
+	if (type == Type::SINGLE || type == Type::LONG || type == Type::SLIDER || type == Type::DOUBLE || type == Type::COMBO)
 	{
 		uint32_t note_events_size = read_u32(file).value();
 		for (uint32_t i = 0; i < note_events_size; ++i)
@@ -192,6 +192,10 @@ std::uint32_t SongInfo::calculate_perfect_score() const
 			break;
 		case TileInfo::Type::EMPTY:
 			break;
+		case TileInfo::Type::COMBO:
+			std::abort();
+			score += 0;
+		break;
 		}
 	}
 	return score * 3;

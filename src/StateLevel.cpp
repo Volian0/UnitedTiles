@@ -11,6 +11,7 @@
 #include "tiles/LongTile.h"
 #include "tiles/SingleTile.h"
 #include "tiles/SliderTile.h"
+#include "tiles/ComboTile.hpp"
 
 #include <picosha2/picosha2.h>
 
@@ -369,6 +370,20 @@ bool t_from_res)
 		}
 		save_score = false;
 	}
+	if (game->cfg->starting_tps)
+	{
+		save_score = false;
+		if (_song_info.acceleration_method == SongInfo::AccelerationMethod::LINEAR)
+		{
+			for (auto& [tile_id, tps] : _song_info.acceleration_info.tempo_changes)
+			{
+				tps *= (game->cfg->starting_tps/Number(_song_info.starting_tempo));
+			}
+		}
+		_song_info.starting_tempo = game->cfg->starting_tps;
+
+		_song_info.acceleration_info.tempo_changes.clear();
+	}
 	tps = 0.0L;
 	_old_tp = new_tp = last_tempo_change = {};
 	previous_position = 3.0L;
@@ -545,6 +560,26 @@ void StateLevel::update()
 	set_theme_tint(theme_tint);
 	_old_tp = new_tp;
 
+	for (auto& touch_event : touch_events)
+	{
+		const auto column = get_column(touch_event.position.x);
+		if (touch_event.type == TouchEvent::Type::DOWN)
+		{
+			if (dt_column == column)
+			{
+				touch_event.type = TouchEvent::Type::NONE;
+				dt_column.reset();
+			}
+			else
+			{
+				dt_column = column;
+			}
+		}
+		else if (touch_event.type == TouchEvent::Type::UP)
+		{
+			dt_column.reset();
+		}
+	}
 
 	if (game_over_reset.has_value() && new_tp - game_over_reset.value() > 2.0L)
 	{
@@ -982,6 +1017,9 @@ void StateLevel::spawn_new_tiles()
 			case TileInfo::Type::SLIDER:
 				previous_tile = tiles.emplace_back(total_pos, std::make_shared<SliderTile>(this)).second;
 				break;
+			case TileInfo::Type::COMBO:
+				previous_tile = tiles.emplace_back(total_pos, std::make_shared<ComboTile>(this)).second;
+				break;
 			default: abort(); break;
 			}
 			previous_tile->y_offset = _position - total_pos;
@@ -1060,7 +1098,7 @@ void ScoreCounter::render() const
 			_tp_update = _level->new_tp;
 		}
 		old_tps = my_tps;
-		_texture = std::make_unique<Texture>(_level->game->renderer.get(), &_font, my_tps, _level->game->cfg->use_pt2_method ? Color{ 63, 63, 255, 255 } : Color{ 255, 63, 63, 255 });
+		_texture = std::make_unique<Texture>(_level->game->renderer.get(), &_font, my_tps, _level->game->cfg->starting_tps ? Color{ 255, 255, 63, 255 } : Color{ 255, 63, 63, 255 });
 		//return;
 	}
 	else if (is_auto)

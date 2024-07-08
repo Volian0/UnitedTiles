@@ -58,7 +58,12 @@ TileColumn next_column(const std::shared_ptr<Tile>& previous_tile)
 	}
 	else if (previous_tile->get_info().type == TileInfo::Type::COMBO)
 	{
-		
+		uint8_t random_column = RNG::integer(0, 1);
+		if (random_column)
+		{
+			return FAR_LEFT;
+		}
+		return FAR_RIGHT;
 	}
 	else if (previous_tile->get_info().type == TileInfo::Type::SINGLE
 		|| previous_tile->get_info().type == TileInfo::Type::LONG)
@@ -238,7 +243,13 @@ void Tile::handle_first_interaction()
 			}
 			else if (user_score == perfect_score)
 			{
+				std::cout << "perfect score reached" << std::endl;
 				_level->perfect_score = true;
+			}
+			else
+			{
+				std::cout << "perfect score not reached" << std::endl;
+				std::cout << perfect_score << " <-- perfect | current --> " << user_score << std::endl;
 			}
 		}
 		if (true)

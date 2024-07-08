@@ -3,11 +3,10 @@
 #include "Tile.h"
 
 inline constexpr auto ComboTileDefault         = TileStateInfo{ TileAction::GAME_OVER };
-inline constexpr auto ComboTileMissed          = TileStateInfo{ TileAction::NOTHING };
 inline constexpr auto ComboTileClearing        = TileStateInfo{ TileAction::NOTHING, ScoreInfo{0,true} };
 inline constexpr auto ComboTileCleared    = TileStateInfo{ TileAction::DELETE,  ScoreInfo{0} };
 
-class ComboTile : public StatableTile<&ComboTileDefault, &ComboTileMissed, &ComboTileCleared, &ComboTileClearing>
+class ComboTile : public StatableTile<&ComboTileDefault, nullptr, &ComboTileCleared, &ComboTileClearing>
 {
 public:
 	ComboTile(class StateLevel* level_);

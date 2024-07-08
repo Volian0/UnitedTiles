@@ -34,6 +34,14 @@ struct TileInfo : NonCopyable
 	std::multimap<uint32_t, NoteEvent> note_events;
 	std::multimap<uint32_t, NoteEvent> note_events_2nd_tile;
 
+	/*[[nodiscard]] std::vector<std::uint32_t> get_combo_taps() const
+	{
+		//TODO: Implement this
+		std::abort();
+		std::vector<std::uint32_t> taps;
+		return taps;
+	}*/
+
 	TileInfo() = default;
 	TileInfo(std::ifstream& file);
 	TileInfo(TileInfo&& tile_info) noexcept;

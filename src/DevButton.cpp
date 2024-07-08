@@ -78,6 +78,7 @@ void DevButton::render() const
 void DevButton::set_text(const std::string& text)
 {
 	_text_texture = std::make_unique<Texture>(_state->game->renderer.get(), _font, text, Colors::WHITE);
+	_text_texture->tint = Color{40, 40, 40, 255};
 }
 
 bool DevButton::is_pressed() const

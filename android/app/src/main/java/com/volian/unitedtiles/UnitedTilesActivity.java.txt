@@ -72,7 +72,22 @@ import android.view.Window;
 
 //import com.vungle.ads.VunglePrivacySettings; 
 //import com.vungle.ads.VunglePrivacySettings; 
+import com.ironsource.adqualitysdk.sdk.IronSourceAdQuality;
+//import com.ironsource.mediationsdk.IronSource;
 
+
+
+import com.ironsource.mediationsdk.ISBannerSize;
+import com.ironsource.mediationsdk.IronSource;
+import com.ironsource.mediationsdk.IronSourceBannerLayout;
+import com.ironsource.mediationsdk.integration.IntegrationHelper;
+import com.ironsource.mediationsdk.model.Placement;
+import com.ironsource.mediationsdk.utils.IronSourceUtils;
+import com.ironsource.mediationsdk.adunit.adapter.utility.AdInfo;
+import com.ironsource.mediationsdk.logger.IronSourceError;
+import com.ironsource.mediationsdk.sdk.LevelPlayBannerListener;
+import com.ironsource.mediationsdk.sdk.LevelPlayInterstitialListener;
+import com.ironsource.mediationsdk.sdk.LevelPlayRewardedVideoListener;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.graphics.Color;
@@ -91,8 +106,6 @@ import java.util.List;
 import com.google.android.gms.ads.ResponseInfo;
 import com.google.android.gms.ads.AdapterResponseInfo;
 
-
-import com.ironsource.mediationsdk.IronSource;
 
 //gdpr
 //import androidx.appcompat.app.AppCompatActivity;
@@ -118,6 +131,7 @@ public class UnitedTilesActivity extends SDLActivity {
     public boolean canUseSDK = false;
     public int resumedOnce = 0;
     public boolean test_device = false;
+    public IronSourceBannerLayout banner = null;
 
   public boolean adRewardLoaded = false;
     private RewardedAd rewardedAd;
@@ -151,7 +165,7 @@ public void loadRewardedAd()
     {
       return;
     }
-    
+    /*
     AdRequest adRequest = new AdRequest.Builder().build();
     RewardedAd.load(this, "ca-app-pub-9020041895455560/5589638257",
       adRequest, new RewardedAdLoadCallback() {
@@ -200,14 +214,22 @@ public void loadRewardedAd()
     });
 
 
-    
+    */
   } 
 
   public void showRewardedAd()
   {
 
+    if (IronSource.isRewardedVideoAvailable())
+    {
+        IronSource.showRewardedVideo("top");
+    }
+    else
+    {
+        handleReward();
+    }
 
-    adRewardLoaded = false;
+    /*(adRewardLoaded = false;
     if (rewardedAd != null) {
   rewardedAd.show(this, new OnUserEarnedRewardListener() {
     @Override
@@ -218,7 +240,7 @@ public void loadRewardedAd()
   });
 } else {
 }
-
+*/
   }
 
   public static native void handleReward();
@@ -233,7 +255,7 @@ public void loadRewardedAd()
     public void resizeWindowAd() {
         if (!resizeOnce) {
             ViewGroup.LayoutParams gameLayoutParams = ((View)mSurface).getLayoutParams();
-            gameLayoutParams.height = ((View)mSurface).getHeight() - adSizeB.getHeightInPixels(this);
+            gameLayoutParams.height = ((View)mSurface).getHeight() - ((View)banner).getHeight();
  
             ((View)mSurface).setLayoutParams(gameLayoutParams);
             resizeOnce = true;
@@ -246,7 +268,10 @@ public void loadRewardedAd()
             return;
         }
 
-        if (adLoaded) {
+
+IronSource.loadInterstitial();
+
+        /*if (adLoaded) {
             return;
         }
         adLoaded = true;
@@ -312,7 +337,7 @@ public void loadRewardedAd()
                                                 Log.d("L3 IronSource", "Ad is not loaded");
 
                 }
-            });
+            });*/
     }
 
     public void showBigAd() {
@@ -321,10 +346,14 @@ public void loadRewardedAd()
             return;
         }
         Log.d("L3 IronSource", "Trying to show AD!");
-        adLoaded = false;
+        if (IronSource.isInterstitialReady())
+        {
+            IronSource.showInterstitial("top");
+        }
+        /*adLoaded = false;
         if (mInterstitialAd != null) {
             mInterstitialAd.show(this);
-        }
+        }*/
     }
 
     private boolean isTestDevice() {
@@ -342,9 +371,21 @@ public void loadRewardedAd()
             return;
         }
 
+IronSource.loadBanner(banner, (String)"top");
+
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.WRAP_CONTENT,
+            RelativeLayout.LayoutParams.WRAP_CONTENT);
+
+        params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+
+        params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+
+        mLayout.addView(banner, params);
 
 
-        adViewB = new AdView(this);
+
+        /*adViewB = new AdView(this);
         adViewB.setAdUnitId("ca-app-pub-9020041895455560/1718498398");
         //adViewB.setAdUnitId("ca-app-pub-3940256099942544/9214589741");
         adViewB.setAdSize(AdSize.BANNER);
@@ -389,7 +430,7 @@ public void loadRewardedAd()
             }
 
 
-        });
+        });*/
 
     }
 
@@ -548,8 +589,9 @@ public void onPause() {
 //VunglePrivacySettings.setCCPAStatus(false);
 
 
+    IronSourceAdQuality.getInstance().initialize(this, "1ede7878d");
+
 //IronSource.setConsent(false);
-IronSource.setConsent(true);
 IronSource.setMetaData("do_not_sell", "true");
 
 IronSource.setMetaData("is_deviceid_optout","true"); 
@@ -592,9 +634,136 @@ IronSource.setMetaData("Google_Family_Self_Certified_SDKS","true");
 //GOOGLE GDPR END
 
 
+IronSource.setLevelPlayInterstitialListener(new LevelPlayInterstitialListener() {
+   // Invoked when the interstitial ad was loaded successfully.
+   // AdInfo parameter includes information about the loaded ad   
+   @Override
+   public void onAdReady(AdInfo adInfo) {
+    Log.d("L3 IronSource", "Ad is ready");
+   }
+   // Indicates that the ad failed to be loaded 
+   @Override
+   public void onAdLoadFailed(IronSourceError error) {
+        Log.d("L3 IronSource", "Ad failed to load");
+
+   }
+   // Invoked when the Interstitial Ad Unit has opened, and user left the application screen.
+   // This is the impression indication. 
+   @Override
+   public void onAdOpened(AdInfo adInfo) {}
+   // Invoked when the interstitial ad closed and the user went back to the application screen.
+   @Override
+   public void onAdClosed(AdInfo adInfo) {}
+   // Invoked when the ad failed to show 
+   @Override
+   public void onAdShowFailed(IronSourceError error, AdInfo adInfo) {
+        Log.d("L3 IronSource", "Ad failed to show");
+
+   }
+   // Invoked when end user clicked on the interstitial ad
+   @Override
+   public void onAdClicked(AdInfo adInfo) {}
+   // Invoked before the interstitial ad was opened, and before the InterstitialOnAdOpenedEvent is reported.
+   // This callback is not supported by all networks, and we recommend using it only if  
+   // it's supported by all networks you included in your build. 
+   @Override
+   public void onAdShowSucceeded(AdInfo adInfo){
+        Log.d("L3 IronSource", "Ad show success");
+
+   }
+});
+
+        banner = IronSource.createBanner(this, ISBannerSize.BANNER);
+
     Activity aaa = this;
 
+banner.setLevelPlayBannerListener(new LevelPlayBannerListener() {
+   // Invoked each time a banner was loaded. Either on refresh, or manual load.
+   //  AdInfo parameter includes information about the loaded ad   
+   @Override
+   public void onAdLoaded(AdInfo adInfo) {
+            aaa.runOnUiThread(new Runnable() {
+    @Override
+    public void run() {
+        // Your UI update logic goes here
+    resizeWindowAd();
 
+    }
+});
+   }
+   // Invoked when the banner loading process has failed.
+   //  This callback will be sent both for manual load and refreshed banner failures. 
+   @Override
+   public void onAdLoadFailed(IronSourceError error) {}
+   // Invoked when end user clicks on the banner ad
+   @Override
+   public void onAdClicked(AdInfo adInfo) {}
+   // Notifies the presentation of a full screen content following user click
+   @Override
+   public void onAdScreenPresented(AdInfo adInfo) {}
+   // Notifies the presented screen has been dismissed
+   @Override
+   public void onAdScreenDismissed(AdInfo adInfo) {}
+   //Invoked when the user left the app
+   @Override
+   public void onAdLeftApplication(AdInfo adInfo) {}
+   
+});
+
+
+IronSource.setLevelPlayRewardedVideoListener(new LevelPlayRewardedVideoListener() {
+   // Indicates that there's an available ad. 
+   // The adInfo object includes information about the ad that was loaded successfully
+   // Use this callback instead of onRewardedVideoAvailabilityChanged(true)
+   @Override
+   public void onAdAvailable(AdInfo adInfo) {}
+   // Indicates that no ads are available to be displayed 
+   // Use this callback instead of onRewardedVideoAvailabilityChanged(false) 
+   @Override
+   public void onAdUnavailable() {}
+   // The Rewarded Video ad view has opened. Your activity will loose focus
+   @Override
+   public void onAdOpened(AdInfo adInfo) {}
+   // The Rewarded Video ad view is about to be closed. Your activity will regain its focus
+   @Override
+   public void onAdClosed(AdInfo adInfo) {}
+   // The user completed to watch the video, and should be rewarded. 
+   // The placement parameter will include the reward data.
+   // When using server-to-server callbacks, you may ignore this event and wait for the ironSource server callback
+   @Override
+   public void onAdRewarded(Placement placement, AdInfo adInfo) {
+            aaa.runOnUiThread(new Runnable() {
+    @Override
+    public void run() {
+        // Your UI update logic goes here
+    handleReward();
+    }
+});
+
+   }
+   // The rewarded video ad was failed to show
+   @Override
+   public void onAdShowFailed(IronSourceError error, AdInfo adInfo) {}
+   // Invoked when the video ad was clicked. 
+   // This callback is not supported by all networks, and we recommend using it 
+   // only if it's supported by all networks you included in your build
+   @Override
+   public void onAdClicked(Placement placement, AdInfo adInfo) {}
+});
+
+
+//Rewarded Video
+IronSource.init(this, "1ede7878d", IronSource.AD_UNIT.REWARDED_VIDEO);
+//Init Interstitial 
+IronSource.init(this, "1ede7878d", IronSource.AD_UNIT.INTERSTITIAL); 
+//Init Banner
+IronSource.init(this, "1ede7878d", IronSource.AD_UNIT.BANNER);
+
+
+IntegrationHelper.validateIntegration(this);
+
+
+//IntegrationHelper.validateIntegration(this);
 
         adViewB = null;
         adSizeB = null;
@@ -614,6 +783,9 @@ IronSource.setMetaData("Google_Family_Self_Certified_SDKS","true");
         MobileAds.initialize(this, new OnInitializationCompleteListener() {
             @Override
             public void onInitializationComplete(InitializationStatus initializationStatus) {
+
+
+
             }
         });
         PlayGamesSdk.initialize(this);
