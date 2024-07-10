@@ -898,7 +898,7 @@ void StateLevel::render() const
 
 	if (_state != State::IDLE || !score.show_tps)
 	{
-		if (_song_info.acceleration_method != SongInfo::AccelerationMethod::ACCELERATION)
+		if (game->cfg->god_mode || _song_info.acceleration_method != SongInfo::AccelerationMethod::ACCELERATION)
 		{
 			score_tps.render();
 		}
