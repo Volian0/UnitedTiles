@@ -105,7 +105,9 @@ StateSongMenu::StateSongMenu(Game* game_)
                 song_panel.medal_level = 4;
             }
             auto score_string = std::to_string(score.reached_score);
-            if (song_id == 162)
+            if (song_id == 162 || song_id == 164
+            || song_id == 165 || song_id == 197 ||
+            song_id == 209 || song_id == 196)
             {
                 score_string.insert(score_string.size()-2, ".");
                 score_string += " T/s";
