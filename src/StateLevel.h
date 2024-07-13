@@ -23,6 +23,8 @@
 
 class StateLevel;
 
+inline constexpr bool halloween_theme = false;
+
 class LevelBackground : NonCopyable
 {
 	public:

@@ -45,7 +45,7 @@ LevelBackground::LevelBackground(StateLevel* level)
 	2,
 	2, 4,
 	0, 2},
-	backgrounds{Texture(level->game->renderer.get(), "bg1.png"), Texture(level->game->renderer.get(), "bg2.png"), Texture(level->game->renderer.get(), "bg3.png")}
+	backgrounds{Texture(level->game->renderer.get(), halloween_theme ? "bg1_a.png" : "bg1.png"), Texture(level->game->renderer.get(), halloween_theme ? "bg2_a.png" : "bg2.png"), Texture(level->game->renderer.get(), halloween_theme ? "bg3_a.png" : "bg3.png")}
 {
 	_dustmotes.dont_spawn = true;
 	_dustmotes_stars.dont_spawn = true;
@@ -73,6 +73,22 @@ void LevelBackground::update(Number delta_time)
 	_level->theme_tint.r = _alpha_second * 85.0L * 2.0L + _alpha_third * 85.0L;
 	//_level->theme_tint.g = 255.0L - _alpha_second * 85.0L - _alpha_third * (42.0L);
 	_level->theme_tint.g = 255.0L - _alpha_second * 85.0L + _alpha_third * (21.0L);
+
+	if (halloween_theme)
+	{
+		if (_state == 0)
+		{
+			_level->theme_tint = {255,128,32, 255};
+		}
+		else if (_state == 1)
+		{
+			_level->theme_tint = {128,32,128, 255};
+		}
+		else
+		{
+			_level->theme_tint = {255,128,32, 255};
+		}
+	}
 
 	_dustmotes.update(delta_time);
 	_dustmotes_stars.update(delta_time);
@@ -304,6 +320,10 @@ bool t_from_res)
 	txt_long_tile_end.blend_mode = 1;
 	txt_long_tile_circle.blend_mode = 1;
 	tile_divider.tint = { 200, 255, 255, 80 };
+	if (halloween_theme)
+	{
+	tile_divider.tint = { 200, 100, 0, 80 };
+	}
 
 	std::string soundfont_filename = "";
 	if (game->cfg->preferred_soundfont && game->cfg->preferred_soundfont <= extra_soundfonts.size())
