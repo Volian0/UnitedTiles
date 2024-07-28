@@ -64,8 +64,8 @@ StateSongMenu::StateSongMenu(Game* game_)
     {
         composer_names.emplace(composer_id, composer_info.name);
     }
-    std::array<uint16_t, 4> medal_n{0,0,0,0};
-    //std::array<uint16_t, 4> medal_n{100,100,100,100};
+    //std::array<uint16_t, 4> medal_n{0,0,0,0};
+    std::array<uint16_t, 4> medal_n{100,100,100,100};
     share_button.spanel = &spanel;
     for (const auto& [song_id, song_info] : song_database.songs_infos)
     {
@@ -156,12 +156,12 @@ StateSongMenu::StateSongMenu(Game* game_)
     spanel._state = this;
     spanel.position.x = 0.0L;
 
-    if (static_amount_of_diamonds == 2 && medal_n[1] == 3)
+    if (static_amount_of_diamonds == 1 && medal_n[3] == 2)
     {
         //show rating
         show_rating(); 
     }
-    static_amount_of_diamonds = medal_n[1]; 
+    static_amount_of_diamonds = medal_n[3]; 
 
     need_to_restore = true;
     tp_state_start = {};
