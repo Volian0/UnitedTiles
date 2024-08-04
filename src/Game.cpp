@@ -163,6 +163,10 @@ void Game::run()
 				{
 					_state->pressed_enter = true;
 				}
+				else if (sym == SDLK_ESCAPE)
+				{
+					std::quick_exit(0);
+				}
 				else
 				{
 					if (sym == SDLK_q || sym == SDLK_a || sym == SDLK_s || sym == SDLK_z)

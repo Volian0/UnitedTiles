@@ -22,7 +22,7 @@ SDL_DisplayMode DM;
 SDL_GetCurrentDisplayMode(0, &DM);
 auto height = DM.h;
 decltype(height) width = static_cast<long double>(height) * (9.0L / 16.0L);
-	_window = SDL_CreateWindow("United Tiles", 0, 0, (DM.w - width)/2, height, SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALWAYS_ON_TOP | SDL_WINDOW_OPENGL);
+	_window = SDL_CreateWindow("United Tiles", (DM.w - width)/2, 0, width, height, SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALWAYS_ON_TOP | SDL_WINDOW_OPENGL);
 #endif
 	_ptr = SDL_CreateRenderer(reinterpret_cast<SDL_Window*>(_window), -1, vsync ? SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC : SDL_RENDERER_ACCELERATED);
 	update_size();
