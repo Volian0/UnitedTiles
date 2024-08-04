@@ -24,6 +24,11 @@
 class StateLevel;
 
 inline constexpr bool halloween_theme = false;
+#ifdef __ANDROID__
+inline constexpr bool pc_controls = false;
+#else
+inline constexpr bool pc_controls = true;
+#endif
 
 class LevelBackground : NonCopyable
 {
@@ -174,6 +179,10 @@ public:
 
 	constexpr Number get_miss_range() const noexcept
 	{
+		if constexpr (pc_controls)
+		{
+			return 2.5L + 0.1L + tps * 0.1L;
+		}
 		return 0.1L + tps * 0.1L;
 	}
 

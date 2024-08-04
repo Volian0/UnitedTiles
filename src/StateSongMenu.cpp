@@ -83,11 +83,11 @@ StateSongMenu::StateSongMenu(Game* game_)
             {},
             0,
             song_id,
-            !song_info.leaderboard_id.empty() ? DevButton{{get_x_pos(414 + (144/2 - 64/2)), 0}, get_x_size(64), 0, "", &_dev_button_texture, &font32, this, 0.0625L * 0.75L} : DevButton{{get_x_pos(414), 0}, get_x_size(144), 0, (last_song && *last_song == song_id) ? "Replay" : "Play", &_dev_button_texture, &font32, this, 0.0625L * 0.75L},
+            !song_info.leaderboard_id.empty() && !pc_controls ? DevButton{{get_x_pos(414 + (144/2 - 64/2)), 0}, get_x_size(64), 0, "", &_dev_button_texture, &font32, this, 0.0625L * 0.75L} : DevButton{{get_x_pos(414), 0}, get_x_size(144), 0, (last_song && *last_song == song_id) ? "Replay" : "Play", &_dev_button_texture, &font32, this, 0.0625L * 0.75L},
             song_info.unlockable_type,
             song_info.unlockable_amount 
         });
-        if (!song_info.leaderboard_id.empty())
+        if (!song_info.leaderboard_id.empty() && !pc_controls)
         {
             song_panel.leaderboard_button.emplace(Vec2{get_x_pos(414 - (144/2 - 64/2)), 0}, get_x_size(64), 0, "", &_dev_button_texture, &font32, this, 0.0625L * 0.75L);
             song_panel.leaderboard_button->spanel = &spanel;

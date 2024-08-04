@@ -152,7 +152,7 @@ void Game::run()
 			{
 				_state->key_events = event.text.text;
 			}
-			else if (event.type == SDL_KEYDOWN)
+			else if (event.type == SDL_KEYDOWN && !event.key.repeat)
 			{
 				const auto sym = event.key.keysym.sym;
 				if (sym == SDLK_BACKSPACE)
@@ -163,6 +163,53 @@ void Game::run()
 				{
 					_state->pressed_enter = true;
 				}
+				else
+				{
+					if (sym == SDLK_q || sym == SDLK_a || sym == SDLK_s || sym == SDLK_z)
+					{
+						_state->touch_events.emplace_back(TouchEvent{
+							TouchEvent::Type::DOWN, 666, Vec2{-0.75,0.25}});
+					}
+					else if (sym == SDLK_e || sym == SDLK_d|| sym == SDLK_f || sym == SDLK_c)
+					{
+						_state->touch_events.emplace_back(TouchEvent{
+							TouchEvent::Type::DOWN, 667, Vec2{-0.25,0.250}});
+					}
+					else if (sym == SDLK_i || sym == SDLK_j|| sym == SDLK_h || sym == SDLK_b)
+					{
+						_state->touch_events.emplace_back(TouchEvent{
+							TouchEvent::Type::DOWN, 668, Vec2{0.25,0.250}});
+					}
+					else if (sym == SDLK_p || sym == SDLK_l|| sym == SDLK_k || sym == SDLK_m)
+					{
+						_state->touch_events.emplace_back(TouchEvent{
+							TouchEvent::Type::DOWN, 669, Vec2{0.75,0.250}});
+					}
+				}
+			}
+			else if (event.type == SDL_KEYUP && !event.key.repeat)
+			{
+				const auto sym = event.key.keysym.sym;
+					if (sym == SDLK_q || sym == SDLK_a || sym == SDLK_s || sym == SDLK_z)
+					{
+						_state->touch_events.emplace_back(TouchEvent{
+							TouchEvent::Type::UP, 666, Vec2{-0.75,0.250}});
+					}
+					else if (sym == SDLK_e || sym == SDLK_d|| sym == SDLK_f || sym == SDLK_c)
+					{
+						_state->touch_events.emplace_back(TouchEvent{
+							TouchEvent::Type::UP, 667, Vec2{-0.25,0.250}});
+					}
+					else if (sym == SDLK_i || sym == SDLK_j|| sym == SDLK_h || sym == SDLK_b)
+					{
+						_state->touch_events.emplace_back(TouchEvent{
+							TouchEvent::Type::UP, 668, Vec2{0.25,0.250}});
+					}
+					else if (sym == SDLK_p || sym == SDLK_l|| sym == SDLK_k || sym == SDLK_m)
+					{
+						_state->touch_events.emplace_back(TouchEvent{
+							TouchEvent::Type::UP, 669, Vec2{0.75,0.250}});
+					}
 			}
 		}
 

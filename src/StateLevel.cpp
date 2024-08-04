@@ -390,6 +390,18 @@ bool t_from_res)
 		}
 		save_score = false;
 	}
+
+	if constexpr (pc_controls)
+	{
+		for (auto& tile : _song_info.tiles)
+		{
+			if (tile.type == TileInfo::Type::SLIDER)
+			{
+				tile.type = TileInfo::Type::LONG;
+			}
+		}
+	}
+
 	if (game->cfg->starting_tps)
 	{
 		save_score = false;
