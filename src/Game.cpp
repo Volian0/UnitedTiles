@@ -153,6 +153,10 @@ void Game::run()
 			{
 				_state->key_events = event.text.text;
 			}
+			else if (event.type == SDL_MOUSEWHEEL)
+			{
+				_state->scrolling_force += glm::sign(event.wheel.preciseY);
+			}
 			else if (event.type == SDL_KEYDOWN && !event.key.repeat)
 			{
 				const auto sym = event.key.keysym.sym;
@@ -277,6 +281,7 @@ void Game::run()
 		_state->key_events.clear();
 		_state->pressed_backspace = false;
 		_state->pressed_enter = false;
+		_state->scrolling_force = 0.0F;
 
 		//check for SDL errors
 		std::string sdlerror(SDL_GetError());

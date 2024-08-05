@@ -724,7 +724,7 @@ void StateLevel::update()
 		{
 			return revive();
 		}
-		else if (revive_yes.update())
+		else if (revive_yes.update() || pressed_enter)
 		{
 			if (revive_seconds) //SHOW AD
 			{
@@ -736,7 +736,7 @@ void StateLevel::update()
 				return revive();
 			}
 		}
-		else if (revive_no.update())
+		else if (revive_no.update() || pressed_backspace)
 		{
 			if (game->cfg->show_interstitial_ads && game->ad_manager.can_show_big_ad() && !perfect_score)
 			{

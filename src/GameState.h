@@ -34,6 +34,7 @@ public:
 	std::string key_events;
 	bool pressed_backspace = false;
 	bool pressed_enter = false;
+	float scrolling_force = 0.0F;
 
 	//bool thread_safe = false;
 

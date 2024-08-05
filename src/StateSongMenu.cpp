@@ -9,6 +9,8 @@
 #include "RNG.h"
 #include "StateSettings.h"
 
+#include <SDL.h>
+
 #include <algorithm>
 #include <map>
 #include <string_view>
@@ -31,9 +33,9 @@ StateSongMenu::StateSongMenu(Game* game_)
     settings_gear{game->renderer.get(), "gear.png"},
     glass_icon{game->renderer.get(), "glass.png"},
     settings_button{Vec2{get_x_pos(482.0L), 0.0L}, get_x_size(40.0L), 0, " ", &_dev_button_texture, &font24, this, 0.0625L * 0.625L},
-    share1{"Share the game with friends", 1.0L, Vec2{get_x_pos(106-72), 0}, {-1.0L, 0.0L}, &font32, game->renderer.get()},
-    share2{"and compete in the leaderboards!", 1.0L, Vec2{get_x_pos(106-72), 0}, {-1.0L, 0.0L}, &font24, game->renderer.get()},
-    share_button{{get_x_pos(414), 0}, get_x_size(144), 0, "Share", &_dev_button_texture, &font32, this, 0.0625L * 0.75L}
+    share1{pc_controls? "Donate to support the game!" : "Share the game with friends", 1.0L, Vec2{get_x_pos(106-72), 0}, {-1.0L, 0.0L}, &font32, game->renderer.get()},
+    share2{pc_controls? "Any amount is appreciated!" : "and compete in the leaderboards!", 1.0L, Vec2{get_x_pos(106-72), 0}, {-1.0L, 0.0L}, &font24, game->renderer.get()},
+    share_button{{get_x_pos(414), 0}, get_x_size(144), 0,pc_controls? "Donate" :  "Share", &_dev_button_texture, &font32, this, 0.0625L * 0.75L}
 {
     game->audio->unload_soundfont();
     //game->play_music();
@@ -291,6 +293,7 @@ void StateSongMenu::update()
     //next, let's set the perfect positions for everything
     uint32_t current_y_pixel_position = 118;
     uint16_t current_song_index = 0;
+    spanel.set_offset(spanel.get_offset() + scrolling_force * 0.5F);
     const Number scroll_offset = spanel.get_offset();
     last_position = scroll_offset;
 
@@ -378,7 +381,11 @@ void StateSongMenu::update()
 
     if (share_button.update())
     {
-        share_game();
+        if constexpr (pc_controls)
+        {
+            SDL_OpenURL("https://paypal.me/volian0");
+        }
+        else share_game();
     }
 
     need_to_restore = false;
