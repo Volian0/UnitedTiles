@@ -163,6 +163,15 @@ bool t_from_res)
 	revive_yes{Vec2{}, 0.5L, 0, "Revive",  &_dev_button_texture, &_debug_font, this},
 	revive_no{Vec2{}, 0.5L, 0, "Exit",  &_dev_button_texture, &_debug_font, this}
 {
+
+	if (pc_controls)
+	{
+		pc_keys.emplace_back(std::make_unique<Texture>(game->renderer.get(), &_debug_font, std::string{"D"}, Color{Colors::WHITE}));
+		pc_keys.emplace_back(std::make_unique<Texture>(game->renderer.get(), &_debug_font, std::string{"F"}, Color{Colors::WHITE}));
+		pc_keys.emplace_back(std::make_unique<Texture>(game->renderer.get(), &_debug_font, std::string{"J"}, Color{Colors::WHITE}));
+		pc_keys.emplace_back(std::make_unique<Texture>(game->renderer.get(), &_debug_font, std::string{"K"}, Color{Colors::WHITE}));
+	}
+
 	    game->stop_music();
 	_dev_button_texture.blend_mode = 1;
 	//std::cout << "wow" << std::endl;
@@ -587,6 +596,10 @@ void StateLevel::update()
 	new_tp = Timepoint();
 
 	Number delta_time = new_tp - _old_tp;
+	if (delta_time > 1.0L && _state == State::ACTIVE)
+	{
+		return game->change_state<StateSongMenu>();
+	}
 	_burst.update(delta_time * tps * 0.25L);
 	lv_bg.update(delta_time);
 	set_theme_tint(theme_tint);
@@ -977,6 +990,14 @@ void StateLevel::render() const
 		}
 		revive_yes.render();
 		revive_no.render();
+	}
+
+	if (pc_controls)
+	{
+		game->renderer->render(pc_keys[0].get(), {}, pc_keys[0]->get_psize(), Vec2{-0.75L, 0.25L}, pc_keys[0]->get_rsize() * 1.25L, {}); 
+		game->renderer->render(pc_keys[1].get(), {}, pc_keys[1]->get_psize(), Vec2{-0.25L, 0.25L}, pc_keys[1]->get_rsize() * 1.25L, {}); 
+		game->renderer->render(pc_keys[2].get(), {}, pc_keys[2]->get_psize(), Vec2{0.25L, 0.25L}, pc_keys[2]->get_rsize() * 1.25L, {}); 
+		game->renderer->render(pc_keys[3].get(), {}, pc_keys[3]->get_psize(), Vec2{0.75L, 0.25L}, pc_keys[3]->get_rsize() * 1.25L, {}); 
 	}
 }
 

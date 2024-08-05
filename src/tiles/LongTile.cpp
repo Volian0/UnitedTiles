@@ -109,7 +109,7 @@ void LongTile::on_changed_state()
 	{
 		_level->queue_notes(get_info().note_events);
 		//tp_tapped = _level->new_tp;
-		y_tapped = y_offset - y_finger_tapped;
+		y_tapped = y_offset - std::max(y_finger_tapped, 0.0L);
 
 		//add taps here
 		{

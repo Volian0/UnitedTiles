@@ -24,6 +24,7 @@
 #include <chrono>
 #include <filesystem>
 #include <iostream>
+#include <cstdlib>
 
 Game::Game(std::string_view t_song_filename)
 {
@@ -165,33 +166,33 @@ void Game::run()
 				}
 				else if (sym == SDLK_ESCAPE)
 				{
-					std::quick_exit(0);
+					std::exit(0);
 				}
-				else
+				else if (pc_controls)
 				{
-					if (sym == SDLK_q || sym == SDLK_a || sym == SDLK_s || sym == SDLK_z)
+					if (sym == SDLK_q || sym == SDLK_d || sym == SDLK_s || sym == SDLK_z)
 					{
 						_state->touch_events.emplace_back(TouchEvent{
-							TouchEvent::Type::DOWN, 666, Vec2{-0.75,0.25}});
+							TouchEvent::Type::DOWN, 666, Vec2{-0.75,0.0}});
 					}
-					else if (sym == SDLK_e || sym == SDLK_d|| sym == SDLK_f || sym == SDLK_c)
+					else if (sym == SDLK_e || sym == SDLK_f|| sym == SDLK_g || sym == SDLK_c)
 					{
 						_state->touch_events.emplace_back(TouchEvent{
-							TouchEvent::Type::DOWN, 667, Vec2{-0.25,0.250}});
+							TouchEvent::Type::DOWN, 667, Vec2{-0.25,0.0}});
 					}
 					else if (sym == SDLK_i || sym == SDLK_j|| sym == SDLK_h || sym == SDLK_b)
 					{
 						_state->touch_events.emplace_back(TouchEvent{
-							TouchEvent::Type::DOWN, 668, Vec2{0.25,0.250}});
+							TouchEvent::Type::DOWN, 668, Vec2{0.25,0.0}});
 					}
-					else if (sym == SDLK_p || sym == SDLK_l|| sym == SDLK_k || sym == SDLK_m)
+					else if (sym == SDLK_p || sym == SDLK_k|| sym == SDLK_l || sym == SDLK_m)
 					{
 						_state->touch_events.emplace_back(TouchEvent{
-							TouchEvent::Type::DOWN, 669, Vec2{0.75,0.250}});
+							TouchEvent::Type::DOWN, 669, Vec2{0.75,0.0}});
 					}
 				}
 			}
-			else if (event.type == SDL_KEYUP && !event.key.repeat)
+			else if (event.type == SDL_KEYUP && !event.key.repeat && pc_controls)
 			{
 				const auto sym = event.key.keysym.sym;
 					if (sym == SDLK_q || sym == SDLK_a || sym == SDLK_s || sym == SDLK_z)

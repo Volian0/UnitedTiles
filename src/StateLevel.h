@@ -181,7 +181,7 @@ public:
 	{
 		if constexpr (pc_controls)
 		{
-			return 2.5L + 0.1L + tps * 0.1L;
+			return 2.0L;
 		}
 		return 0.1L + tps * 0.1L;
 	}
@@ -239,4 +239,6 @@ private:
 	std::string scoreboard_id;
 
 	void game_over(Tile*);
+
+	std::vector<std::unique_ptr<Texture>> pc_keys;
 };
