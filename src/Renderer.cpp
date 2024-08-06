@@ -44,6 +44,12 @@ void Renderer::display()
 	SDL_RenderPresent(reinterpret_cast<SDL_Renderer*>(_ptr));
 }
 
+void Renderer::minimize()
+{
+	auto window = reinterpret_cast<SDL_Window*>(_window);
+	SDL_MinimizeWindow(window);
+}
+
 void Renderer::reload(bool recreate)
 {
 	std::cout << "Reloading renderer" << std::endl;

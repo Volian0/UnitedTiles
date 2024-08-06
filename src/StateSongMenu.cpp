@@ -384,6 +384,7 @@ void StateSongMenu::update()
         if constexpr (pc_controls)
         {
             SDL_OpenURL("https://paypal.me/volian0");
+            game->renderer->minimize();
         }
         else share_game();
     }

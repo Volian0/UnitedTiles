@@ -172,7 +172,7 @@ void Game::run()
 				{
 					std::exit(0);
 				}
-				else if (pc_controls)
+				else if (pc_controls && dynamic_cast<StateLevel*>(_state.get()))
 				{
 					if (sym == SDLK_q || sym == SDLK_d || sym == SDLK_s || sym == SDLK_z)
 					{
@@ -196,7 +196,7 @@ void Game::run()
 					}
 				}
 			}
-			else if (event.type == SDL_KEYUP && !event.key.repeat && pc_controls)
+			else if (event.type == SDL_KEYUP && !event.key.repeat && pc_controls && dynamic_cast<StateLevel*>(_state.get()))
 			{
 				const auto sym = event.key.keysym.sym;
 					if (sym == SDLK_q || sym == SDLK_a || sym == SDLK_s || sym == SDLK_z)

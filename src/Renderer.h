@@ -22,6 +22,8 @@ public:
 	void display();
 	void reload(bool recreate);
 
+	void minimize();
+
 	void render(Texture* texture, glm::u32vec2 src_pos, glm::u32vec2 src_size,
 		Vec2 dest_pos, Vec2 dest_size,
 		Vec2 rot_origin,
