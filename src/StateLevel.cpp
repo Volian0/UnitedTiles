@@ -628,7 +628,7 @@ void StateLevel::update()
 
 	if (game_over_reset.has_value() && new_tp - game_over_reset.value() > 2.0L)
 	{
-		if (_song_info.acceleration_method != SongInfo::AccelerationMethod::ACCELERATION && can_be_revived /*&& game->ad_manager.can_show_rewarded_ad()*/)
+		if (!game->cfg->god_mode && _song_info.acceleration_method != SongInfo::AccelerationMethod::ACCELERATION && can_be_revived && score.get_score() >= 50 /*&& game->ad_manager.can_show_rewarded_ad()*/)
 		{
 			//game_over_reset.reset();
 			if (!revive_tp.has_value())
