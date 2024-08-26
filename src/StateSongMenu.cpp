@@ -23,8 +23,8 @@ StateSongMenu::StateSongMenu(Game* game_)
 	:GameState(game_),
     _dev_button_texture{game->renderer.get(), "dev_button.png"},
     txt_white{game->renderer.get(), "white.png"},
-    font32{game->renderer.get(), "roboto.ttf", 6.25L * 0.75L},
-    font24{game->renderer.get(), "roboto.ttf", 4.6875L * 0.75L},
+    font32{game->renderer.get(), "robotoc.ttf", 6.25L * 0.75L},
+    font24{game->renderer.get(), "robotoc.ttf", 4.6875L * 0.75L},
         txt_icons{game->renderer.get(), "misc_icons.png"},
 
     //font16{game->renderer.get(), "roboto.ttf", 3.125L * 0.75L},
