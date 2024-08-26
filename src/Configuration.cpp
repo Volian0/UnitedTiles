@@ -43,6 +43,7 @@ void Configuration::load_from_file()
 	menu_music = read_u8(*file).value_or(1);   
 	reload_renderer = read_u8(*file).value_or(1);   
 	starting_tps = read_u8(*file).value_or(0);   
+	pc_user = read_u8(*file).value_or(1);   
 }
 
 void Configuration::save_to_file() const
@@ -72,6 +73,7 @@ void Configuration::save_to_file() const
 		write_u8(*file, menu_music);
 		write_u8(*file, reload_renderer);
 		write_u8(*file, starting_tps);
+		write_u8(*file, pc_user);
 		file->close();
 		if (!file.value())
 		{

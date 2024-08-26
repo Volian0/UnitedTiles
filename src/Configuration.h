@@ -32,6 +32,5 @@ public:
 	bool menu_music = true;
 	bool reload_renderer = true;
 	std::uint8_t starting_tps{0};
-	//constexpr static bool show_banner_ads = false;
-	//constexpr static bool show_interstitial_ads = false;
+	bool pc_user = true;
 };

@@ -164,7 +164,7 @@ bool t_from_res)
 	revive_no{Vec2{}, 0.5L, 0, "Exit",  &_dev_button_texture, &_debug_font, this}
 {
 
-	if (pc_controls)
+	if (pc_controls &&game->cfg->pc_user)
 	{
 		pc_keys.emplace_back(std::make_unique<Texture>(game->renderer.get(), &_debug_font, std::string{"D"}, Color{Colors::WHITE}));
 		pc_keys.emplace_back(std::make_unique<Texture>(game->renderer.get(), &_debug_font, std::string{"F"}, Color{Colors::WHITE}));
@@ -400,7 +400,7 @@ bool t_from_res)
 		save_score = false;
 	}
 
-	if constexpr (pc_controls)
+	if (pc_controls &&game->cfg->pc_user)
 	{
 		for (auto& tile : _song_info.tiles)
 		{
@@ -590,6 +590,15 @@ void StateLevel::set_theme_tint(Color t_tint)
 	txt_long_tile_end.tint = t_tint;
 	_burst._texture.tint = t_tint;
 }
+
+	Number StateLevel::get_miss_range() const noexcept
+	{
+		if (pc_controls && game->cfg->pc_user)
+		{
+			return 2.0L;
+		}
+		return 0.1L + tps * 0.1L;
+	}
 
 void StateLevel::update()
 {
@@ -992,7 +1001,7 @@ void StateLevel::render() const
 		revive_no.render();
 	}
 
-	if (pc_controls)
+	if (pc_controls &&game->cfg->pc_user)
 	{
 		game->renderer->render(pc_keys[0].get(), {}, pc_keys[0]->get_psize(), Vec2{-0.75L, 0.25L}, pc_keys[0]->get_rsize() * 1.25L, {}); 
 		game->renderer->render(pc_keys[1].get(), {}, pc_keys[1]->get_psize(), Vec2{-0.25L, 0.25L}, pc_keys[1]->get_rsize() * 1.25L, {}); 

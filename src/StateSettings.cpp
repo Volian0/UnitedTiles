@@ -44,8 +44,12 @@ StateSettings::StateSettings(Game* game_)
 
 
 	//ONLY TEMPORARY, UNCOMMENT FOR PRODUCTION
+	#ifdef __ANDROID__
 	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Support the game by banner ads", game->renderer.get()), std::forward_as_tuple(game->cfg->show_banner_ads));
 	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Support the game by game over ads", game->renderer.get()), std::forward_as_tuple(game->cfg->show_interstitial_ads));
+	#else
+		check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "PC controls", game->renderer.get()), std::forward_as_tuple(game->cfg->pc_user));
+	#endif
 	//check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Revive Music", game->renderer.get()), std::forward_as_tuple(game->cfg->menu_music));
 	check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "Reload renderer on resize", game->renderer.get()), std::forward_as_tuple(game->cfg->reload_renderer));
 	//check_boxes.emplace_back(std::piecewise_construct, std::forward_as_tuple(&cb_u, &cb_c, &_font, "PT2 Acceleration", game->renderer.get()), std::forward_as_tuple(game->cfg->use_pt2_method));
@@ -155,11 +159,13 @@ void StateSettings::render() const
 	_b_starting_tps.render();
 
 		//ONLY TEMPORARY, UNCOMMENT FOR PRODUCTION
+		#ifdef __ANDROID__
 	if (!game->cfg->show_banner_ads || !game->cfg->show_interstitial_ads
 	|| !check_boxes[3].first._checked || !check_boxes[4].first._checked)
 	{
 		ad_hint.render(game->renderer.get()); 
 	}
+	#endif
 
 	scrollable_panel.stop_rendering();
 }

@@ -177,14 +177,7 @@ public:
 
 	bool can_be_revived = true;
 
-	constexpr Number get_miss_range() const noexcept
-	{
-		if constexpr (pc_controls)
-		{
-			return 2.0L;
-		}
-		return 0.1L + tps * 0.1L;
-	}
+	Number get_miss_range() const noexcept;
 
 	BurstParticles _burst;
 
