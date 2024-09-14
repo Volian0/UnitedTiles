@@ -53,6 +53,8 @@ private:
 	SongDatabase song_database;
 	SongUserDatabase song_user_database;
 
+    bool discord_message;
+
     Font font32;
     Font font24;
     std::array<std::optional<Label>, 4> medals_texts;

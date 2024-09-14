@@ -21,6 +21,7 @@ std::optional<std::uint16_t> StateSongMenu::last_song{};
 
 StateSongMenu::StateSongMenu(Game* game_)
 	:GameState(game_),
+    discord_message{RNG::boolean()},
     _dev_button_texture{game->renderer.get(), "dev_button.png"},
     txt_white{game->renderer.get(), "white.png"},
     font32{game->renderer.get(), "robotoc.ttf", 6.25L * 0.75L},
@@ -33,9 +34,9 @@ StateSongMenu::StateSongMenu(Game* game_)
     settings_gear{game->renderer.get(), "gear.png"},
     glass_icon{game->renderer.get(), "glass.png"},
     settings_button{Vec2{get_x_pos(482.0L), 0.0L}, get_x_size(40.0L), 0, " ", &_dev_button_texture, &font24, this, 0.0625L * 0.625L},
-    share1{pc_controls? "Donate to support the game!" : "Share the game with friends", 1.0L, Vec2{get_x_pos(106-72), 0}, {-1.0L, 0.0L}, &font32, game->renderer.get()},
-    share2{pc_controls? "Any amount is appreciated!" : "and compete in the leaderboards!", 1.0L, Vec2{get_x_pos(106-72), 0}, {-1.0L, 0.0L}, &font24, game->renderer.get()},
-    share_button{{get_x_pos(414), 0}, get_x_size(144), 0,pc_controls? "Donate" :  "Share", &_dev_button_texture, &font32, this, 0.0625L * 0.75L}
+    share1{discord_message ? "Wanna hang out?" : (pc_controls? "Donate to support the game!" : "Share the game with friends"), 1.0L, Vec2{get_x_pos(106-72), 0}, {-1.0L, 0.0L}, &font32, game->renderer.get()},
+    share2{discord_message ? "Join our Discord!" : (pc_controls? "Any amount is appreciated!" : "and compete in the leaderboards!"), 1.0L, Vec2{get_x_pos(106-72), 0}, {-1.0L, 0.0L}, &font24, game->renderer.get()},
+    share_button{{get_x_pos(414), 0}, get_x_size(144), 0,discord_message ? "Join" : (pc_controls? "Donate" :  "Share"), &_dev_button_texture, &font32, this, 0.0625L * 0.75L}
 {
     game->audio->unload_soundfont();
     //game->play_music();
@@ -381,7 +382,12 @@ void StateSongMenu::update()
 
     if (share_button.update())
     {
-        if constexpr (pc_controls)
+        if (discord_message)
+        {
+            SDL_OpenURL("https://discord.gg/PpNgM9exT8");
+            game->renderer->minimize();
+        }
+        else if (pc_controls)
         {
             SDL_OpenURL("https://paypal.me/volian0");
             game->renderer->minimize();

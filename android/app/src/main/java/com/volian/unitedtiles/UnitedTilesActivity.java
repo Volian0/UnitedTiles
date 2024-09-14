@@ -559,7 +559,7 @@ IronSource.setMetaData("Google_Family_Self_Certified_SDKS","true");
 
 
 //GOOGLE GDPR START
-
+/*
 
     // Create a ConsentRequestParameters object.
     ConsentRequestParameters params = new ConsentRequestParameters
@@ -588,7 +588,7 @@ IronSource.setMetaData("Google_Family_Self_Certified_SDKS","true");
 
         });
 
-
+*/
 //GOOGLE GDPR END
 
 
